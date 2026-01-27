@@ -1,0 +1,876 @@
+[
+    {
+        "name": "Spirit Blade",
+        "school": "balance",
+        "type": "charm",
+        "pips": 1,
+        "description": "Applies +35% Death, Myth, and Life Damage Blades",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "school": "death", "amount": 35, "target": "ally_same"},
+            {"type": "charm", "aspect": "damage", "school": "myth", "amount": 35, "target": "ally_same"},
+            {"type": "charm", "aspect": "damage", "school": "life", "amount": 35, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Spirit_Blade.png",
+        "id": "spirit_blade",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Reshuffle",
+        "school": "balance",
+        "type": "manipulation",
+        "pips": 4,
+        "description": "Reshuffles all used or discarded cards back into the deck",
+        "effects": [
+            {"type": "reshuffle"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Reshuffle.png",
+        "id": "reshuffle",
+        "accuracy": 100,
+        "reshuffle": false
+    },
+    {
+        "name": "Scorpion",
+        "school": "balance",
+        "type": "damage",
+        "pips": 2,
+        "description": "Deals 160-200 Balance Damage",
+        "effects": [
+            {"type": "damage", "school": "balance", "min": 160, "max": 200}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Scorpion.png",
+        "id": "scorpion",
+        "accuracy": 85
+    },
+    {
+        "name": "Locust Swarm",
+        "school": "balance",
+        "type": "damage",
+        "pips": 3,
+        "description": "Deals 245-305 Balance Damage",
+        "effects": [
+            {"type": "damage", "school": "balance", "min": 245, "max": 305}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Locust_Swarm.png",
+        "id": "locust_swarm",
+        "accuracy": 85
+    },
+    {
+        "name": "Balance of Power",
+        "school": "balance",
+        "type": "global",
+        "pips": 2,
+        "description": "Applies a +25% Balance Damage Global",
+        "effects": [
+            {"type": "global", "aspect": "damage", "school": "balance", "amount": 25}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Balance_of_Power.png",
+        "id": "balance_of_power",
+        "accuracy": 100,
+        "pvp_level": 22
+    },
+    {
+        "name": "Dyvim's Resurgence",
+        "school": "balance",
+        "type": "damage",
+        "pips": {"regular": 2, "balance": 1},
+        "description": "Deals 315 Balance Damage to and a -60% Healing Ward and +30% Damage Ward on target",
+        "effects": [
+            {"type": "damage", "school": "balance", "amount": 315, "target": "enemy_same"},
+            {"type": "jinx", "aspect": "heal", "amount": -60, "target": "enemy_same"},
+            {"type": "trap", "amount": 30, "target": "enemy_same"}
+
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Dyvim's_Resurgence.png",
+        "id": "dyvim's_resurgence",
+        "accuracy": 85,
+        "pvp_level": 30
+    },
+    {
+        "name": "Blade Dilution",
+        "school": "balance",
+        "type": "manipulation",
+        "pips": 1,
+        "description": "Removes up to four helpful Charms from target to apply a +15% Blade on target per Charm removed",
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 4, 
+                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "charm_positive", "target": "ally"},
+                    {"type": "charm", "aspect": "damage", "amount": 15, "target": "enemy"}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Blade_Dilution.png",
+        "id": "blade_dilution",
+        "accuracy": 100,
+        "pvp_level": 40
+    },
+    {
+        "name": "Spirit Trap",
+        "school": "balance",
+        "type": "jinx",
+        "pips": 1,
+        "description": "Applies +30% Death, Myth, and Life Damage Wards",
+        "effects": [
+            {"type": "jinx", "school": "death", "amount": 30, "target": "enemy_same"},
+            {"type": "jinx", "school": "myth", "amount": 30, "target": "enemy_same"},
+            {"type": "jinx", "school": "life", "amount": 30, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Spirit_Trap.png",
+        "id": "spirit_trap",
+        "accuracy": 100
+    },
+    {
+        "name": "Elemental Defuse",
+        "school": "balance",
+        "type": "curse",
+        "pips": 5,
+        "description": "Applies Fire, Ice, and Storm Dispel Charms",
+        "effects": [
+            {"type": "curse", "aspect": "dispel", "school": "fire", "target": "enemy_same"},
+            {"type": "curse", "aspect": "dispel", "school": "ice", "target": "enemy_same"},
+            {"type": "curse", "aspect": "dispel", "school": "storm", "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Elemental_Defuse.png",
+        "id": "elemental_defuse",
+        "accuracy": 100,
+        "pvp_level": 35
+    },
+    {
+        "name": "Spirit Defuse",
+        "school": "balance",
+        "type": "curse",
+        "pips": 5,
+        "description": "Applies Life, Death, and Myth Dispel Charms",
+        "effects": [
+            {"type": "curse", "aspect": "dispel", "school": "life", "target": "enemy_same"},
+            {"type": "curse", "aspect": "dispel", "school": "death", "target": "enemy_same"},
+            {"type": "curse", "aspect": "dispel", "school": "myth", "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Spirit_Defuse.png",
+        "id": "spirit_defuse",
+        "accuracy": 100,
+        "pvp_level": 35
+    },
+    {
+        "name": "Spinning Scythe",
+        "school": "balance",
+        "type": "damage",
+        "pips": 5,
+        "description": "Deals 470 Balance Damage",
+        "effects": [
+            {"type": "damage", "school": "balance", "amount": 470}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Spinning_Scythe.png",
+        "id": "spinning_scythe",
+        "accuracy": 85,
+        "pvp_level": 72
+    },
+    {
+        "name": "Elemental Golem",
+        "school": "balance",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 245-305 Balance Damage to target and applies -50% Storm, Fire, and Ice Damage Wards on caster",
+        "effects": [
+            {"type": "damage", "school": "balance", "min": 245, "max": 305},
+            {"type": "ward", "aspect": "damage", "school": "storm", "amount": -50, "target": "self"},
+            {"type": "ward", "aspect": "damage", "school": "fire", "amount": -50, "target": "self"},
+            {"type": "ward", "aspect": "damage", "school": "ice", "amount": -50, "target": "self"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Elemental_Golem.png",
+        "id": "elemental_golem",
+        "accuracy": 85
+    },
+    {
+        "name": "Terminus' Strike",
+        "school": "balance",
+        "type": "damage",
+        "pips": 8,
+        "description": "Removes up to seven harmful Charms from caster to apply up to seven -15% Damage Charms on caster, then deals 645 Balance Damage to target",
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 7, 
+                "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "self"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "curse", "target": "self"},
+                    {"type": "curse", "aspect": "damage", "amount": -15, "target": "self"}
+                ]
+            },
+            {"type": "damage", "school": "balance", "amount": 645}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Terminus'_Strike.png",
+        "id": "terminus'_strike",
+        "accuracy": 85
+    },
+    {
+        "name": "Courageous Charge",
+        "school": "balance",
+        "type": "damage",
+        "pips": 2,
+        "description": "Deals 130 Balance Damage to target and applies a +20% outgoing Armor Piercing Aura on caster for 4 Rounds if target has a helpful Aura",
+        "effects": [
+            {
+                "type": "gambit", 
+                "condition": {"type": "amount", "aspect": "aura_positive", "amount": 1, "target": "enemy"}, 
+                "true": [
+                    {"type": "damage", "school": "balance", "amount": 130},
+                    {"type": "aura", "aspect": "armor_piercing", "amount": 20, "rounds": 4, "target": "self"}
+                ], 
+                "false": [
+                    {"type": "damage", "school": "balance", "amount": 130}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Courageous_Charge.png",
+        "id": "courageous_charge",
+        "accuracy": 85,
+        "pvp_level": 75
+    },
+    {
+        "name": "Duststorm Jinn",
+        "school": "balance",
+        "type": "damage",
+        "pips": 9,
+        "description": "Deals 285 Storm, Fire, and Ice Damage to target, or removes two helpful Wards from caster and two harmful Wards from target to deal 480 Storm, Fire, and Ice Damage",
+        "effects": [
+            {
+                "type": "gambit", 
+                "condition": [
+                    {"type": "amount", "aspect": "ward_positive", "amount": 2, "target": "self"},
+                    {"type": "amount", "aspect": "ward_negative", "amount": 2, "target": "enemy"}
+                ], 
+                "true": [
+                    {"type": "destroy", "aspect": "ward_positive", "target": "self", "times": 2},
+                    {"type": "destroy", "aspect": "ward_negative", "target": "enemy_same", "times": 2},
+                    {"type": "damage", "school": "storm", "amount": 480, "target": "enemy_same"},
+                    {"type": "damage", "school": "fire", "amount": 480, "target": "enemy_same"},
+                    {"type": "damage", "school": "ice", "amount": 480, "target": "enemy_same"}
+                ], 
+                "false": [
+                    {"type": "damage", "school": "storm", "amount": 285, "target": "enemy_same"},
+                    {"type": "damage", "school": "fire", "amount": 285, "target": "enemy_same"},
+                    {"type": "damage", "school": "ice", "amount": 285, "target": "enemy_same"}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Duststorm_Jinn.png",
+        "id": "duststorm_jinn",
+        "accuracy": 80
+    },
+    {
+        "name": "Oni's Shadow",
+        "school": "balance",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Applies a +25% Damage Blade on caster if target has a helpful Charm (max 2), and applies a -25% Damage Charm on target if caster has a harmful Charm (max 2)",
+        "condition": {"OR": [
+            {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "self"},
+            {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}
+        ]},
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 2, 
+                "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "self"}, 
+                "effects": [
+                    {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy_same"}
+                ]
+            },
+            {
+                "type": "repeat", 
+                "up_to": 2, 
+                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}, 
+                "effects": [
+                    {"type": "charm", "aspect": "damage", "amount": 25, "target": "self"}
+                ]
+            }
+            
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Oni's_Shadow.png",
+        "id": "oni's_shadow",
+        "accuracy": 100,
+        "pvp_level": 100
+    },
+    {
+        "name": "Black Mantle",
+        "school": "balance",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a -45% Accuracy Charm",
+        "effects": [
+            {"type": "charm", "aspect": "accuracy", "amount": -45, "target": "enemy"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Black_Mantle.png",
+        "id": "black_mantle",
+        "accuracy": 100
+    },
+    {
+        "name": "Spirit Weakness",
+        "school": "balance",
+        "type": "charm",
+        "pips": 1,
+        "description": "Applies -30% Death, Myth, and Life Damage Charms",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "school": "death", "amount": -30, "target": "enemy_same"},
+            {"type": "charm", "aspect": "damage", "school": "myth", "amount": -30, "target": "enemy_same"},
+            {"type": "charm", "aspect": "damage", "school": "life", "amount": -30, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Spirit_Weakness.png",
+        "id": "spirit_weakness",
+        "accuracy": 100,
+        "pvp_level": 15
+    },
+    {
+        "name": "Counterforce",
+        "school": "balance",
+        "type": "global",
+        "pips": 4,
+        "description": "Applies a +20% Balance Armor Piercing and +20% Balance Critical Chance Global",
+        "effects": [
+            {"type": "global", "aspect": "armor_piercing", "school": "balance", "amount": 20},
+            {"type": "global", "aspect": "critical", "school": "balance", "amount": 20}
+
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Counterforce.png",
+        "id": "counterforce",
+        "accuracy": 100,
+        "pvp_level": 97
+    },
+    {
+        "name": "Hex",
+        "school": "balance",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies a +30% Damage Ward",
+        "effects": [
+            {"type": "trap", "amount": "30"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Hex.png",
+        "id": "hex",
+        "accuracy": 100
+    },
+    {
+        "name": "Samoorai",
+        "school": "balance",
+        "type": "damage",
+        "pips": {"regular": 3, "balance": 1},
+        "description": "Deals 460-540 Balance Damage",
+        "effects": [
+            {"type": "damage", "school": "balance", "min": 460, "max": 540}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Samoorai.png",
+        "id": "samoorai",
+        "accuracy": 80
+    },
+    {
+        "name": "Spiritual Tribunal",
+        "school": "balance",
+        "type": "damage",
+        "pips": {"regular": 2, "balance": 1},
+        "description": "Deals 425 Myth Damage, Life Damage, or Death Damage",
+        "effects": [
+            {"type": "damage", "school": ["life", "myth", "death"], "amount": 425}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Spiritual_Tribunal.png",
+        "id": "spiritual_tribunal",
+        "accuracy": 80
+    },
+    {
+        "name": "Chimera",
+        "school": "balance",
+        "type": "damage",
+        "pips": 9,
+        "description": "Deals 290 Myth Damage, Life Damage, and Death Damage",
+        "effects": [
+            {"type": "damage", "school": "myth", "amount": 290, "target": "enemy_same"},
+            {"type": "damage", "school": "life", "amount": 290,"target": "enemy_same"},
+            {"type": "damage", "school": "death", "amount": 290, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Chimera.png",
+        "id": "chimera",
+        "accuracy": 85,
+        "pvp_level": 68
+    },
+    {
+        "name": "Wheel of Fortune",
+        "school": "balance",
+        "type": "damage",
+        "pips": 10,
+        "description": "Deals 700 Balance Damage and 210 Balance Damage after 3 Rounds to and applies a -25% Damage Charm on target",
+        "effects": [
+            {"type": "damage", "school": "balance", "amount": 700, "target": "enemy_same"},
+            {"type": "DoT", "school": "balance", "amount": 210, "rounds": 3, "wait": true, "target": "enemy_same"},
+            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Wheel_of_Fortune.png",
+        "id": "wheel_of_fortune",
+        "accuracy": 85,
+        "pvp_level": 170
+    },
+    {
+        "name": "Spirit Shield",
+        "school": "balance",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies -50% Death, Myth, and Life Damage Wards",
+        "effects": [
+            {"type": "shield", "aspect": "damage", "school": "death", "amount": -50, "target": "ally_same"},
+            {"type": "shield", "aspect": "damage", "school": "myth", "amount": -50, "target": "ally_same"},
+            {"type": "shield", "aspect": "damage", "school": "life", "amount": -50, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Spirit_Shield.png",
+        "id": "spirit_shield",
+        "accuracy": 100
+    },
+    {
+        "name": "Availing Hands",
+        "school": "balance",
+        "type": "heal",
+        "pips": 4,
+        "description": "Restores 70 Health and 780 Health over 3 Rounds",
+        "effects": [
+            {"type": "heal", "amount": 70, "target": "ally_same"},
+            {"type": "HoT", "amount": 780, "rounds": 3, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Availing_Hands.png",
+        "id": "availing_hands",
+        "accuracy": 85,
+        "pvp_level": 55,
+        "reshuffle": false
+    },
+    {
+        "name": "Trap Dilution",
+        "school": "balance",
+        "type": "manipulation",
+        "pips": 1,
+        "description": "Removes up to four harmful Wards from ally to apply a +20% Trap on ally per Ward removed",
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 4, 
+                "condition": {"type": "amount", "aspect": "ward_negative", "amount": 1, "target": "ally"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "ward_negative", "target": "ally"},
+                    {"type": "trap",  "amount": 20, "target": "ally"}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Trap_Dilution.png",
+        "id": "trap_dilution",
+        "accuracy": 100,
+        "pvp_level": 40
+    },
+    {
+        "name": "Weakness",
+        "school": "balance",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a -25% Damage Charm",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Weakness.png",
+        "id": "weakness",
+        "accuracy": 100
+    },
+    {
+        "name": "Donate Power",
+        "school": "balance",
+        "type": "manipulation",
+        "pips": 1,
+        "description": "Target gains 2 regular Pips",
+        "effects": [
+            {"type": "pip", "amount": 2, "target": "ally"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Donate_Power.png",
+        "id": "donate_power",
+        "accuracy": 100,
+        "pvp_level": 33
+    },
+    {
+        "name": "Loremaster",
+        "school": "balance",
+        "type": "damage",
+        "pips": {"regular": 2, "balance": 1},
+        "description": "Deals 315-395 Balance Damage to and applies -15% Damage and -25% Accuracy Charms on target",
+        "effects": [
+            {"type": "damage", "school": "balance", "min": 315, "max": 395, "target": "enemy_same"},
+            {"type": "charm", "aspect": "damage", "amount": -15, "target": "enemy_same"},
+            {"type": "charm", "aspect": "accuracy", "amount": -25, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Loremaster.png",
+        "id": "loremaster",
+        "accuracy": 80
+    },
+    {
+        "name": "Scarab",
+        "school": "balance",
+        "type": "damage",
+        "pips": 1,
+        "description": "Deals 65-105 Balance Damage",
+        "effects": [
+            {"type": "damage", "school": "balance", "min": 65, "max": 105}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Scarab.png",
+        "id": "scarab",
+        "accuracy": 85
+    },
+    {
+        "name": "Spirit Spear",
+        "school": "balance",
+        "type": "charm",
+        "pips": 1,
+        "description": "",
+        "effects": [
+            {"type": "charm", "aspect": "armor_piercing", "school": "death", "amount": 20, "target": "ally_same"},
+            {"type": "charm", "aspect": "armor_piercing", "school": "myth", "amount": 20, "target": "ally_same"},
+            {"type": "charm", "aspect": "armor_piercing", "school": "life", "amount": 20, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Spirit_Spear.png",
+        "id": "spirit_spear",
+        "accuracy": 100,
+        "pvp_level": 80
+    },
+    {
+        "name": "Jinn's Fortune",
+        "school": "balance",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Applies a +30% Damage Trap on target if caster has a harmful Ward (max 2), and applies a -50% Damage Ward on caster if target has a helpful Ward (max 2)",
+        "condition": {"OR": [
+            {"type": "amount", "aspect": "ward_negative", "amount": 1, "target": "self"},
+            {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}
+        ]},
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 2, 
+                "condition": {"type": "amount", "aspect": "ward_negative", "amount": 1, "target": "self"}, 
+                "effects": [
+                    {"type": "trap", "amount": 30, "target": "enemy_same"}
+                ]
+            },
+            {
+                "type": "repeat", 
+                "up_to": 2, 
+                "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}, 
+                "effects": [
+                    {"type": "shield", "aspect": "damage", "amount": -50, "target": "self"}
+                ]
+            }
+            
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Jinn's_Fortune.png",
+        "id": "jinn's_fortune",
+        "accuracy": 100,
+        "pvp_level": 70
+    },
+    {
+        "name": "Chameleon Clash",
+        "school": "balance",
+        "type": "damage",
+        "pips": 7,
+        "description": "Deals 665 Damage of a random School except Balance",
+        "effects": [
+            {"type": "damage", "school": ["life", "death", "myth", "fire", "storm", "ice"], "amount": 665}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Chameleon_Clash.png",
+        "id": "chameleon_clash",
+        "accuracy": 85,
+        "pvp_level": 170
+    },
+    {
+        "name": "Helping Hands",
+        "school": "balance",
+        "type": "heal",
+        "pips": 3,
+        "description": "Restores 125 Health and 465 Health over 3 Rounds",
+        "effects": [
+            {"type": "heal", "amount": 125, "target": "ally_same"},
+            {"type": "HoT", "amount": 465, "rounds": 3, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Helping_Hands.png",
+        "id": "helping_hands",
+        "accuracy": 85
+    },
+    {
+        "name": "Precision",
+        "school": "balance",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a +25% Accuracy Charm",
+        "effects": [
+            {"type": "charm", "aspect": "accuracy", "target": "ally"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Precision.png",
+        "id": "precision",
+        "accuracy": 100
+    },
+    {
+        "name": "Sap Health",
+        "school": "balance",
+        "type": "damage",
+        "pips": 1,
+        "description": "Sacrifices a friendly Minion to restore 500 Health to caster",
+        "effects": [],
+        "image": "static/w101/spells/balance/(Spell)_Sap_Health.png",
+        "id": "sap_health",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Steal Pip",
+        "school": "balance",
+        "type": "manipulation",
+        "pips": 0,
+        "description": "Steals one Pip from target",
+        "condition": {"type": "amount", "aspect": "pips", "amount": 1, "target": "enemy"},
+        "effects": [
+            {"type": "take", "aspect": "pip", "target": "enemy"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Steal_Pip.png",
+        "id": "steal_pip",
+        "accuracy": 100
+    },
+    {
+        "name": "Brave Sir Badger",
+        "school": "balance",
+        "type": "damage",
+        "pips": {"regular": 3, "balance": 1},
+        "description": "Deals 390 Balance Damage to target and applies a +25% outgoing Damage Aura on caster for 4 Rounds",
+        "effects": [
+            {"type": "damage", "school": "balance", "amount": 390},
+            {"type": "aura", "amount": 25, "rounds": 4, "target": "self"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Brave_Sir_Badger.png",
+        "id": "brave_sir_badger",
+        "accuracy": 80
+    },
+    {
+        "name": "Sand Wurm",
+        "school": "balance",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 250 Balance Damage and applies a +35% Damage Ward split among selected enemies",
+        "effects": [
+            {"type": "damage", "school": "balance", "amount": 250, "target": "enemy_selected"},
+            {"type": "trap", "amount": 35, "target": "enemy_selected"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Sand_Wurm.png",
+        "id": "sand_wurm",
+        "accuracy": 85,
+        "pvp_level": 118
+    },
+    {
+        "name": "Elemental Spear",
+        "school": "balance",
+        "type": "charm",
+        "pips": 1,
+        "description": "Applies +20% Ice, Storm, and Fire Armor Piercing Charms",
+        "effects": [
+            {"type": "charm", "aspect": "armor_piercing", "school": "ice", "amount": 20, "target": "ally_same"},
+            {"type": "charm", "aspect": "armor_piercing", "school": "storm", "amount": 20, "target": "ally_same"},
+            {"type": "charm", "aspect": "armor_piercing", "school": "fire", "amount": 20, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Elemental_Spear.png",
+        "id": "elemental_spear",
+        "accuracy": 100,
+        "pvp_level": 80
+    },
+    {
+        "name": "Elemental Trap",
+        "school": "balance",
+        "type": "ward",
+        "pips": 1,
+        "description": "Applies +30% Fire, Ice, and Storm Damage Wards",
+        "effects": [
+            {"type": "trap", "school": "fire", "amount": 30, "target": "enemy_same"},
+            {"type": "trap", "school": "ice", "amount": 30, "target": "enemy_same"},
+            {"type": "trap", "school": "storm", "amount": 30, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Elemental_Trap.png",
+        "id": "elemental_trap",
+        "accuracy": 100
+    },
+    {
+        "name": "Gearhead Destroyer",
+        "school": "balance",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 345-405 Balance Damage",
+        "effects": [
+            {"type": "damage", "school": "balance", "min": 345, "max": 405}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Gearhead_Destroyer.png",
+        "id": "gearhead_destroyer",
+        "accuracy": 85
+    },
+    {
+        "name": "Elemental Weakness",
+        "school": "balance",
+        "type": "charm",
+        "pips": 1,
+        "description": "Applies -30% Ice, Storm, and Fire Damage Charms",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "school": "ice", "amount": -30, "target": "enemy_same"},
+            {"type": "charm", "aspect": "damage", "school": "storm", "amount": -30, "target": "enemy_same"},
+            {"type": "charm", "aspect": "damage", "school": "fire", "amount": -30, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Elemental_Weakness.png",
+        "id": "elemental_weakness",
+        "accuracy": 100,
+        "pvp_level": 15
+    },
+    {
+        "name": "Unbalance",
+        "school": "balance",
+        "type": "charm",
+        "pips": 2,
+        "description": "Applies a Balance Dispel Charm",
+        "effects": [
+            {"type": "dispel", "school": "balance", "target": "enemy"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Unbalance.png",
+        "id": "unbalance",
+        "accuracy": 100,
+        "pvp_level": 22
+    },
+    {
+        "name": "Ninja Piglets",
+        "school": "balance",
+        "type": "damage",
+        "pips": {"regular": 2, "balance": 1},
+        "description": "Deals 420-510 Balance Damage",
+        "effects": [
+            {"type": "damage", "school": "balance", "min": 420, "max": 510}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Ninja_Piglets.png",
+        "id": "ninja_piglets",
+        "accuracy": 80
+    },
+    {
+        "name": "Balanceblade",
+        "school": "balance",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a +25% Damage Charm",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "amount": 25, "target": "ally"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Balanceblade.png",
+        "id": "balanceblade",
+        "accuracy": 100
+    },
+    {
+        "name": "Obsidian Colossus",
+        "school": "balance",
+        "type": "damage",
+        "pips": 6,
+        "description": "Deals 375 Balance Damage to and applies two -25% Damage Charms on target",
+        "effects": [
+            {"type": "damage", "school": "balance", "amount": 375, "target": "enemy_same"},
+            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy_same"},
+            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Obsidian_Colossus.png",
+        "id": "obsidian_colossus",
+        "accuracy": 85,
+        "pvp_level": 45
+    },
+    {
+        "name": "Elemental Shield",
+        "school": "balance",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies -50% Fire, Ice, and Storm Damage Wards",
+        "effects": [
+            {"type": "shield", "aspect": "damage", "school": "fire", "amount": -50, "target": "ally_same"},
+            {"type": "shield", "aspect": "damage", "school": "ice", "amount": -50, "target": "ally_same"},
+            {"type": "shield", "aspect": "damage", "school": "storm", "amount": -50, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Elemental_Shield.png",
+        "id": "elemental_shield",
+        "accuracy": 100
+    },
+    {
+        "name": "Elemental Blade",
+        "school": "balance",
+        "type": "charm",
+        "pips": 1,
+        "description": "Applies +35% Ice, Storm, and Fire Damage Blades",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "school": "ice", "amount": 35, "target": "ally_same"},
+            {"type": "charm", "aspect": "damage", "school": "storm", "amount": 35, "target": "ally_same"},
+            {"type": "charm", "aspect": "damage", "school": "fire", "amount": 35, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Elemental_Blade.png",
+        "id": "elemental_blade",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Savage Paw",
+        "school": "balance",
+        "type": "damage",
+        "pips": {"regular": 3, "balance": 1},
+        "description": "Deals 500 Balance Damage to target and applies a +25% Damage Blade on caster",
+        "effects": [
+            {"type": "damage", "school": "balance", "amount": 500},
+            {"type": "charm", "aspect": "damage", "amount": 25, "target": "self"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Savage_Paw.png",
+        "id": "savage_paw",
+        "accuracy": 80
+    },
+    {
+        "name": "Tribunal Oni",
+        "school": "balance",
+        "type": "damage",
+        "pips": 9,
+        "description": "Deals 285 Myth, Death, and Life Damage to target; removes two helpful Charms from caster and two harmful Charms from target to deal 500 Myth, Death, and Life Damage",
+        "effects": [
+            {
+                "type": "gambit", 
+                "condition": [
+                    {"type": "amount", "aspect": "ward_positive", "amount": 2, "target": "self"},
+                    {"type": "amount", "aspect": "ward_negative", "amount": 2, "target": "enemy"}
+                ], 
+                "true": [
+                    {"type": "destroy", "aspect": "ward_positive", "target": "self", "times": 2},
+                    {"type": "destroy", "aspect": "ward_negative", "target": "enemy_same", "times": 2},
+                    {"type": "damage", "school": "myth", "amount": 500, "target": "enemy_same"},
+                    {"type": "damage", "school": "death", "amount": 500, "target": "enemy_same"},
+                    {"type": "damage", "school": "life", "amount": 500, "target": "enemy_same"}
+                ], 
+                "false": [
+                    {"type": "damage", "school": "myth", "amount": 285, "target": "enemy_same"},
+                    {"type": "damage", "school": "death", "amount": 285, "target": "enemy_same"},
+                    {"type": "damage", "school": "life", "amount": 285, "target": "enemy_same"}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Tribunal_Oni.png",
+        "id": "tribunal_oni",
+        "accuracy": 80,
+        "pvp_level": 100
+    },
+    {
+        "name": "Bladestorm",
+        "school": "balance",
+        "type": "damage",
+        "pips": 1,
+        "description": "Applies a +20% Damage Charm on all allies",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "amount": 20, "target": "ally_all"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Bladestorm.png",
+        "id": "bladestorm",
+        "accuracy": 80,
+        "pvp_level": 100
+    }
+]

@@ -1,0 +1,660 @@
+[
+    {
+        "name": "Climaclysm",
+        "school": "ice",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 200 Ice Damage and applies a +60% Ice Damage Ward split among selected enemies",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 200, "target": "enemy_selected"},
+            {"type": "trap", "school": "ice", "amount": 60, "target": "enemy_selected"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Climaclysm.png",
+        "id": "climaclysm",
+        "accuracy": 80,
+        "pvp_level": 118
+    },
+    {
+        "name": "Steal Ward",
+        "school": "ice",
+        "type": "manipulation",
+        "pips": 1,
+        "description": "Steals a helpful Ward from target",
+        "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"},
+        "effects": [
+            {"type": "take", "aspect": "ward_positive", "target": "enemy"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Steal_Ward.png",
+        "id": "steal_ward",
+        "accuracy": 100
+    },
+    {
+        "name": "Ice Trap",
+        "school": "ice",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies a +40% Ice Damage Ward",
+        "effects": [
+            {"type": "trap", "school": "ice", "amount": 40}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Ice_Trap.png",
+        "id": "ice_trap",
+        "accuracy": 100
+    },
+    {
+        "name": "Deermouse Trap",
+        "school": "ice",
+        "type": "damage",
+        "pips": {"regular": 3, "ice": 1},
+        "description": "Deals 385 Ice Damage to and applies a +55% Damage Ward on target",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 385, "target": "enemy_same"},
+            {"type": "trap", "amount": 55, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Deermouse_Trap.png",
+        "id": "deermouse_trap",
+        "accuracy": 80,
+        "pvp_level": 40
+    },
+    {
+        "name": "Volcanic Shield",
+        "school": "ice",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies -70% Fire and Storm Damage Wards",
+        "effects": [
+            {"type": "shield", "aspect": "damage", "school": "storm", "amount": -70, "target": "ally_same"},
+            {"type": "shield", "aspect": "damage", "school": "fire", "amount": -70, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Volcanic_Shield.png",
+        "id": "volcanic_shield",
+        "accuracy": 100
+    },
+    {
+        "name": "Evil Snowman",
+        "school": "ice",
+        "type": "damage",
+        "pips": 3,
+        "description": "Deals 240-300 Ice Damage",
+        "effects": [
+            {"type": "damage", "school": "ice", "min": 240, "max": 300}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Evil_Snowman.png",
+        "id": "evil_snowman",
+        "accuracy": 80
+    },
+    {
+        "name": "Frost Beetle",
+        "school": "ice",
+        "type": "damage",
+        "pips": 1,
+        "description": "Deals 65-105 Ice Damage",
+        "effects": [
+            {"type": "damage", "school": "ice", "min": 65, "max": 105}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Frost_Beetle.png",
+        "id": "frost_beetle",
+        "accuracy": 80
+    },
+    {
+        "name": "Ice Wyvern",
+        "school": "ice",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 335-395 Ice Damage",
+        "effects": [
+            {"type": "damage", "school": "ice", "min": 335, "max": 395}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Ice_Wyvern.png",
+        "id": "ice_wyvern",
+        "accuracy": 80,
+        "pvp_level": 22
+    },
+    {
+        "name": "Draw Health",
+        "school": "ice",
+        "type": "damage",
+        "pips": 1,
+        "description": "Sacrifices a friendly Minion to restore 350 Health to caster",
+        "effects": [],
+        "image": "static/w101/spells/ice/(Spell)_Draw_Health.png",
+        "id": "draw_health",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Mass Ice Prism",
+        "school": "ice",
+        "type": "ward",
+        "pips": 1,
+        "description": "Applies an Ice to Fire Damage Prism Ward on all enemies",
+        "effects": [
+            {"type": "prism", "from": "ice", "to": "fire", "target": "enemy_all"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Mass_Ice_Prism.png",
+        "id": "mass_ice_prism",
+        "accuracy": 100,
+        "pvp_level": 70
+    },
+    {
+        "name": "Stun Block",
+        "school": "ice",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies two Stun Resist Wards on target",
+        "effects": [
+            {"type": "shield", "aspect": "stun", "target": "ally_same"},
+            {"type": "shield", "aspect": "stun", "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Stun_Block.png",
+        "id": "stun_block",
+        "accuracy": 100
+    },
+    {
+        "name": "Icespear",
+        "school": "ice",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a +30% Ice Armor Piercing Charm",
+        "effects": [
+            {"type": "charm", "aspect": "armor_piercing", "school": "ice", "amount": 30, "target": "ally"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Icespear.png",
+        "id": "icespear",
+        "accuracy": 100,
+        "pvp_level": 80
+    },
+    {
+        "name": "Shu",
+        "school": "ice",
+        "type": "damage",
+        "pips": 7,
+        "description": "Deals 650 Ice Damage",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 650}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Shu.png",
+        "id": "shu",
+        "accuracy": 80,
+        "pvp_level": 170
+    },
+    {
+        "name": "Iceblade",
+        "school": "ice",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a +35% Ice Damage Blade",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "school": "ice", "amount": 35, "target": "ally"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Iceblade.png",
+        "id": "iceblade",
+        "accuracy": 100,
+        "pvp_level": 38
+    },
+    {
+        "name": "Legion Shield",
+        "school": "ice",
+        "type": "ward",
+        "pips": 1,
+        "description": "Applies a -45% Damage Ward on all allies",
+        "effects": [
+            {"type": "shield", "aspect": "damage", "amount": -45, "target": "ally_all"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Legion_Shield.png",
+        "id": "legion_shield",
+        "accuracy": 100,
+        "pvp_level": 35
+    },
+    {
+        "name": "Thieving Dragon",
+        "school": "ice",
+        "type": "damage",
+        "pips": 4,
+        "description": "Steals a helpful Ward from and deals 120-150 Ice Damage to target",
+        "effects": [
+            {"type": "take", "aspect": "ward_positive", "target": "enemy_same"},
+            {"type": "damage", "school": "ice", "min": 120, "max": 150}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Thieving_Dragon.png",
+        "id": "thieving_dragon",
+        "accuracy": 80,
+        "pvp_level": 42
+    },
+    {
+        "name": "Iceburn Jinn",
+        "school": "ice",
+        "type": "damage",
+        "pips": 9,
+        "description": "Deals 835 Ice Damage, or removes four harmful Charms from target to deal 1,420 Ice Damage",
+        "effects": [
+            {
+                "type": "gambit", 
+                "condition": {"type": "amount", "aspect": "charm_negative", "amount": 4, "target": "enemy"}, 
+                "true": [
+                    {"type": "destroy", "aspect": "charm_negative", "target": "enemy", "times": 4},
+                    {"type": "damage", "school": "ice", "amount": 1420}
+                ], 
+                "false": [
+                    {"type": "damage", "school": "ice", "amount": 835}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Iceburn_Jinn.png",
+        "id": "iceburn_jinn",
+        "accuracy": 75,
+        "pvp_level": 70
+    },
+    {
+        "name": "Melt",
+        "school": "ice",
+        "type": "charm",
+        "pips": 2,
+        "description": "Applies an Ice Dispel Charm",
+        "effects": [
+            {"type": "dispel", "school": "ice", "target": "enemy"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Melt.png",
+        "id": "melt",
+        "accuracy": 100,
+        "pvp_level": 22
+    },
+    {
+        "name": "Everwinter Oni",
+        "school": "ice",
+        "type": "damage",
+        "pips": 9,
+        "description": "Deals 835 Ice Damage, or removes four harmful Wards from target to deal 1,285 Ice Damage",
+        "effects": [
+            {
+                "type": "gambit", 
+                "condition": {"type": "amount", "aspect": "ward_negative", "amount": 4, "target": "enemy"}, 
+                "true": [
+                    {"type": "destroy", "aspect": "ward_negative", "target": "enemy", "times": 4},
+                    {"type": "damage", "school": "ice", "amount": 1285}
+
+                ], 
+                "false": [
+                    {"type": "damage", "school": "ice", "amount": 835}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Everwinter_Oni.png",
+        "id": "everwinter_oni",
+        "accuracy": 75,
+        "pvp_level": 100
+    },
+    {
+        "name": "Katabatic Wind",
+        "school": "ice",
+        "type": "global",
+        "pips": 4,
+        "description": "Applies a +20% Ice Armor Piercing and +20% Ice Critical Chance Global",
+        "effects": [
+            {"type": "global", "aspect": "armor_piercing", "school": "ice", "amount": 20},
+            {"type": "global", "aspect": "critical", "school": "ice", "amount": 20}
+
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Katabatic_Wind.png",
+        "id": "katabatic_wind",
+        "accuracy": 100,
+        "pvp_level": 97
+    },
+    {
+        "name": "Ice Weakness",
+        "school": "ice",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a -35% Ice Damage Charm",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "school": "ice", "amount": -35, "target": "enemy"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Ice_Weakness.png",
+        "id": "ice_weakness",
+        "accuracy": 100,
+        "pvp_level": 10
+    },
+    {
+        "name": "Ice Armor",
+        "school": "ice",
+        "type": "ward",
+        "pips": "X",
+        "description": "Applies a 125 per Pip Damage Absorb Ward on self (does not absorb Damage from Steal Spells)",
+        "effects": [
+            {"type": "shield", "aspect": "absorb", "amount": 125, "target": "self"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Ice_Armor.png",
+        "id": "ice_armor",
+        "accuracy": 90
+    },
+    {
+        "name": "Snow Shield",
+        "school": "ice",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies a -80% Ice Damage Ward",
+        "effects": [
+            {"type": "shield", "aspect": "damage", "school": "ice", "amount": -80, "target": "ally"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Snow_Shield.png",
+        "id": "snow_shield",
+        "accuracy": 100,
+        "pvp_level": 10
+    },
+    {
+        "name": "Deathly Depths",
+        "school": "ice",
+        "type": "damage",
+        "pips": {"regular": 3, "death": 1},
+        "description": "Deals 535 Ice Damage",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 535}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Deathly_Depths.png",
+        "id": "deathly_depths",
+        "accuracy": 75,
+        "pvp_level": 150
+    },
+    {
+        "name": "King Artorius (Ice)",
+        "school": "ice",
+        "type": "damage",
+        "pips": 8,
+        "description": "Deals 650 Ice Damage to target, and applies a +10% Ice Armor Piercing Charm on and gives a Pip to caster",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 650},
+            {"type": "charm", "aspect": "armor_piercing", "school": "ice", "amount": 10, "target": "self"},
+            {"type": "pip", "amount": 1, "target": "self"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_King_Artorius_(Ice).png",
+        "id": "king_artorius_(ice)",
+        "accuracy": 80,
+        "pvp_level": 80
+    },
+    {
+        "name": "Impair",
+        "school": "ice",
+        "type": "manipulation",
+        "pips": 2,
+        "description": "Removes three helpful Charms from target",
+        "effects": [
+            {"type": "destroy", "aspect": "charm_positive", "target": "enemy_same"},
+            {"type": "destroy", "aspect": "charm_positive", "target": "enemy_same"},
+            {"type": "destroy", "aspect": "charm_positive", "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Impair.png",
+        "id": "impair",
+        "accuracy": 100,
+        "pvp_level": 72
+    },
+    {
+        "name": "Oni's Destruction",
+        "school": "ice",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes up to three helpful Charms from target to apply up to three +15% Ice Damage Traps on target",
+        "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"},
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 3, 
+                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "charm_positive", "target": "enemy"},
+                    {"type": "trap", "school": "ice", "amount": 15}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Oni's_Destruction.png",
+        "id": "oni's_destruction",
+        "accuracy": 100,
+        "pvp_level": 100
+    },
+    {
+        "name": "Frostfeather",
+        "school": "ice",
+        "type": "global",
+        "pips": 4,
+        "description": "Deals 135 Ice Damage to target and applies a +25% Ice Damage Global",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 135},
+            {"type": "global", "aspect": "damage", "school": "ice", "amount": 25}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Frostfeather.png",
+        "id": "frostfeather",
+        "accuracy": 80,
+        "pvp_level": 45
+    },
+    {
+        "name": "Frozen Armor",
+        "school": "ice",
+        "type": "ward",
+        "pips": "X",
+        "description": "Applies a 175 per Pip Damage Absorb Ward (does not absorb Damage from Steal Spells)",
+        "effects": [
+            {"type": "shield", "aspect": "absorb", "amount": 175, "target": "self"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Frozen_Armor.png",
+        "id": "frozen_armor",
+        "accuracy": 100,
+        "pvp_level": 55
+    },
+    {
+        "name": "Blight Hound",
+        "school": "ice",
+        "type": "damage",
+        "pips": 5,
+        "description": "Deals 420-500 Ice Damage",
+        "effects": [
+            {"type": "damage", "school": "ice", "min": 420, "max": 500}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Blight_Hound.png",
+        "id": "blight_hound",
+        "accuracy": 80,
+        "pvp_level": 33
+    },
+    {
+        "name": "Tower Shield",
+        "school": "ice",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies a -50% Damage Ward",
+        "effects": [
+            {"type": "shield", "aspect": "damage", "amount": -50, "target": "ally"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Tower_Shield.png",
+        "id": "tower_shield",
+        "accuracy": 100,
+        "pvp_level": 10
+    },
+    {
+        "name": "Colossus",
+        "school": "ice",
+        "type": "damage",
+        "pips": 6,
+        "description": "Deals 515-595 Ice Damage",
+        "effects": [
+            {"type": "damage", "school": "ice", "min": 515, "max": 595}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Colossus.png",
+        "id": "colossus",
+        "accuracy": 80,
+        "pvp_level": 42
+    },
+    {
+        "name": "Neptune's Fury",
+        "school": "ice",
+        "type": "damage",
+        "pips": 9,
+        "description": "Deals 710 Ice Damage to and removes eight helpful Charms from target",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 710, "target": "enemy_same"},
+            {
+                "type": "repeat", 
+                "up_to": 8, 
+                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "charm_positive", "target": "enemy"}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Neptune's_Fury.png",
+        "id": "neptune's_fury",
+        "accuracy": 80,
+        "pvp_level": 90
+    },
+    {
+        "name": "Abominable Weaver",
+        "school": "ice",
+        "type": "damage",
+        "pips": 5,
+        "description": "Deals 385 Ice Damage to target and applies a -50% Damage Ward on caster",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 385},
+            {"type": "shield", "aspect": "damage", "amount": -50, "target": "self"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Abominable_Weaver.png",
+        "id": "abominable_weaver",
+        "accuracy": 80,
+        "pvp_level": 100
+    },
+    {
+        "name": "Jinn's Vexation",
+        "school": "ice",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes up to three harmful Charms from caster to apply up to three -10% Damage Charms on enemy",
+        "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "self"},
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 3, 
+                "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "self"},
+                "effects": [
+                    {"type": "destroy", "aspect": "charm_negative", "target": "self"},
+                    {"type": "charm", "aspect": "damage", "amount": -10, "target": "enemy"}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Jinn's_Vexation.png",
+        "id": "jinn's_vexation",
+        "accuracy": 100,
+        "pvp_level": 70
+    },
+    {
+        "name": "Ice Elemental",
+        "school": "ice",
+        "type": "damage",
+        "pips": {"regular": 2, "ice": 1},
+        "description": "Deals 330 Ice Damage to and applies a -30% Damage Charm on target",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 330, "target": "enemy_same"},
+            {"type": "charm", "aspect": "damage", "amount": -30, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Ice_Elemental.png",
+        "id": "ice_elemental",
+        "accuracy": 75
+    },
+    {
+        "name": "Snow Serpent",
+        "school": "ice",
+        "type": "damage",
+        "pips": 2,
+        "description": "Deals 155-195 Ice Damage",
+        "effects": [
+            {"type": "damage", "school": "ice", "min": 155, "max": 195}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Snow_Serpent.png",
+        "id": "snow_serpent",
+        "accuracy": 80
+    },
+    {
+        "name": "Glacial Fortress",
+        "school": "ice",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes up to three harmful Charms from ally to apply up to three -20% Damage or Steal Wards on ally",
+        "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "ally"},
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 3, 
+                "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "ally"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "charm_negative", "target": "ally"},
+                    {"type": "shield", "aspect": ["damage", "steal"], "amount": -20, "target": "ally"}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Glacial_Fortress.png",
+        "id": "glacial_fortress",
+        "accuracy": 100,
+        "pvp_level": 40
+    },
+    {
+        "name": "Ice Prism",
+        "school": "ice",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies a +40% Ice Damage Ward",
+        "effects": [
+            {"type": "prism", "from": "ice", "to": "fire", "target": "enemy"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Ice_Prism.png",
+        "id": "ice_prism",
+        "accuracy": 100
+    },
+    {
+        "name": "Balefrost",
+        "school": "ice",
+        "type": "global",
+        "pips": 2,
+        "description": "Applies a +25% Ice Damage Global",
+        "effects": [
+            {"type": "global", "aspect": "damage", "school": "ice", "amount": 25}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Balefrost.png",
+        "id": "balefrost",
+        "accuracy": 100,
+        "pvp_level": 30
+    },
+    {
+        "name": "The Hierophant",
+        "school": "ice",
+        "type": "damage",
+        "pips": 10,
+        "description": "Deals 760 Ice Damage to and applies a +40% Ice Damage Ward on target and applies a -60% Damage Ward of target's School on caster",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 760, "target": "enemy_same"},
+            {"type": "trap", "school": "ice", "amount": 40, "target": "enemy_same"},
+            {"type": "shield", "aspect": "damage", "school": "player", "amount": -60, "target": "self"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_The_Hierophant.png",
+        "id": "the_hierophant",
+        "accuracy": 80,
+        "pvp_level": 170
+    },
+    {
+        "name": "Wall of Blades",
+        "school": "ice",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes up to three helpful Charms from target to apply up to three -20% Damage or Steal Wards on caster",
+        "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"},
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 3, 
+                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "charm_positive", "target": "enemy"},
+                    {"type": "shield", "aspect": {"AND": ["damage", "steal"]}, "amount": -20, "target": "self"}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Wall_of_Blades.png",
+        "id": "wall_of_blades",
+        "accuracy": 100,
+        "pvp_level": 40
+    }
+]

@@ -1,0 +1,693 @@
+[
+    {
+        "name": "The Chariot",
+        "school": "fire",
+        "type": "damage",
+        "pips": 10,
+        "description": "Deals 830 Fire Damage to and applies a +40% Fire Damage Ward on target and restores 450 Health over 3 Rounds to caster",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 830, "target": "enemy_same"},
+            {"type": "trap", "school": "fire", "amount": 40, "target": "enemy_same"},
+            {"type": "HoT", "amount": 450, "rounds": 3, "target": "self"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_The_Chariot.png",
+        "id": "the_chariot",
+        "accuracy": 75,
+        "pvp_level": 170
+    },
+    {
+        "name": "Whitehart Fire",
+        "school": "fire",
+        "type": "damage",
+        "pips": {"regular": 3, "fire": 1},
+        "description": "Deals 370 Fire Damage to target and restores 645 Health over 4 Rounds to caster",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 370},
+            {"type": "HoT", "amount": 645, "rounds": 4, "target": "self"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Whitehart_Fire.png",
+        "id": "whitehart_fire",
+        "accuracy": 70
+    },
+    {
+        "name": "Oni's Forge",
+        "school": "fire",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes up to three helpful Wards from target to restore 190 Health per helpful Ward over 4 Rounds to caster",
+        "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"},
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 3, 
+                "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "ward_positive", "target": "enemy"},
+                    {"type": "HoT", "amount": 190, "rounds": 4, "target": "self"}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Oni's_Forge.png",
+        "id": "oni's_forge",
+        "accuracy": 100,
+        "pvp_level": 100
+    },
+    {
+        "name": "Fire Shield",
+        "school": "fire",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies a -80% Fire Damage Ward",
+        "effects": [
+            {"type": "shield", "aspect": "damage", "school": "fire", "amount": -80, "target": "ally"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Fire_Shield.png",
+        "id": "fire_shield",
+        "accuracy": 100,
+        "pvp_level": 10
+    },
+    {
+        "name": "Link",
+        "school": "fire",
+        "type": "damage",
+        "pips": 2,
+        "description": "Deals 30 Fire Damage and 150 Fire Damage over 3 Rounds to target and restores 15 Health and 105 Health over 3 Rounds to self",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 30, "target": "enemy_same"},
+            {"type": "DoT", "school": "fire", "amount": 150, "rounds": 3, "target": "enemy_same"},
+            {"type": "heal", "amount": 15, "target": "self"},
+            {"type": "HoT", "amount": 105, "rounds": 3, "target": "self"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Link.png",
+        "id": "link",
+        "accuracy": 75
+    },
+    {
+        "name": "Mass Fire Prism",
+        "school": "fire",
+        "type": "ward",
+        "pips": 1,
+        "description": "Applies a Fire to Ice Damage Prism Ward on all enemies",
+        "effects": [
+            {"type": "prism", "from": "fire", "to": "ice", "target": "enemy_all"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Mass_Fire_Prism.png",
+        "id": "mass_fire_prism",
+        "accuracy": 100,
+        "pvp_level": 70
+    },
+    {
+        "name": "Meltdown",
+        "school": "fire",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes up to three helpful Wards from target to deal 100 Fire Damage per helpful Ward over 3 Rounds to target",
+        "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"},
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 3, 
+                "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "ward_positive", "target": "enemy"},
+                    {"type": "DoT", "school": "fire", "amount": 100, "rounds": 3}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Meltdown.png",
+        "id": "meltdown",
+        "accuracy": 100,
+        "pvp_level": 40
+    },
+    {
+        "name": "Fire Weakness",
+        "school": "fire",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a -35% Fire Damage Charm",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "school": "fire", "amount": -35, "target": "enemy"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Fire_Weakness.png",
+        "id": "fire_weakness",
+        "accuracy": 100,
+        "pvp_level": 10
+    },
+    {
+        "name": "Fireblade",
+        "school": "fire",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a +35% Fire Damage Charm",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "school": "fire", "amount": 35, "target": "ally"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Fireblade.png",
+        "id": "fireblade",
+        "accuracy": 0
+    },
+    {
+        "name": "Ammut",
+        "school": "fire",
+        "type": "damage",
+        "pips": 7,
+        "description": "Deals 780 Fire Damage",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 780}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Ammut.png",
+        "id": "ammut",
+        "accuracy": 75,
+        "pvp_level": 170
+    },
+    {
+        "name": "Caldera Jinn",
+        "school": "fire",
+        "type": "damage",
+        "pips": 9,
+        "description": "Applies three Damage over Time effects on target that each deal 480 Fire Damage over 6 Rounds; or removes four harmful Wards from target to deal 1,550 Fire Damage",
+        "effects": [
+            {
+                "type": "gambit", 
+                "condition": {"type": "amount", "aspect": "ward_negative", "amount": 4, "target": "enemy"}, 
+                "true": [
+                    {"type": "damage", "school": "fire", "amount": 1550}
+                ], 
+                "false": [
+                    {"type": "DoT", "school": "fire", "amount": 480, "rounds": 6, "times": 3}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Caldera_Jinn.png",
+        "id": "caldera_jinn",
+        "accuracy": 70,
+        "pvp_level": 70
+    },
+    {
+        "name": "Glimpse of Infinity",
+        "school": "fire",
+        "type": "damage",
+        "pips": {"regular": 3, "myth": 1},
+        "description": "Applies two Damage over Time effects on target that each deal 465 Fire Damage over 5 Rounds",
+        "effects": [
+            {"type": "DoT", "school": "fire", "amount": 465, "rounds": 5, "target": "enemy_same"},
+            {"type": "DoT", "school": "fire", "amount": 465, "rounds": 5, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Glimpse_of_Infinity.png",
+        "id": "glimpse_of_infinity",
+        "accuracy": 70,
+        "pvp_level": 150
+    },
+    {
+        "name": "Fire Prism",
+        "school": "fire",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies a Fire to Ice Damage Prism Ward",
+        "effects": [
+            {"type": "prism", "from": "fire", "to": "ice", "target": "enemy"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Fire_Prism.png",
+        "id": "fire_prism",
+        "accuracy": 100
+    },
+    {
+        "name": "Fuel",
+        "school": "fire",
+        "type": "ward",
+        "pips": 2,
+        "description": "Applies three +30% Fire Damage Traps",
+        "effects": [
+            {"type": "trap", "school": "fire", "amount": 30, "target": "enemy_same"},
+            {"type": "trap", "school": "fire", "amount": 30, "target": "enemy_same"},
+            {"type": "trap", "school": "fire", "amount": 30, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Fuel.png",
+        "id": "fuel",
+        "accuracy": 100,
+        "pvp_level": 35
+    },
+    {
+        "name": "Jinn's Reversal",
+        "school": "fire",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes up to three harmful Wards from caster to apply up to three +35% Damage over Time Traps on target",
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 3, 
+                "condition": {"type": "amount", "aspect": "ward_negative", "amount": 1, "target": "self"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "ward_negative", "target": "self"},
+                    {"type": "trap", "aspect": "DoT", "amount": 35}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Jinn's_Reversal.png",
+        "id": "jinn's_reversal",
+        "accuracy": 100,
+        "pvp_level": 70
+    },
+    {
+        "name": "S'more Machine",
+        "school": "fire",
+        "type": "damage",
+        "pips": 5,
+        "description": "Deals 465 Fire Damage to and applies three +40% Fire Damage over Time Wards on target",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 465, "target": "enemy_same"},
+            {"type": "trap", "aspect": "DoT", "school": "fire", "amount": 40, "target": "enemy_same"},
+            {"type": "trap", "aspect": "DoT", "school": "fire", "amount": 40, "target": "enemy_same"},
+            {"type": "trap", "aspect": "DoT", "school": "fire", "amount": 40, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_S'more_Machine.png",
+        "id": "s'more_machine",
+        "accuracy": 75,
+        "pvp_level": 130
+    },
+    {
+        "name": "Brimstone Revenant",
+        "school": "fire",
+        "type": "damage",
+        "pips": {"regular": 2, "fire": 1},
+        "description": "Deals 470 Fire Damage to and applies a +30% Fire Trap on target",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 470, "target": "enemy_same"},
+            {"type": "trap", "school": "fire", "amount": 30, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Brimstone_Revenant.png",
+        "id": "brimstone_revenant",
+        "accuracy": 70
+    },
+    {
+        "name": "Scorching Scimitars",
+        "school": "fire",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 220 Fire Damage split among selected enemies and restores 420 Health over 3 Rounds to caster",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 220, "target": "enemy_select"},
+            {"type": "HoT", "amount": 420, "rounds": 3, "target": "self"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Scorching_Scimitars.png",
+        "id": "scorching_scimitars",
+        "accuracy": 75,
+        "pvp_level": 118
+    },
+    {
+        "name": "A-baahh-calypse",
+        "school": "fire",
+        "type": "damage",
+        "pips": {"regular": 2, "fire": 1},
+        "description": "Deals 350 Fire Damage to and Detonates two Damage over Time effects on target",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 350, "target": "enemy_same"},
+            {
+                "type": "repeat", 
+                "up_to": 3, 
+                "condition": {"type": "amount", "aspect": "DoT", "amount": 1, "target": "enemy_same"}, 
+                "effects": [
+                    {"type": "detonate", "target": "enemy_same"}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/fire/(Spell)_A-baahh-calypse.png",
+        "id": "a-baahh-calypse",
+        "accuracy": 70
+    },
+    {
+        "name": "Inferno Salamander",
+        "school": "fire",
+        "type": "damage",
+        "pips": 6,
+        "description": "Applies two Damage over Time effects on target that each deal 475 Fire Damage over 5 Rounds",
+        "effects": [
+            {"type": "DoT", "school": "fire", "amount": 475, "rounds": 5, "target": "enemy_same"},
+            {"type": "DoT", "school": "fire", "amount": 475, "rounds": 5, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Inferno_Salamander.png",
+        "id": "inferno_salamander",
+        "accuracy": 75,
+        "pvp_level": 45
+    },
+    {
+        "name": "Helephant",
+        "school": "fire",
+        "type": "damage",
+        "pips": 6,
+        "description": "Deals 625-705 Fire Damage",
+        "effects": [
+            {"type": "damage", "school": "fire", "min": 625, "max": 705}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Helephant.png",
+        "id": "helephant",
+        "accuracy": 75,
+        "pvp_level": 42
+    },
+    {
+        "name": "Glacial Shield",
+        "school": "fire",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies -70% Ice and Storm Damage Wards",
+        "effects": [
+            {"type": "shield", "aspect": "damage", "school": "ice", "amount": -70, "target": "ally_same"},
+            {"type": "shield", "aspect": "damage", "school": "storm", "amount": -70, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Glacial_Shield.png",
+        "id": "glacial_shield",
+        "accuracy": 100,
+        "pvp_level": 10
+    },
+    {
+        "name": "Sunbird",
+        "school": "fire",
+        "type": "damage",
+        "pips": 3,
+        "description": "Deals 295-355 Fire Damage",
+        "effects": [
+            {"type": "damage", "school": "fire", "min": 295, "max": 355}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Sunbird.png",
+        "id": "sunbird",
+        "accuracy": 75
+    },
+    {
+        "name": "Firespear",
+        "school": "fire",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a +30% Fire Armor Piercing Charm",
+        "effects": [
+            {"type": "charm", "aspect": "armor_piercing", "school": "fire", "amount": 30, "target": "ally"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Firespear.png",
+        "id": "firespear",
+        "accuracy": 100,
+        "pvp_level": 80
+    },
+    {
+        "name": "Steal Charm",
+        "school": "fire",
+        "type": "manipulation",
+        "pips": 1,
+        "description": "Steals a helpful Charm",
+        "effects": [
+            {"type": "take", "aspect": "charm_positive", "target": "enemy"}
+
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Steal_Charm.png",
+        "id": "steal_charm",
+        "accuracy": 100
+    },
+    {
+        "name": "Combustion",
+        "school": "fire",
+        "type": "global",
+        "pips": 4,
+        "description": "Applies a +20% Fire Armor Piercing and +20% Fire Critical Chance Global",
+        "effects": [
+            {"type": "global", "aspect": "armor_piercing", "school": "fire", "amount": 20},
+            {"type": "global", "aspect": "critical", "school": "fire", "amount": 20}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Combustion.png",
+        "id": "combustion",
+        "accuracy": 100,
+        "pvp_level": 97
+    },
+    {
+        "name": "Naphtha Scarab",
+        "school": "fire",
+        "type": "damage",
+        "pips": 2,
+        "description": "Deals 150 Fire Damage to and applies three +30% Fire Damage over Time Traps on target",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 150, "target": "enemy_same"},
+            {"type": "trap", "aspect": "DoT", "school": "fire", "amount": 30, "target": "enemy_same"},
+            {"type": "trap", "aspect": "DoT", "school": "fire", "amount": 30, "target": "enemy_same"},
+            {"type": "trap", "aspect": "DoT", "school": "fire", "amount": 30, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Naphtha_Scarab.png",
+        "id": "naphtha_scarab",
+        "accuracy": 75,
+        "pvp_level": 42
+    },
+    {
+        "name": "Power Link",
+        "school": "fire",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 55 Fire Damage and 345 Fire Damage over 3 Rounds to target and restores 40 Health and 240 Health over 3 Rounds to caster",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 55, "target": "enemy_same"},
+            {"type": "DoT", "school": "fire", "amount": 345, "rounds": 3, "target": "enemy_same"},
+            {"type": "heal", "amount": 40, "target": "self"},
+            {"type": "HoT", "amount": 240, "rounds": 3, "target": "self"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Power_Link.png",
+        "id": "power_link",
+        "accuracy": 75,
+        "pvp_level": 55
+    },
+    {
+        "name": "Fires of Mars",
+        "school": "fire",
+        "type": "damage",
+        "pips": 8,
+        "description": "Applies three Damage over Time effects on target that each deal 435 Damage of caster's School over 6 Rounds",
+        "effects": [
+            {"type": "DoT", "school": "player", "amount": 435, "rounds": 6, "times": 3}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Fires_of_Mars.png",
+        "id": "fires_of_mars",
+        "accuracy": 75,
+        "pvp_level": 90
+    },
+    {
+        "name": "Fire Cat",
+        "school": "fire",
+        "type": "damage",
+        "pips": 1,
+        "description": "Deals 80-120 Fire Damage",
+        "effects": [
+            {"type": "damage", "school": "fire", "min": 80, "max": 120}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Fire_Cat.png",
+        "id": "fire_cat",
+        "accuracy": 75
+    },
+    {
+        "name": "Quench",
+        "school": "fire",
+        "type": "charm",
+        "pips": 2,
+        "description": "Applies a Fire Dispel Charm",
+        "effects": [
+            {"type": "dispel", "school": "fire", "target": "enemy"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Quench.png",
+        "id": "quench",
+        "accuracy": 100,
+        "pvp_level": 22
+    },
+    {
+        "name": "Smoke Screen",
+        "school": "fire",
+        "type": "charm",
+        "pips": 1,
+        "description": "Applies a -40% Accuracy Charm on all enemies",
+        "effects": [
+            {"type": "charm", "aspect": "accuracy", "amount": 40, "target": "enemy_all"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Smoke_Screen.png",
+        "id": "smoke_screen",
+        "accuracy": 100,
+        "pvp_level": 38
+    },
+    {
+        "name": "Infernal Oni",
+        "school": "fire",
+        "type": "damage",
+        "pips": 7,
+        "description": "Applies two Damage over Time effects on target that each deal 475 Fire Damage over 5 Rounds, or removes three Heal over Time effects from caster to deal 1,855 Fire Damage",
+        "effects": [
+            {
+                "type": "gambit", 
+                "condition": {"type": "amount", "aspect": "HoT", "amount": 3, "target": "self"}, 
+                "true": [
+                    {"type": "destroy", "aspect": "HoT", "target": "self", "repeat": 3},
+                    {"type": "damage", "school": "fire", "amount": 1855}
+                ], 
+                "false": [
+                    {"type": "DoT", "school": "fire", "amount": 475, "rounds": 3, "repeat": 2}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Infernal_Oni.png",
+        "id": "infernal_oni",
+        "accuracy": 70,
+        "pvp_level": 100
+    },
+    {
+        "name": "Hephaestus",
+        "school": "fire",
+        "type": "global",
+        "pips": {"regular": 3, "fire": 1},
+        "description": "Deals 340-420 Fire Damage to target and applies a +25% Fire Damage Global",
+        "effects": [
+            {"type": "damage", "school": "fire", "min": 340, "max": 420},
+            {"type": "global", "aspect": "damage", "school": "fire", "amount": 25}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Hephaestus.png",
+        "id": "hephaestus",
+        "accuracy": 70
+    },
+    {
+        "name": "Immolate",
+        "school": "fire",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 200 Fire Damage to caster to deal 600 Fire Damage to target",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 200, "target": "self"},
+            {"type": "damage", "school": "fire", "amount": 600}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Immolate.png",
+        "id": "immolate",
+        "accuracy": 75
+    },
+    {
+        "name": "Fire Elf",
+        "school": "fire",
+        "type": "damage",
+        "pips": 2,
+        "description": "Deals 100 Fire Damage and 210 Fire Damage over 3 Rounds",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 100, "target": "enemy_same"},
+            {"type": "DoT", "school": "fire", "amount": 210, "rounds": 3, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Fire_Elf.png",
+        "id": "fire_elf",
+        "accuracy": 0
+    },
+    {
+        "name": "Burning Rampage",
+        "school": "fire",
+        "type": "damage",
+        "pips": {"regular": 3, "fire": 1},
+        "description": "Deals 70 Fire Damage to target, and applies two Damage over Time effects on target that each deal 420 Damage of the caster's School after five Rounds",
+        "effects": [
+            {"type": "damage", "school": "balance", "amount": 70, "target": "enemy_same"},
+            {"type": "DoT", "school": "player", "amount": 420, "rounds": 5, "wait": true,"target": "enemy_same"},
+            {"type": "DoT", "school": "player", "amount": 420, "rounds": 5, "wait": true, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Burning_Rampage.png",
+        "id": "burning_rampage",
+        "accuracy": 70
+    },
+    {
+        "name": "Backfire",
+        "school": "fire",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes up to three harmful Wards from caster to deal 70 Fire Damage per harmful Ward over 3 Rounds to target",
+        "effects": [
+            {
+                "type": "repeat", 
+                "up_to": 3, 
+                "condition": {"type": "amount", "aspect": "ward_negative", "amount": 1, "target": "self"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "ward_negative", "target": "self"},
+                    {"type": "DoT", "school": "fire", "amount": 70, "rounds": 3}
+                ]
+            }
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Backfire.png",
+        "id": "backfire",
+        "accuracy": 100,
+        "pvp_level": 40
+    },
+    {
+        "name": "Krampus",
+        "school": "fire",
+        "type": "damage",
+        "pips": {"regular": 2, "fire": 1},
+        "description": "Deals 420-460 Fire Damage to and applies a -45% Accuracy Charm on target",
+        "effects": [
+            {"type": "damage", "school": "fire", "min": 420, "max": 460, "target": "enemy_same"},
+            {"type": "charm", "aspect": "accuracy", "amount": -45, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Krampus.png",
+        "id": "krampus",
+        "accuracy": 0
+    },
+    {
+        "name": "Wyldfire",
+        "school": "fire",
+        "type": "global",
+        "pips": 2,
+        "description": "Applies a +25% Fire Damage Global",
+        "effects": [
+            {"type": "global", "aspect": "damage", "school": "fire", "amount": 25}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Wyldfire.png",
+        "id": "wyldfire",
+        "accuracy": 100,
+        "pvp_level": 26
+    },
+    {
+        "name": "Detonate",
+        "school": "fire",
+        "type": "manipulation",
+        "pips": 0,
+        "description": "Destroys 1 Damage over Time effect on target and deals its full remaining Damage",
+        "condition": {"type": "amount", "aspect": "DoT", "amount": 1, "target": "enemy"},
+        "effects": [
+            {"type": "detonate"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Detonate.png",
+        "id": "detonate",
+        "accuracy": 75,
+        "pvp_level": 72
+    },
+    {
+        "name": "Take Power",
+        "school": "fire",
+        "type": "damage",
+        "pips": 1,
+        "description": "Sacrifices a friendly Minion to give 3 Pips to self",
+        "effects": [],
+        "image": "static/w101/spells/fire/(Spell)_Take_Power.png",
+        "id": "take_power",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Phoenix",
+        "school": "fire",
+        "type": "damage",
+        "pips": 5,
+        "description": "Deals 515-595 Fire Damage",
+        "effects": [
+            {"type": "damage", "school": "fire", "min": 515, "max": 595}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Phoenix.png",
+        "id": "phoenix",
+        "accuracy": 75,
+        "pvp_level": 33
+    },
+    {
+        "name": "Fire Trap",
+        "school": "fire",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies a +40% Fire Damage Ward",
+        "effects": [
+            {"type": "trap", "school": "fire", "amount": 40}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Fire_Trap.png",
+        "id": "fire_trap",
+        "accuracy": 100
+    }
+]

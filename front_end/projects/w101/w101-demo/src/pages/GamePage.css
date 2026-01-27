@@ -1,0 +1,11 @@
+.orbital-layout {
+  position: relative;
+  width: 100%;
+  height: min(75vh, 600px); /* big enough for all effects */
+}
+
+.effects-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* usually desired for effects */
+}

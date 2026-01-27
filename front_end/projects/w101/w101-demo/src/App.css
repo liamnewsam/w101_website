@@ -1,0 +1,31 @@
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #1b1b1b;
+  color: white;
+  height: 100vh;
+}
+
+.hud {
+  margin-top: 20px;
+}
+
+.duel-board {
+  border: 2px solid #aaa;
+  width: 80%;
+  height: 300px;
+  margin: 20px 0;
+}
+
+.spell-deck {
+  display: flex;
+  gap: 10px;
+}
+
+.spell-card {
+  padding: 10px 20px;
+  background: #444;
+  border: 1px solid #666;
+  cursor: pointer;
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Demo</title>
+
+  <!-- Use the global stylesheet -->
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="../../css/charts.css-1.2.0/dist/charts.min.css">
+</head>
+<body>
+
+  <div class="project-page">
+
+    <!-- Banner -->
+    <div class="project-banner">
+      <img src="../../assets/demo1.png" alt="Project banner" />
+    </div>
+
+    <!-- Project Title -->
+    <h1 class="project-title">Digit Classification</h1>
+
+    <!-- Short Description -->
+    <p class="project-subtitle">
+      A beginning.
+    </p>
+
+    <!-- Content Section -->
+    <div class="project-content">
+
+      <section class="project-section">
+        <h2>Overview</h2>
+        <p>
+          As my first project, I wanted to create a digit classifier using the CNN architecture. My model
+          used two convolution layers with feature layers 8 and 64 respectively, and a kernel size of 3. 
+          I also used pooling (for efficiency). There is a final single linear layer. I used Adam optimization,
+          and trained for 4 epochs on the MNIST dataset.
+        </p>
+      </section>
+
+      <section class="project-section">
+        <h2>Demo</h2>
+        <p>
+          Draw a digit on the black canvas.
+        </p>
+
+        <div class="demo-box">
+
+          <div id="main-container">
+            <!-- LEFT: Canvas -->
+            <div id="demo-left-column">
+              <div id="canvas-container">
+                <div>
+                  <button id="predict" class="button">Predict</button>
+                  <button id="erase" class="button">Erase</button>
+                </div>
+                <canvas id="canvas"></canvas>
+                
+              </div>
+            </div>
+
+            <!-- RIGHT: Vertical Bar Chart -->
+             <div id="demo-right-column">
+              <div>
+                <div id="result" class="text-bubble">Prediction: </div>
+              </div>
+              <div id="chart-container">
+
+                <table id="prob-chart" class="charts-css bar show-labels data-spacing-10 horizontal">
+                  <tbody>
+                    <!-- JS will fill rows here -->
+                  </tbody>
+                </table>
+
+              </div>
+            </div>
+          </div>
+
+          
+
+        </div>
+
+      </section>
+
+    </div>
+
+    <a href="../../index.html" class="back-button">← Back to Home</a>
+
+  </div>
+  <script src="digit-predict.js"></script>
+</body>
+</html>

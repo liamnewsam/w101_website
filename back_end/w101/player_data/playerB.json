@@ -1,0 +1,28 @@
+{
+    "name": "ShadowSerpent",
+    "school": "life",
+    "decks": [
+        {
+            "name": "deckA",
+            "cards": [
+                "imp",
+                "imp",
+                "imp",
+                "imp",
+                "imp",
+                "imp",
+                "life_trap",
+                "life_trap",
+                "life_trap",
+                "life_weakness",
+                "life_weakness",
+                "life_weakness",
+                "minor_blessing",
+                "minor_blessing",
+                "lifeblade",
+                "lifeblade"
+            ]
+        }
+    ]
+}
+

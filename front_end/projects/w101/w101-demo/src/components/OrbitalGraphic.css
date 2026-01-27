@@ -1,0 +1,46 @@
+.orbital-container {
+  position: relative;
+  margin: 0 auto;
+}
+
+/* Center circle */
+.main-circle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border-style: solid;
+  border-color: white;
+}
+
+/* Orbiting circles */
+.orbit-item {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border-color: white;
+  border-style: solid;
+}
+
+.orbit-item img {
+  width: 100%;
+  height: 100%;
+  /*object-fit: cover;*/  /*causing the target images to be same dimensions as infocard*/
+}
+
+.invalid-target {
+    filter: grayscale(100%);
+    pointer-events: none;
+}
+
+.valid-target {
+    filter: grayscale(0%);
+    transition: transform 0.15s ease;
+}
+
+.valid-target:hover {
+    transform: scale(1.03);
+}
+
+.school-icon {
+    border: none;
+}

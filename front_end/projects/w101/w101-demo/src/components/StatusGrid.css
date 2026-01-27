@@ -1,0 +1,28 @@
+.status-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    grid-auto-flow: column;
+  
+}
+
+.status-popup {
+  background-color: white;
+  padding: 6px 10px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.popup-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px; /* spacing between lines */
+}
+
+.popup-line:last-child {
+  margin-bottom: 0;
+}

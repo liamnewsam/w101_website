@@ -1,0 +1,15 @@
+Pillow
+numpy
+onnxruntime
+
+
+Flask
+Flask-Cors
+Flask-SocketIO
+python-socketio
+python-engineio
+eventlet
+SQLAlchemy
+psycopg2-binary
+bcrypt
+PyJWT

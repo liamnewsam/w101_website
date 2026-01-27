@@ -1,0 +1,581 @@
+[
+    {
+        "name": "Sprite",
+        "school": "life",
+        "type": "heal",
+        "pips": 1,
+        "description": "Restores 30 Health and 280 Health over 4 Rounds",
+        "effects": [
+            {"type": "heal", "amount": 30, "target": "self"},
+            {"type": "HoT", "amount": 280, "rounds": 4, "target": "self"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Sprite.png",
+        "id": "sprite",
+        "accuracy": 90
+    },
+    {
+        "name": "Verdurous Jinn",
+        "school": "life",
+        "type": "manipulation",
+        "pips": 7,
+        "description": "Applies two Damage over Time effects on target that each deal 400 Life Damage after 5 Rounds or removes three Damage over Time effects from target to deal 1,545 Life Damage",
+        "effects": [{"type": "gambit"}],
+        "image": "static/w101/spells/life/(Spell)_Verdurous_Jinn.png",
+        "id": "verdurous_jinn",
+        "accuracy": 85,
+        "pvp_level": 70
+    },
+    {
+        "name": "Hunting Wyrm",
+        "school": "life",
+        "type": "damage",
+        "pips": 5,
+        "description": "Deals 75 Life Damage and 300 Life Damage after 3 Rounds to target, and restores 420 Health over 3 Rounds to caster",
+        "effects": [
+            {"type": "damage", "school": "life", "amount": 75, "target":"enemy_same"},
+            {"type": "damage", "school": "life", "amount": 300, "wait": true, "rounds": 3, "target":"enemy_same"},
+            {"type": "HoT", "amount": 420, "rounds": 3,"target": "self"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Hunting_Wyrm.png",
+        "id": "hunting_wyrm",
+        "accuracy": 90,
+        "pvp_level": 28
+    },
+    {
+        "name": "Life Shield",
+        "school": "life",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies a -80% Life Damage Ward",
+        "effects": [
+            {"type": "ward", "aspect": "damage", "school": "life", "amount": -80, "target": "ally"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Life_Shield.png",
+        "id": "life_shield",
+        "accuracy": 100,
+        "pvp_level": 10
+    },
+    {
+        "name": "Mass Life Prism",
+        "school": "life",
+        "type": "jinx",
+        "pips": 1,
+        "description": "Applies a Life to Death Damage Prism Ward on all enemies",
+        "effects": [
+            {"type": "jinx", "aspect": "prism", "from": "life", "to": "death", "target": "enemy_all"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Mass_Life_Prism.png",
+        "id": "mass_life_prism",
+        "accuracy": 100,
+        "pvp_level": 70
+    },
+    {
+        "name": "Entangle",
+        "school": "life",
+        "type": "curse",
+        "pips": 2,
+        "description": "Applies a Life Dispel Charm",
+        "effects": [
+            {"type": "curse", "aspect": "dispel", "school": "life", "target": "enemy"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Entangle.png",
+        "id": "entangle",
+        "accuracy": 100,
+        "pvp_level": 22
+    },
+    {
+        "name": "Life Trap",
+        "school": "life",
+        "type": "jinx",
+        "pips": 0,
+        "description": "Applies a +40% Life Damage Ward",
+        "effects": [
+            {"type": "jinx", "aspect": "damage", "school": "life", "amount": 40}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Life_Trap.png",
+        "id": "life_trap",
+        "accuracy": 100
+    },
+    {
+        "name": "The World",
+        "school": "life",
+        "type": "damage",
+        "pips": 10,
+        "description": "Deals 680 Life Damage and 210 Life Damage after 3 Rounds to target and applies a -25% incoming Damage Aura for 4 Rounds on caster",
+        "effects": [
+            {"type": "DoT", "school": "life", "amount": 680, "rounds": 3, "wait": true},
+            {"type": "aura", "amount": 25, "rounds": 4, "target": "self"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_The_World.png",
+        "id": "the_world",
+        "accuracy": 90,
+        "pvp_level": 170
+    },
+    {
+        "name": "Life Weakness",
+        "school": "life",
+        "type": "curse",
+        "pips": 0,
+        "description": "Applies a -35% Life Damage Charm",
+        "effects": [
+            {"type": "curse", "aspect": "damage", "school": "life", "amount": -35, "target": "enemy"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Life_Weakness.png",
+        "id": "life_weakness",
+        "accuracy": 100,
+        "pvp_level": 10
+    },
+    {
+        "name": "Guiding Light",
+        "school": "life",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a +35% Healing Charm",
+        "effects": [
+            {"type": "charm", "aspect": "heal", "amount": 35, "target": "ally"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Guiding_Light.png",
+        "id": "guiding_light",
+        "accuracy": 100,
+        "pvp_level": 30
+    },
+    {
+        "name": "Legend Shield",
+        "school": "life",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies -70% Death and Myth Damage Wards",
+        "effects": [
+            {"type": "ward", "aspect": "damage", "school": "death", "amount": -70, "target": "ally_same"},
+            {"type": "ward", "aspect": "damage", "school": "myth", "amount": -70, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Legend_Shield.png",
+        "id": "legend_shield",
+        "accuracy": 100
+    },
+    {
+        "name": "Mass Triage",
+        "school": "life",
+        "type": "manipulation",
+        "pips": 2,
+        "description": "Removes a Damage over Time effect from all allies",
+        "effects": [
+            {"type": "destroy", "aspect": "DoT", "target": "ally_all"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Mass_Triage.png",
+        "id": "mass_triage",
+        "accuracy": 0
+    },
+    {
+        "name": "Tranquility",
+        "school": "life",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes up to three harmful Wards from ally to restore 130 Health per harmful Ward over 3 Rounds to ally",
+        "effects": [{"type": "gambit"}],
+        "image": "static/w101/spells/life/(Spell)_Tranquility.png",
+        "id": "tranquility",
+        "accuracy": 100,
+        "pvp_level": 40
+    },
+    {
+        "name": "Guidance",
+        "school": "life",
+        "type": "charm",
+        "pips": 1,
+        "description": "+10% accuracy to all friends",
+        "effects": [
+            {"type": "charm", "aspect": "accuracy", "amount": 10, "target": "ally_all"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Guidance.png",
+        "id": "guidance",
+        "accuracy": 100
+    },
+    {
+        "name": "King Artorius (Life)",
+        "school": "life",
+        "type": "damage",
+        "pips": 8,
+        "description": "Deals 650 Life Damage to target, and applies a +10% Life Armor Piercing Charm on and restores 300 Health over 3 Rounds to self",
+        "effects": [
+            {"type": "damage", "school": "life", "amount": 650},
+            {"type": "charm", "aspect": "armor_piercing", "school": "life", "amount": 10, "target": "self"},
+            {"type": "HoT", "amount": 300, "rounds": 3, "target": "self"}
+
+        ],
+        "image": "static/w101/spells/life/(Spell)_King_Artorius_(Life).png",
+        "id": "king_artorius_(life)",
+        "accuracy": 90,
+        "pvp_level": 80
+    },
+    {
+        "name": "Jinn's Affliction",
+        "school": "life",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "",
+        "effects": [{"type": "gambit"}],
+        "image": "static/w101/spells/life/(Spell)_Jinn's_Affliction.png",
+        "id": "jinn's_affliction",
+        "accuracy": 100,
+        "pvp_level": 70
+    },
+    {
+        "name": "Earth Walker",
+        "school": "life",
+        "type": "damage",
+        "pips": 5,
+        "description": "Deals 420-500 Life Damage",
+        "effects": [
+            {"type": "damage", "school": "life", "min": 420, "max": 500}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Earth_Walker.png",
+        "id": "earth_walker",
+        "accuracy": 90,
+        "pvp_level": 33
+    },
+    {
+        "name": "Life Prism",
+        "school": "life",
+        "type": "jinx",
+        "pips": 0,
+        "description": "Applies a Life to Death Damage Prism Ward",
+        "effects": [
+            {"type": "jinx", "aspect": "prism", "from": "life", "to": "death", "target": "enemy"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Life_Prism.png",
+        "id": "life_prism",
+        "accuracy": 100
+    },
+    {
+        "name": "Oni's Naturalism",
+        "school": "life",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes up to three harmful Wards from ally to apply up to three +15% Life Damage Blades on ally",
+        "effects": [
+            {"type": "gambit"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Oni's_Naturalism.png",
+        "id": "oni's_naturalism",
+        "accuracy": 100,
+        "pvp_level": 100
+    },
+    {
+        "name": "Spirit Armor",
+        "school": "life",
+        "type": "ward",
+        "pips": 3,
+        "description": "Applies a 400 Damage Absorb Ward",
+        "effects": [
+            {"type": "ward", "aspect": "absorb", "amount": 400, "target": "ally"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Spirit_Armor.png",
+        "id": "spirit_armor",
+        "accuracy": 100
+    },
+    {
+        "name": "Phoebus' Will",
+        "school": "life",
+        "type": "damage",
+        "pips": 8,
+        "description": "Deals 610 Life Damage to target then Detonates up to three Damage over Time effects on target to deal 130% of the remaining Damage",
+        "effects": [
+            {"type": "damage", "school": "life", "amount": 610, "target": "enemy_same"},
+            {"type": "detonate"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Phoebus'_Will.png",
+        "id": "phoebus'_will",
+        "accuracy": 90,
+        "pvp_level": 90
+    },
+    {
+        "name": "Primal Oni",
+        "school": "life",
+        "type": "damage",
+        "pips": 9,
+        "description": "Deals 835 Life Damage; or removes four helpful Charms from caster to deal 1,285 Life Damage",
+        "effects": [
+            {"type": "gambit"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Primal_Oni.png",
+        "id": "primal_oni",
+        "accuracy": 85,
+        "pvp_level": 100
+    },
+    {
+        "name": "Drain Health",
+        "school": "life",
+        "type": "damage",
+        "pips": 1,
+        "description": "Sacrifices a friendly Minion to restore 450 Health to caster",
+        "effects": [
+            {"type": "gambit"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Drain_Health.png",
+        "id": "drain_health",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Brilliant Light",
+        "school": "life",
+        "type": "charm",
+        "pips": 1,
+        "description": "Applies a +30% Healing Charm on all allies",
+        "effects": [
+            {"type": "charm", "aspect": "heal", "amount": 30, "target": "ally_all"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Brilliant_Light.png",
+        "id": "brilliant_light",
+        "accuracy": 100,
+        "pvp_level": 55
+    },
+    {
+        "name": "Meditation",
+        "school": "life",
+        "type": "manipulation",
+        "pips": 3,
+        "description": "Removes a Damage over Time effect from ally to restore 390 Health over 3 Rounds to ally",
+        "effects": [{"type": "gambit"}],
+        "image": "static/w101/spells/life/(Spell)_Meditation.png",
+        "id": "meditation",
+        "accuracy": 100,
+        "pvp_level": 40
+    },
+    {
+        "name": "Triage",
+        "school": "life",
+        "type": "manipulation",
+        "pips": 1,
+        "description": "Removes a Damage over Time effect from target",
+        "effects": [
+            {"type": "destroy", "aspect": "DoT", "target": "ally"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Triage.png",
+        "id": "triage",
+        "accuracy": 100,
+        "pvp_level": 35
+    },
+    {
+        "name": "Imp",
+        "school": "life",
+        "type": "damage",
+        "pips": 1,
+        "description": "Deals 65-105 Life Damage",
+        "effects": [
+            {"type": "damage", "school": "life", "min": 65, "max": 105}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Imp.png",
+        "id": "imp",
+        "accuracy": 90
+    },
+    {
+        "name": "Leprechaun",
+        "school": "life",
+        "type": "damage",
+        "pips": 2,
+        "description": "Deals 155-195 Life Damage",
+        "effects": [
+            {"type": "damage", "school": "life", "min": 155, "max": 195}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Leprechaun.png",
+        "id": "leprechaun",
+        "accuracy": 90
+    },
+    {
+        "name": "Minor Blessing",
+        "school": "life",
+        "type": "heal",
+        "pips": 0,
+        "description": "Restores 120 Health",
+        "effects": [
+            {"type": "heal", "amount": 120, "target": "ally"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Minor_Blessing.png",
+        "id": "minor_blessing",
+        "accuracy": 90
+    },
+    {
+        "name": "Starspawn",
+        "school": "life",
+        "type": "damage",
+        "pips": {"regular": 3, "fire": 1},
+        "description": "Deals 535 Life Damage",
+        "effects": [
+            {"type": "damage", "school": "life", "amount": 535}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Starspawn.png",
+        "id": "starspawn",
+        "accuracy": 85,
+        "pvp_level": 150
+    },
+    {
+        "name": "Lifeblade",
+        "school": "life",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a +35% Life Damage Charm",
+        "effects": [
+            {"type": "charm", "aspect": "damage", "school": "life", "amount": 35, "target": "ally"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Lifeblade.png",
+        "id": "lifeblade",
+        "accuracy": 100
+    },
+    {
+        "name": "Gnomes!",
+        "school": "life",
+        "type": "damage",
+        "pips": 9,
+        "description": "Deals 740-840 Life Damage to target and applies a +30% Healing Charm on caster",
+        "effects": [
+            {"type": "damage", "school": "life", "min": 740, "max": 840},
+            {"type": "charm", "aspect": "heal", "amount": 30, "target": "self"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Gnomes!.png",
+        "id": "gnomes!",
+        "accuracy": 90,
+        "pvp_level": 68
+    },
+    {
+        "name": "Nature's Wrath",
+        "school": "life",
+        "type": "damage",
+        "pips": 3,
+        "description": "Deals 240-300 Life Damage",
+        "effects": [
+            {"type": "damage", "school": "life", "min": 240, "max": 300}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Nature's_Wrath.png",
+        "id": "nature's_wrath",
+        "accuracy": 90
+    },
+    {
+        "name": "Lifespear",
+        "school": "life",
+        "type": "charm",
+        "pips": 0,
+        "description": "Applies a +30% Life Armor Piercing Charm",
+        "effects": [
+            {"type": "charm", "aspect": "armor_piercing", "school": "life", "amount": 30}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Lifespear.png",
+        "id": "lifespear",
+        "accuracy": 100,
+        "pvp_level": 80
+    },
+    {
+        "name": "Burrowing Bane",
+        "school": "life",
+        "type": "damage",
+        "pips": {"regular": 3, "life": 1},
+        "description": "Applies two Damage over Time effects on target that each deal 380 Life Damage after 5 Rounds",
+        "effects": [
+            {"type": "DoT", "school": "life", "amount": 380, "rounds": 5, "target": "enemy_same", "wait": true},
+            {"type": "DoT", "school": "life", "amount": 380, "rounds": 5, "target": "enemy_same", "wait": true}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Burrowing_Bane.png",
+        "id": "burrowing_bane",
+        "accuracy": 0
+    },
+    {
+        "name": "Seraph",
+        "school": "life",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 335-395 Life Damage",
+        "effects": [
+            {"type": "damage", "school": "life", "min": 335, "max": 395}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Seraph.png",
+        "id": "seraph",
+        "accuracy": 90,
+        "pvp_level": 22
+    },
+    {
+        "name": "Namaste",
+        "school": "life",
+        "type": "global",
+        "pips": 4,
+        "description": "Applies a +20% Life Armor Piercing and +20% Life Critical Chance Global",
+        "effects": [
+            {"type": "global", "aspect": "armor_piercing", "school": "life", "amount": 20},
+            {"type": "global", "aspect": "critical", "school": "life", "amount": 20}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Namaste.png",
+        "id": "namaste",
+        "accuracy": 100,
+        "pvp_level": 97
+    },
+    {
+        "name": "Circle of Thorns",
+        "school": "life",
+        "type": "global",
+        "pips": 2,
+        "description": "Applies a +25% Life Damage Global",
+        "effects": [
+            {"type": "global", "aspect": "damage", "school": "life", "amount": 25}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Circle_of_Thorns.png",
+        "id": "circle_of_thorns",
+        "accuracy": 100,
+        "pvp_level": 42
+    },
+    {
+        "name": "Centaur",
+        "school": "life",
+        "type": "damage",
+        "pips": 6,
+        "description": "Deals 515-595 Life Damage",
+        "effects": [
+            {"type": "damage", "school": "life", "min": 515, "max": 595}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Centaur.png",
+        "id": "centaur",
+        "accuracy": 90,
+        "pvp_level": 38
+    },
+    {
+        "name": "Goat Monk",
+        "school": "life",
+        "type": "damage",
+        "pips": {"regular": 3, "life": 1},
+        "description": "Deals 515-555 Life Damage",
+        "effects": [
+            {"type": "damage", "school": "life", "min": 515, "max": 555}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Goat_Monk.png",
+        "id": "goat_monk",
+        "accuracy": 85
+    },
+    {
+        "name": "Sanctuary",
+        "school": "life",
+        "type": "global",
+        "pips": 2,
+        "description": "Applies a +35% Healing Global (does not affect Steal Spells)",
+        "effects": [
+            {"type": "global", "aspect": "heal", "amount": 35}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Sanctuary.png",
+        "id": "sanctuary",
+        "accuracy": 100,
+        "pvp_level": 42
+    },
+    {
+        "name": "Infestation",
+        "school": "life",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 135 Life Damage and applies a +25% Life Damage Global",
+        "effects": [
+            {"type": "damage", "school": "life", "amount": 135},
+            {"type": "global", "aspect": "damage", "school": "life", "amount": 25}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Infestation.png",
+        "id": "infestation",
+        "accuracy": 90,
+        "pvp_level": 42
+    }
+]
