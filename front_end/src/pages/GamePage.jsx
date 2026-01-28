@@ -468,7 +468,7 @@ export default function GamePage() {
 
 
         <motion.img
-          src={BACKEND_URL + "static/w101/battle_triangle.png"}
+          src={BACKEND_URL + "/static/w101/battle_triangle.png"}
           animate={
             activatedPlayerID != null
               ? { rotate: 90 + (playerAngles[activatedPlayerID] * 180) / Math.PI }
@@ -628,7 +628,7 @@ async function processEvent(event, gs, ps, playerAngles, playerPositions, setVis
             case "attempt_cast": {
               let effect = {
                 type: "IMAGE",
-                srcImg: BACKEND_URL + BATTLE_PATH + "cast_symbols/" + event.school + ".png",
+                srcImg: BACKEND_URL + "/" + BATTLE_PATH + "cast_symbols/" + event.school + ".png",
                 id: crypto.randomUUID()
               };
               setVisualEffects(effects => [...effects, effect]);
@@ -843,7 +843,7 @@ async function processEvent(event, gs, ps, playerAngles, playerPositions, setVis
             console.log("Success");
             let effect = {
                 type: "REVEAL",
-                imgSrc: BACKEND_URL + event.card,
+                imgSrc: BACKEND_URL + "/" + event.card,
                 id: crypto.randomUUID(),
                 startPos: playerPositions[event.player]
             }
