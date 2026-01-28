@@ -50,7 +50,13 @@ def handle_http_exception(e):
 def favicon():
     return "", 200
 
-
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = ORIGIN
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return response
 # ========================================================
 # In-Memory Data Models
 # ========================================================
