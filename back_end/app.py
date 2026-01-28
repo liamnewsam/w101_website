@@ -6,19 +6,18 @@ import uuid
 import time
 
 # ===== Game Logic =====
-from w101.Game import Game, createBotPlayer
-from w101.Player import loadPlayer
-from digit_prediction.digit_prediction import predict_digit
-from w101.Card import CARD_BY_ID
+from Game import Game, createBotPlayer
+from Player import loadPlayer
+from Card import CARD_BY_ID
 
 # ===== Auth System =====
-from w101.auth_routes import auth
-from w101.jwt_utils import decode_jwt
-from w101.utils import getRandomPlayerImage
+from auth_routes import auth
+from jwt_utils import decode_jwt
+from utils import getRandomPlayerImage
 
 # ===== Database =====
-from w101.database import *
-from w101.models import *
+from database import *
+from models import *
 
 from socketio.exceptions import ConnectionRefusedError
 
@@ -663,20 +662,10 @@ def player_action(data):
 
     return {"ok": True}
 
-
-# ========================================================
-# REST: Digit Prediction
-# ========================================================
-
-@app.route("/digit-predict", methods=["POST"])
-def digit_predict_route():
-    data = request.get_json()
-    return jsonify(predict_digit(data["image"]))
-
-
 # ========================================================
 # Main Entrypoint
 # ========================================================
 
 if __name__ == "__main__":
+    #Only for dev use, not on google cloud
     socketio.run(app, host="0.0.0.0", port=5000, debug=True)
