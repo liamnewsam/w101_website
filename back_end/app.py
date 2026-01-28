@@ -28,7 +28,8 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_PATH = os.path.join(BASE_DIR, "w101", "game.db")
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "https://w101-website.vercel.app"}})
+
 app.register_blueprint(auth)
 
 socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
