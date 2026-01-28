@@ -57,6 +57,14 @@ def add_cors_headers(response):
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     return response
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    response = jsonify({"error": str(e)})
+    response.status_code = 500
+    response.headers["Access-Control-Allow-Origin"] = ORIGIN
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
 # ========================================================
 # In-Memory Data Models
 # ========================================================
