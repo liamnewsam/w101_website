@@ -13,7 +13,6 @@ export default function LoginPage() {
   // Auto redirect if already logged in
   useEffect(() => {
     if (connected) {
-      console.log("YOYOYOYOYO");
       navigate("/menu");
     }
   }, [connected]);

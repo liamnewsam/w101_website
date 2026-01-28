@@ -15,7 +15,7 @@ from config import CHARACTER_IMAGE_PATH
 from utils import getRandomPlayerImage
 auth = Blueprint("auth", __name__)
 
-@auth.route("/auth/login", methods=["POST"])
+@auth.route("/login", methods=["POST"])
 def login():
     print("User Logging In")
     data = request.json
@@ -35,7 +35,7 @@ def login():
     return jsonify({"token": token})
 
 
-@auth.route("/auth/guest", methods=["POST"])
+@auth.route("/guest", methods=["POST"])
 def guest_login():
     print("Guest Logging In")
     guest_id = uuid.uuid4().hex
@@ -70,7 +70,7 @@ def guest_login():
     return jsonify({"token": token})
 
 
-@auth.route("/auth/logout", methods=["POST"])
+@auth.route("/logout", methods=["POST"])
 def logout():
     print("Guess logging out")
     # The frontend must delete the stored JWT.

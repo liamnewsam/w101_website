@@ -25,7 +25,12 @@ export async function guestLogin() {
     method: "POST",
   });
 
+  if (!res.ok) {
+    throw new Error("Guest login failed");
+  }
+
   const data = await res.json();
+  localStorage.setItem("token", data.token); // ← REQUIRED
   return data;
 }
 
