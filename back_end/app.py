@@ -35,6 +35,9 @@ app = Flask(__name__)
 # Apply Flask-CORS (still useful for normal routes)
 CORS(app,supports_credentials=True,resources={r"/*": {"origins": ORIGIN}},)
 
+app.register_blueprint(auth, url_prefix="/auth")
+
+
 socketio = SocketIO(app,cors_allowed_origins=[ORIGIN],logger=True,engineio_logger=True,)
 
 from flask import make_response
@@ -51,6 +54,8 @@ def handle_http_exception(e):
 def favicon():
     return "", 200
 
+
+'''
 @app.after_request
 def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = ORIGIN
@@ -66,6 +71,8 @@ def handle_exception(e):
     response.headers["Access-Control-Allow-Origin"] = ORIGIN
     response.headers["Access-Control-Allow-Credentials"] = "true"
     return response
+
+'''
 # ========================================================
 # In-Memory Data Models
 # ========================================================
