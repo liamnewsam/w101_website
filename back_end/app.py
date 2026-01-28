@@ -29,6 +29,7 @@ DB_PATH = os.path.join(BASE_DIR, "game.db")
 
 ORIGIN = "https://w101-website.vercel.app"
 
+#blahsdkfh
 app = Flask(__name__)
 
 # Apply Flask-CORS (still useful for normal routes)

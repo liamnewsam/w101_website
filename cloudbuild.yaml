@@ -38,5 +38,5 @@ options:
 substitutions:
   _AR_PROJECT_ID: fresh-circle-478122-b7
   _AR_REPOSITORY: cloud-run-source-deploy
-  _SERVICE_NAME: my-socketio-app
-  _DEPLOY_REGION: europe-west1
+  _SERVICE_NAME: w101
+  _DEPLOY_REGION: us-west1
