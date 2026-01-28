@@ -1,10 +1,10 @@
 from typing import *
 import random
 #--------------
-from w101.Player import *
-from w101.Card import *
-from w101.Deck import *
-from w101.utils import *
+from Player import *
+from Card import *
+from Deck import *
+from utils import *
 
 def createBotPlayer(name, bot_id, image_path, school="random", deck=None, difficulty="easy"):
     if school=="random":

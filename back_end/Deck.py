@@ -1,7 +1,7 @@
 from typing import *
 import random
 
-from w101.Card import *
+from Card import *
 
 HAND_SIZE = 5
 

@@ -1,6 +1,6 @@
 import os
 import random
-from w101.config import CHARACTER_IMAGE_PATH
+from config import CHARACTER_IMAGE_PATH
 
 
 def inp(values, hidden=[], keys=[], custom=None):

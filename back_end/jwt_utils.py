@@ -1,7 +1,7 @@
 import jwt
 import time
 #-------------
-from w101.config import SECRET_KEY, JWT_EXPIRY_SECONDS
+from config import SECRET_KEY, JWT_EXPIRY_SECONDS
 
 def create_jwt(payload):
     payload["exp"] = int(time.time()) + JWT_EXPIRY_SECONDS

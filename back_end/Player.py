@@ -1,6 +1,6 @@
-from w101.Deck import *
-from w101.utils import *
-from w101.Card import *
+from Deck import *
+from utils import *
+from Card import *
 
 import random
 

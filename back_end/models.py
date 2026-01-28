@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, JSON, ForeignKey, Bool
 from sqlalchemy.sql import func
 import json
 #----------------
-from w101.database import Base
+from database import Base
 
 class User(Base):
     __tablename__ = "users"

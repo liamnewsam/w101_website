@@ -25,17 +25,17 @@ from socketio.exceptions import ConnectionRefusedError
 # Flask + CORS Setup
 # --------------------------------------------------------
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, "w101", "game.db")
+DB_PATH = os.path.join(BASE_DIR, "game.db")
+
+ORIGIN = "https://w101-website.vercel.app"
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "https://w101-website.vercel.app"}})
 
-app.register_blueprint(auth)
+# Apply Flask-CORS (still useful for normal routes)
+CORS(app,supports_credentials=True,resources={r"/*": {"origins": ORIGIN}},)
 
-socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
+socketio = SocketIO(app,cors_allowed_origins=[ORIGIN],logger=True,engineio_logger=True,)
 
-
-import traceback
 from flask import make_response
 
 from werkzeug.exceptions import HTTPException

@@ -6,13 +6,13 @@ import json
 import random
 import os
 #-------------------
-from w101.database import SessionLocal
-from w101.models import User, GuestSession, PlayerState
-from w101.jwt_utils import create_jwt
-from w101.config import GUEST_SESSION_LIFETIME
-from w101.Deck import simple_life
-from w101.config import CHARACTER_IMAGE_PATH
-from w101.utils import getRandomPlayerImage
+from database import SessionLocal
+from models import User, GuestSession, PlayerState
+from jwt_utils import create_jwt
+from config import GUEST_SESSION_LIFETIME
+from Deck import simple_life
+from config import CHARACTER_IMAGE_PATH
+from utils import getRandomPlayerImage
 auth = Blueprint("auth", __name__)
 
 @auth.route("/auth/login", methods=["POST"])
