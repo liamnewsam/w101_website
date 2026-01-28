@@ -628,7 +628,7 @@ async function processEvent(event, gs, ps, playerAngles, playerPositions, setVis
             case "attempt_cast": {
               let effect = {
                 type: "IMAGE",
-                srcImg: BACKEND_URL + "/" + BATTLE_PATH + "cast_symbols/" + event.school + ".png",
+                srcImg: BACKEND_URL + BATTLE_PATH + "cast_symbols/" + event.school + ".png",
                 id: crypto.randomUUID()
               };
               setVisualEffects(effects => [...effects, effect]);
