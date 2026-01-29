@@ -143,7 +143,7 @@ export default function OrbitalGraphic({
           >
             <PlayerInfoWithIcons
                 player={player}
-                leftIcon={BACKEND_URL + `static/w101/icons/schools/${player.school}.png`}
+                leftIcon={BACKEND_URL + `/static/w101/icons/schools/${player.school}.png`}
                 style={{
                     left: `${orbit_size/2 + infoXRelative}px`,
                     top: `${orbit_size/2 + infoYRelative}px`,
@@ -217,7 +217,7 @@ export default function OrbitalGraphic({
           >
             <PlayerInfoWithIcons
                 player={player}
-                leftIcon={BACKEND_URL + `static/w101/icons/schools/${player.school}.png`}
+                leftIcon={BACKEND_URL + `/static/w101/icons/schools/${player.school}.png`}
                 style={{
                     left: `${orbit_size/2 + infoXRelative}px`,
                     top: `${orbit_size/2 + infoYRelative}px`,
