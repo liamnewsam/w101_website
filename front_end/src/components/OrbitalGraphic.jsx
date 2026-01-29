@@ -158,7 +158,7 @@ export default function OrbitalGraphic({
             
             <div style={{ overflow: "hidden" }}>
                 <img
-                    src={BACKEND_URL + player.img_path}
+                    src={BACKEND_URL + "/" + player.img_path}
                     alt=""
                     className={`
                         player-image
@@ -232,7 +232,7 @@ export default function OrbitalGraphic({
             
             <div style={{ overflow: "hidden" }}>
                 <img
-                    src={BACKEND_URL + player.img_path}
+                    src={BACKEND_URL + "/" + player.img_path}
                     alt=""
                     className={`
                         player-image
