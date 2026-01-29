@@ -62,7 +62,7 @@ export default function CardHand({
           >
             <img
               className="card"
-              src={BACKEND_URL + card.img_path}
+              src={BACKEND_URL + "/" + card.img_path}
               alt={card.card}
               draggable={false}
             />
