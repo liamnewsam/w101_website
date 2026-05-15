@@ -4,6 +4,7 @@ from typing import *
 #------------
 
 import json
+import uuid
 
 class CardDef:
     def __init__(self, id, name, school, description, type, pips, effects, accuracy, pvp_level, reshuffle, condition, img_path):
@@ -97,6 +98,7 @@ for card in ALL_CARD_DEFS:
 class Card():
     def __init__(self, card_def):
         self.card_def = card_def
+        self.instance_id = str(uuid.uuid4())
 
     def __str__(self):
         return str(self.card_def)

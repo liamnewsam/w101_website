@@ -196,7 +196,7 @@ class Player:
         for effect in card.card_def.effects:
             if effect["type"] in ["damage", "DoT", "heal", "HoT"]:
                 for charm in self.charms:
-                    if charm.aspect == "damage" and charm.school in ["any", effect["school"]] and not isRedundant(used_charms, charm):
+                    if charm.aspect == "damage" and effect["type"] in ["damage", "DoT"] and charm.school in ["any", effect["school"]] and not isRedundant(used_charms, charm):
                         accumulation["damage"][charm.school] += charm.amount
                         self.charms.remove(charm)
                         used_charms.append(charm)
@@ -218,19 +218,6 @@ class Player:
         
         return used_curses
 
-    def consumeWards(self, card, accumulation): # Automatically assumes we are the target
-        used_wards = []
-        for effect in card.card_def.effects:
-            if effect["type"] in ["damage", "DoT", "heal", "HoT"]:
-                for ward in self.wards:
-                    if ward.type == "damage" and ward.school in ["any", effect["school"]] and not isRedundant(used_wards, ward):
-                        accumulation["damage"][ward.school] -= ward.amount
-                        self.charms.remove(ward)
-                        used_wards.append(ward)
-                        print(f"Removing {ward.amount}% damage")
-        
-        return used_wards
-    
     def consumeWards(self, card, accumulation): # Automatically assumes we are the target
         used_wards = []
         for effect in card.card_def.effects:
@@ -364,8 +351,8 @@ class DamageEffect(Effect):
     def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
 
         base = self.get_amount()  
-        dmg = base + self.owner.flat_boost[school]
-        dmg *= (1 + self.owner.boost[school] / 100.0)
+        dmg = base + self.owner.flat_boost[self.school]
+        dmg *= (1 + self.owner.boost[self.school] / 100.0)
         blade_mult = 1.0 + caster_accumulation["damage"]["any"] / 100.0
                     
         if self.school != "any":

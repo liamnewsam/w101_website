@@ -1,77 +1,65 @@
 from flask import Blueprint, request, jsonify
-from sqlalchemy.orm import Session
-import bcrypt, uuid, time
+import bcrypt, uuid
 from datetime import datetime, timedelta
-import json
-import random
-import os
 #-------------------
 from database import SessionLocal
 from models import User, GuestSession, PlayerState
 from jwt_utils import create_jwt
 from config import GUEST_SESSION_LIFETIME
-from Deck import simple_life
-from config import CHARACTER_IMAGE_PATH
+from Deck import simple_life, circular_arrow
 from utils import getRandomPlayerImage
+
 auth = Blueprint("auth", __name__)
+
 
 @auth.route("/login", methods=["POST"])
 def login():
-    print("User Logging In")
     data = request.json
-    username = data["username"]
-    password = data["password"].encode()
+    if not data:
+        return jsonify({"error": "Missing request body"}), 400
+    username = data.get("username")
+    password = data.get("password")
+    if not username or not password:
+        return jsonify({"error": "Missing username or password"}), 400
+    password = password.encode()
 
     db = SessionLocal()
-    user = db.query(User).filter_by(username=username).first()
-
-    if not user:
-        return jsonify({"error": "Invalid username/password"}), 400
-
-    if not bcrypt.checkpw(password, user.password_hash.encode()):
-        return jsonify({"error": "Invalid username/password"}), 400
-
-    token = create_jwt({"user_id": user.id, "type": "registered"})
-    return jsonify({"token": token})
+    try:
+        user = db.query(User).filter_by(username=username).first()
+        if not user or not bcrypt.checkpw(password, user.password_hash.encode()):
+            return jsonify({"error": "Invalid username/password"}), 400
+        token = create_jwt({"user_id": user.id, "type": "registered"})
+        return jsonify({"token": token})
+    finally:
+        db.close()
 
 
 @auth.route("/guest", methods=["POST"])
 def guest_login():
-    print("Guest Logging In")
     guest_id = uuid.uuid4().hex
-    print("generated guest_id:", guest_id)
-
     expires = datetime.utcnow() + timedelta(seconds=GUEST_SESSION_LIFETIME)
 
     db = SessionLocal()
-    sess = GuestSession(
-        guest_id=guest_id,
-        expire_at=expires
-    )
-    db.add(sess)
-    db.commit()
+    try:
+        db.add(GuestSession(guest_id=guest_id, expire_at=expires))
+        db.add(PlayerState(
+            player_id=guest_id,
+            is_guest=True,
+            name=f"Guest {guest_id[:6]}",
+            school="Life",
+            deck=simple_life().to_dict(),
+            image_path=getRandomPlayerImage()
+        ))
+        db.commit()
+    finally:
+        db.close()
 
-
-
-    player = PlayerState(
-        player_id=guest_id,
-        is_guest=True,
-
-        name=f"Guest {guest_id}",
-        school="Life",
-        deck=json.dumps(simple_life().to_dict()),
-        image_path=getRandomPlayerImage()
-    )
-    db.add(player)
-    db.commit()
-    
     token = create_jwt({"guest_id": guest_id, "type": "guest"})
-    print(f"our token is: {token}")
     return jsonify({"token": token})
 
 
 @auth.route("/logout", methods=["POST"])
 def logout():
-    print("Guess logging out")
-    # The frontend must delete the stored JWT.
+    # JWT is stateless; the client must delete its stored token.
+    # Tokens remain valid until expiry — add a denylist table here if needed.
     return jsonify({"success": True})

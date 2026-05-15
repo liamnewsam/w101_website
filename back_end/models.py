@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, JSON, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, JSON, Boolean
 from sqlalchemy.sql import func
-import json
 #----------------
 from database import Base
 
@@ -29,7 +28,7 @@ class PlayerState(Base):
         return {
             "name": self.name,
             "school": self.school,
-            "deck": json.loads(self.deck),
+            "deck": self.deck,
             "user_id": self.player_id,
             "image_path": self.image_path
         }

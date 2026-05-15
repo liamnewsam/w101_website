@@ -54,21 +54,81 @@ def simple_life():
     #cards.append()
     return Deck("SimpleLifeDeck", cards)
 
+def circular_arrow():
+    cards = []
+    cards.extend([Card(CARD_BY_ID["lifeblade"]) for _ in range(10)])
+    #cards.append()
+    return Deck("CircularArrow", cards)
+
 
 def simple_storm():
     cards = []
-    cards.extend([Card(CARD_BY_ID["thunder_snake"]) for _ in range(8)])
-    #cards.extend([Card(CARD_BY_ID["stormblade"]) for _ in range(3)])
-    #cards.extend([Card(CARD_BY_ID["thermic_shield"]) for _ in range(2)])
-    #cards.extend([Card(CARD_BY_ID["minor_blessing"]) for _ in range(3)])
-    #cards.extend([Card(CARD_BY_ID["lifeblade"]) for _ in range(3)])
-    #cards.append()
+    cards.extend([Card(CARD_BY_ID["thunder_snake"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["stormblade"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["thermic_shield"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["lightning_bats"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["storm_shark"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["storm_trap"]) for _ in range(3)])
+    return Deck("SimpleStormDeck", cards)
+
+def simple_fire():
+    cards = []
+    cards.extend([Card(CARD_BY_ID["fire_cat"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["fire_elf"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["glacial_shield"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["sunbird"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["fire_trap"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["fire_weakness"]) for _ in range(3)])
+    return Deck("SimpleStormDeck", cards)
+
+def simple_ice():
+    cards = []
+    cards.extend([Card(CARD_BY_ID["frost_beetle"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["snow_serpent"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["volcanic_shield"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["evil_snowman"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["tower_shield"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["ice_trap"]) for _ in range(2)])
+    return Deck("SimpleStormDeck", cards)
+
+def simple_death():
+    cards = []
+    cards.extend([Card(CARD_BY_ID["dark_sprite"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["ghoul"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["dream_shield"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["banshee"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["vampire"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["infection"]) for _ in range(3)])
+    return Deck("SimpleStormDeck", cards)
+
+def simple_myth():
+    cards = []
+    cards.extend([Card(CARD_BY_ID["blood_bat"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["troll"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["myth_trap"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["cyclops"]) for _ in range(3)])
+    cards.extend([Card(CARD_BY_ID["ether_shield"]) for _ in range(3)])
+    return Deck("SimpleStormDeck", cards)
+
+def simple_balance():
+    cards = []
+    cards.extend([Card(CARD_BY_ID["scarab"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["scorpion"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["weakness"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["locust_swarm"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["elemental_trap"]) for _ in range(2)])
+    cards.extend([Card(CARD_BY_ID["elemental_shield"]) for _ in range(2)])
     return Deck("SimpleStormDeck", cards)
 
 
 DECK_MASTER = {
     "easy": {
         "Life": simple_life,
-        "Storm": simple_storm
+        "Storm": simple_storm,
+        "Myth": simple_myth,
+        "Fire": simple_fire,
+        "Ice": simple_ice,
+        "Death": simple_death,
+        "Balance": simple_balance
     }
 }

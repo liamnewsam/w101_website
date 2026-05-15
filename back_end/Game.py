@@ -96,10 +96,23 @@ class Game():
         return log
     
     def takeRandomAction(self, player):
+        if len(player.deck.play_hand) == 0:
+            print(f"{player.name} is out of cards, passing")
+            self.player_pass(player)
+            return
+
         playable_indices = [i for i, option in enumerate(self.playability[player.user_id]) if option["playable"]]
+        if len(playable_indices) == 0:
+            print(f"{player.name} cannot play anything! Will discard one card and then pass")
+            discard_card = player.deck.play_hand[random.randint(0, len(player.deck.play_hand)-1)]
+            self.player_discard(player, discard_card.instance_id)
+            self.player_pass(player)
+            return
+
         cardIndex = random.choice(playable_indices)
         target = None
         if self.playability[player.user_id][cardIndex]["targets"]:
+            #target = player.user_id
             target = random.choice(self.playability[player.user_id][cardIndex]["targets"]).user_id
         self.player_cast(player, cardIndex, target)
 
@@ -131,22 +144,23 @@ class Game():
     
 
     def allActionsReceived(self):
-        print(self.player_actions)
+        #print(self.player_actions)
         for player in self.current_team():
             if self.player_actions[player.user_id] == None:
                 return False
         return True
 
-    def player_discard(self, player, i):
-        if i >= 0 and i < len(player.deck.play_hand):
-            card = player.deck.play_hand.pop(i)
-            self.log.append({"type": "action", "player": player.user_id, "action": "discard", "cardIndex": i})
-            player.deck.play_discard.append(card)
+    def player_discard(self, player, card_id):
+        for i, card in enumerate(player.deck.play_hand):
+            if card.instance_id == card_id:
+                player.deck.play_hand.pop(i)
+                self.log.append({"type": "action", "player": player.user_id, "action": "discard", "cardIndex": i})
+                player.deck.play_discard.append(card)
+                self.playability[player.user_id].pop(i)
+                return True
 
-            self.playability[player.user_id].pop(0)
-            return True
-        
-        print("[error] Error in discarding")
+        print("[error] Discard card not found in hand")
+        print(f"card_id={card_id}, hand={[c.instance_id for c in player.deck.play_hand]}")
         return False
     
     def player_pass(self, player):
@@ -208,8 +222,8 @@ class Game():
                 log.append({"type": "effect_resolve", "player": player.user_id, "aspect": "accuracy", "amount": extra_accuracy})
             
             if random.randint(1, 100) > card.card_def.accuracy + extra_accuracy:
-                print(card.card_def.accuracy)
-                print(extra_accuracy)
+                #print(card.card_def.accuracy)
+                #print(extra_accuracy)
                 log.append({"type": "result", "player": player.user_id, "result": "fizzle"})
                 player.deck.play_hand.pop(card_index)
                 player.deck.play_cards.insert(random.randint(0, len(player.deck.play_cards)), card)
@@ -263,7 +277,6 @@ class Game():
         
         for message in log:
             print(message)
-            print('\n\n')
         self.log.extend(log)
 
         if self.check_end():
@@ -294,6 +307,10 @@ class Game():
 
         if card.card_def.condition == None:
             return True
+        
+        # TODO: Deal with conditions
+
+        return False
 
     
     def interpretTarget(self, player, targetType):
@@ -385,7 +402,7 @@ class Game():
                 remaining.append(hot)
             else:
                 print(f"{hot.type} on {player.name} expired.")
-        player.hot = remaining
+        player.hots = remaining
 
     def check_end(self):
         for player in self.teams[0]:

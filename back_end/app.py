@@ -1,9 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
-import os
 import uuid
-import time
 
 # ===== Game Logic =====
 from Game import Game, createBotPlayer
@@ -18,27 +16,25 @@ from utils import getRandomPlayerImage
 # ===== Database =====
 from database import *
 from models import *
+from db_utils import cleanup_expired_guests
 
 from socketio.exceptions import ConnectionRefusedError
 
 # --------------------------------------------------------
 # Flask + CORS Setup
 # --------------------------------------------------------
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, "game.db")
+ALLOWED_ORIGINS = [
+    "https://w101-website.vercel.app",
+    "http://localhost:5173",
+]
 
-ORIGIN = "https://w101-website.vercel.app"
-
-#blahsdkfh
 app = Flask(__name__)
 
-# Apply Flask-CORS (still useful for normal routes)
-CORS(app,supports_credentials=True,resources={r"/*": {"origins": ORIGIN}},)
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
 
 app.register_blueprint(auth, url_prefix="/auth")
 
-
-socketio = SocketIO(app,cors_allowed_origins=[ORIGIN],logger=True,engineio_logger=True,)
+socketio = SocketIO(app, cors_allowed_origins=ALLOWED_ORIGINS, logger=False, engineio_logger=False)
 
 from flask import make_response
 
@@ -78,14 +74,16 @@ def handle_exception(e):
 # ========================================================
 
 class LobbyPlayer:
-    def __init__(self, user_id, sid, name, image_path, team="A", isBot=False):
+    def __init__(self, user_id, sid, name, image_path, school="balance", deck_name="", team="A", isBot=False):
         self.id = user_id
         self.name = name
         self.team = team
-        self.isReady = False
+        self.isReady = isBot  # bots are always ready
         self.sid = sid  # socket id
         self.image_path = image_path
         self.isBot = isBot
+        self.school = school
+        self.deck_name = deck_name
 
 
 class Lobby:
@@ -118,7 +116,10 @@ class Lobby:
                     "name": p.name,
                     "team": p.team,
                     "isReady": p.isReady,
-                    "image_path": p.image_path
+                    "image_path": p.image_path,
+                    "school": p.school,
+                    "deck_name": p.deck_name,
+                    "isBot": p.isBot,
                 }
                 for p in self.players.values()
             ],
@@ -126,7 +127,8 @@ class Lobby:
         }
 
     def UID_to_SID(self, uid):
-        return self.players[uid].sid
+        player = self.players.get(uid)
+        return player.sid if player else None
 lobbies = {}  # gameId → Lobby
 
 
@@ -157,7 +159,6 @@ def get_player_from_db(user_id):
 
 connected_users = {}  # sid → user_id
 
-from flask import session, request
 
 @socketio.on("connect")
 def on_connect(auth):
@@ -177,7 +178,6 @@ def on_connect(auth):
 
     # Bind socket → identity
     connected_users[request.sid] = user_id
-    session["user_id"] = user_id
 
     print(
         f"[connect] socket {request.sid} authenticated "
@@ -194,19 +194,29 @@ def on_disconnect():
     gameID_to_remove = None
 
     for gameID, lobby in lobbies.items():
-        # Find the player associated with this socket
-        print(lobby.players.keys())
-        if user_id not in lobby.players.keys():
+        if user_id not in lobby.players:
             continue
 
         del lobby.players[user_id]
         print(f"[disconnect] removed player {user_id} from lobby {gameID}")
 
-        # Mark empty lobby for cleanup
         if not lobby.players:
             gameID_to_remove = gameID
+        elif not lobby.started:
+            socketio.emit("update_lobby_state", lobby.snapshot(), room=gameID)
+        else:
+            # Give the disconnected player a pass so the turn can still resolve
+            game = lobby.game
+            player = game.get_player(user_id)
+            if player and player in game.current_team() and game.player_actions.get(player.user_id) is None:
+                game.player_pass(player)
+                while not game.winner and attemptTurnResolution(lobby, game):
+                    continue
+                if game.winner:
+                    socketio.emit("match_finished", game.winner, room=gameID)
+                    gameID_to_remove = gameID
 
-        break  # a socket should only belong to one lobby
+        break  # a socket belongs to only one lobby
     
 
     if gameID_to_remove is not None:
@@ -225,8 +235,7 @@ def on_disconnect():
 
 @socketio.on("get_player_info")
 def get_player_info():
-    user_id = session.get("user_id")   # ← works perfectly
-    print(user_id)
+    user_id = get_user_identity(request.sid)
 
     if not user_id:
         emit("error", {"msg": "Not authenticated"})
@@ -273,16 +282,20 @@ def create_game(data):
     
 
 
+    db_player = get_player_from_db(user_id)
+    if not db_player:
+        return {"ok": False, "error": "Player not found"}
     player = LobbyPlayer(
         user_id=user_id,
         sid=request.sid,
-        name=user_id,
-        image_path=get_player_from_db(user_id)["image_path"]
+        name=db_player.get("name", user_id),
+        image_path=db_player["image_path"],
+        school=db_player.get("school", "balance"),
+        deck_name=(db_player.get("deck") or {}).get("name", ""),
     )
     lobby.players[user_id] = player
 
     join_room(gameId)
-    #emit("game_list", [], broadcast=True)
     list_games()
 
     return {"gameId": gameId}
@@ -298,14 +311,27 @@ def create_bot_game(data):
     lobbies[gameId] = lobby
 
     # host joins
-    lobby.players[user_id] = LobbyPlayer(user_id, sid=request.sid, name=user_id, image_path=get_player_from_db(user_id)["image_path"])
-    lobby.players[user_id].sid = request.sid
+    db_player = get_player_from_db(user_id)
+    if not db_player:
+        return {"ok": False, "error": "Player not found"}
+    lobby.players[user_id] = LobbyPlayer(
+        user_id, sid=request.sid,
+        name=db_player.get("name", user_id),
+        image_path=db_player["image_path"],
+        school=db_player.get("school", "balance"),
+        deck_name=(db_player.get("deck") or {}).get("name", ""),
+    )
 
-#    def __init__(self, user_id, sid, name, image_path, team="A", isBot=False):
     # add bots
+    import random as _random
+    BOT_SCHOOLS = ["fire", "ice", "storm", "life", "death", "myth", "balance"]
     for i in range(3):
         bot_id = f"bot_{i}"
-        lobby.players[bot_id] = LobbyPlayer(bot_id, None, f"Bot {i}", getRandomPlayerImage(), team="B", isBot=True)
+        lobby.players[bot_id] = LobbyPlayer(
+            bot_id, None, f"Bot {i+1}", getRandomPlayerImage(),
+            school=_random.choice(BOT_SCHOOLS), deck_name="Bot Deck",
+            team="B", isBot=True,
+        )
 
     join_room(gameId)
     return {"gameId": gameId}
@@ -325,13 +351,18 @@ def join_game(data):
         return {"ok": False, "error": "Game already started"}
 
     if user_id not in lobby.players:
+        db_player = get_player_from_db(user_id)
+        if not db_player:
+            return {"ok": False, "error": "Player not found"}
         team_counts = lobby.team_counts()
         lobby.players[user_id] = LobbyPlayer(
-            user_id, 
-            sid=request.sid, 
-            name=user_id,
-            image_path=get_player_from_db(user_id)["image_path"],
-            team=("A" if team_counts["A"] < team_counts["B"] else "B")
+            user_id,
+            sid=request.sid,
+            name=db_player.get("name", user_id),
+            image_path=db_player["image_path"],
+            school=db_player.get("school", "balance"),
+            deck_name=(db_player.get("deck") or {}).get("name", ""),
+            team=("A" if team_counts["A"] < team_counts["B"] else "B"),
         )
 
     lobby.players[user_id].sid = request.sid
@@ -339,7 +370,7 @@ def join_game(data):
     join_room(gameId)
 
     # Notify lobby watchers
-    socketio.emit("lobby_update", lobby.snapshot(), room=gameId)
+    socketio.emit("update_lobby_state", lobby.snapshot(), room=gameId)
     return {"ok": True}
 
 
@@ -368,10 +399,9 @@ def update_lobby_state(data):
 @socketio.on("get_lobby_state")
 def get_lobby_state(data):
     gameId = data["gameId"]
-    user_id = get_user_identity(request.sid)
     lobby = lobbies.get(gameId)
     if not lobby:
-        return
+        return {}
 
     return lobby.snapshot()
 
@@ -388,26 +418,65 @@ def player_ready(data):
     if user_id in lobby.players:
         lobby.players[user_id].isReady = not lobby.players[user_id].isReady
 
-    if lobby.isReady():
-        start_game(data)
-
     socketio.emit("update_lobby_state", lobby.snapshot(), room=gameId)
 
 
 @socketio.on("switch_team")
 def switch_team(data):
     gameId = data["gameId"]
-    playerId = data["playerId"]
     new_team = data["team"]
+    user_id = get_user_identity(request.sid)
+
+    lobby = lobbies.get(gameId)
+    if not lobby or user_id not in lobby.players:
+        return
+
+    lobby.players[user_id].team = new_team
+    lobby.players[user_id].isReady = False
+
+    socketio.emit("update_lobby_state", lobby.snapshot(), room=gameId)
+
+
+@socketio.on("add_bot")
+def add_bot(data):
+    import random as _random
+    gameId = data["gameId"]
+    team = data.get("team", "A")
 
     lobby = lobbies.get(gameId)
     if not lobby:
         return
 
-    if playerId in lobby.players:
-        lobby.players[playerId].team = new_team
+    BOT_SCHOOLS = ["fire", "ice", "storm", "life", "death", "myth", "balance"]
+    bot_num = sum(1 for p in lobby.players.values() if p.isBot) + 1
+    bot_id = f"bot_{uuid.uuid4().hex[:6]}"
+    lobby.players[bot_id] = LobbyPlayer(
+        user_id=bot_id,
+        sid=None,
+        name=f"Bot {bot_num}",
+        image_path=getRandomPlayerImage(),
+        school=_random.choice(BOT_SCHOOLS),
+        deck_name="Bot Deck",
+        team=team,
+        isBot=True,
+    )
 
     socketio.emit("update_lobby_state", lobby.snapshot(), room=gameId)
+
+
+@socketio.on("remove_bot")
+def remove_bot(data):
+    gameId = data["gameId"]
+    bot_id = data["botId"]
+
+    lobby = lobbies.get(gameId)
+    if not lobby:
+        return
+
+    player = lobby.players.get(bot_id)
+    if player and player.isBot:
+        del lobby.players[bot_id]
+        socketio.emit("update_lobby_state", lobby.snapshot(), room=gameId)
 
 
 @socketio.on("start_game")
@@ -452,7 +521,7 @@ def start_game(data):
             player = loadPlayer(player.to_dict())
         
         else:
-            player = createBotPlayer(p.name, p.id, p.image_path)
+            player = createBotPlayer(p.name, p.id, p.image_path, school=p.school, deck=p.deck)
 
 
         if p.team == "A":
@@ -469,8 +538,11 @@ def start_game(data):
     socketio.emit("game_start", {}, room=gameId)
 
     if lobby.game.isAllBots(lobby.game.playing_team_i):
-        print("WHATTTTTTT")
-        attemptTurnResolution(lobby, lobby.game)
+        while not lobby.game.winner and attemptTurnResolution(lobby, lobby.game):
+            continue
+        if lobby.game.winner:
+            socketio.emit("match_finished", lobby.game.winner, room=gameId)
+            del lobbies[gameId]
     return {"ok": True}
 
 
@@ -485,12 +557,14 @@ def leave_lobby(data):
 
     if user_id in lobby.players:
         del lobby.players[user_id]
-    
+
+    leave_room(gameId)
+
     if len(lobby.players) == 0:
         del lobbies[gameId]
         list_games()
     else:
-        get_lobby_state(data)
+        socketio.emit("update_lobby_state", lobby.snapshot(), room=gameId)
 
     
 
@@ -519,7 +593,9 @@ def watch_team(data):
         return {"error": "Missing game"}
     
     user_id = get_user_identity(request.sid)
-    player = lobby.players[user_id]
+    player = lobby.players.get(user_id)
+    if not player:
+        return {"error": "Player not in lobby"}
     if player.team == "A":
         print(f"[join] {user_id} joins room {gameId + ':A'}")
         join_room(gameId + ":A")
@@ -537,25 +613,26 @@ def get_game_state(data):
     return lobby.game.to_json_public()
 
 
-def build_player_view(game, player):
-
-    data = player.to_json_private()
+def build_hand(game, player):
     hand = []
-
     for card_play_info in game.playability[player.user_id]:
-        
+        card = card_play_info["card"]
+        entry = {
+            "card": card.card_def.id,
+            "img_path": card.card_def.img_path,
+            "instanceId": card.instance_id,
+            "playable": card_play_info["playable"],
+        }
         if card_play_info["playable"]:
-            target_ids = [p.user_id for p in card_play_info["targets"]]
+            entry["targets"] = [p.user_id for p in card_play_info["targets"]]
+        hand.append(entry)
+    return hand
 
-            hand.append({"card": card_play_info["card"].card_def.id, "img_path": card_play_info["card"].card_def.img_path, "playable": True, "targets": target_ids})
-        else:
-            hand.append({"card": card_play_info["card"].card_def.id, "img_path": card_play_info["card"].card_def.img_path, "playable": False})
-    
 
-    data["hand"] = hand
-
+def build_player_view(game, player):
+    data = player.to_json_private()
+    data["hand"] = build_hand(game, player)
     data["team"] = 0 if player in game.teams[0] else 1
-
     return data
 
 @socketio.on("get_player_state")
@@ -573,11 +650,14 @@ def get_player_state(data):
 
 
 def attemptTurnResolution(lobby, game):
+    print("attempting turn resolution")
     if game.allActionsReceived():
         print("At least we are here!!!!")
         # Resolve actions and collect log
         turn_log = game.resolve_actions()
-        turn_log.append({"type": "turn_end", "resting_player": game.opposite_team(aliveOnly=True)[0].user_id})
+        opp = game.opposite_team(aliveOnly=True)
+        if opp:
+            turn_log.append({"type": "turn_end", "resting_player": opp[0].user_id})
         turn_log.extend(game.start_turn())
 
         prepareLog(turn_log)
@@ -587,15 +667,17 @@ def attemptTurnResolution(lobby, game):
 
         # Emit ONE event that starts client replay
         for p in game.getPlayers(includeBots=False):
-            emit(
-                "turn_resolved",
-                {
-                    "finalGameState": final_game_state,
-                    "finalPlayerState": build_player_view(game, p),
-                    "log": turn_log,
-                },
-                to=lobby.UID_to_SID(p.user_id)
-            )
+            sid = lobby.UID_to_SID(p.user_id)
+            if sid:
+                emit(
+                    "turn_resolved",
+                    {
+                        "finalGameState": final_game_state,
+                        "finalPlayerState": build_player_view(game, p),
+                        "log": turn_log,
+                    },
+                    to=sid
+                )
         return True
     return False
 
@@ -622,8 +704,8 @@ def player_action(data):
     game = lobby.game
 
     if game.winner:
-        print("Game finished")
-        game.print_log()
+        #print("Game finished")
+        #game.print_log()
         return {"ok": False, "error": "Game finished"}
 
     
@@ -649,7 +731,8 @@ def player_action(data):
 
         if lobby.game.check_end():
             emit("match_finished", game.winner, room=gameId)
-        
+            del lobbies[gameId]
+
         return {"ok": True}
 
 
@@ -659,11 +742,10 @@ def player_action(data):
         return {"ok": False}
 
     if action["type"] == "discard":
-        i = action["cardIndex"]
-        if not game.player_discard(player, i):
+        card_id = action["cardId"]
+        if not game.player_discard(player, card_id):
             return {"ok": False}
 
-        #emit("player_state_update", build_player_view(game, player), to=request.sid)
         return {"ok": True}
     
     if action["type"] == "pass":
@@ -675,19 +757,23 @@ def player_action(data):
             return {"ok": False}
 
     while not game.winner and attemptTurnResolution(lobby, game):
-        print("Another round")
         continue
-    
 
     if game.winner:
         emit("match_finished", game.winner, room=gameId)
         game.print_log()
-
+        del lobbies[gameId]
+    
     return {"ok": True}
 
 # ========================================================
 # Main Entrypoint
 # ========================================================
+
+try:
+    cleanup_expired_guests()
+except Exception as e:
+    print(f"[startup] Guest cleanup failed: {e}")
 
 if __name__ == "__main__":
     #Only for dev use, not on google cloud
