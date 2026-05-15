@@ -40,13 +40,14 @@ function statusToPopup(status) {
         {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
         {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`}
       ];
-    case "jin":
+    case "jinx":
       return [
         {"type": "text", "value": `+${status.amount}%`, "color": badColor},
         {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
         {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`}
       ];
-    
+    default:
+      return [{"type": "text", "value": status.type ?? "unknown"}];
   }
 }
 

@@ -9,13 +9,11 @@ export default function MenuPage() {
   const { socket, connected, disconnectSocket } = useSocket();
   const navigate = useNavigate();
   const [games, setGames] = useState([]);
-  console.log(socket);
 
   const { player } = usePlayer();
   // Redirect if no socket (means logged out)
   useEffect(() => {
     if (!socket) {
-      console.log("We don't have socket");
       navigate("/login");
       return;
     }

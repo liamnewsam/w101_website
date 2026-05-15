@@ -27,11 +27,11 @@ export default function CardHand({
     };
   }, [onClearSelection]);*/
 
-  function handleCardMouseDown(e, idx) {
+  function handleCardMouseDown(e, instanceId) {
     // Middle click → discard
     if (e.button === 1) {
       e.preventDefault();
-      onDiscardCard(idx);
+      onDiscardCard(instanceId);
     }
   }
 
@@ -49,7 +49,7 @@ export default function CardHand({
 
         return (
           <div
-            key={idx}
+            key={card.instanceId || idx}
             className={[
               "card-wrapper",
               isSelected && "selected",
@@ -57,7 +57,7 @@ export default function CardHand({
             ]
               .filter(Boolean)
               .join(" ")}
-            onMouseDown={(e) => handleCardMouseDown(e, idx)}
+            onMouseDown={(e) => handleCardMouseDown(e, card.instanceId)}
             onClick={(e) => handleCardClick(e, idx, isPlayable)}
           >
             <img

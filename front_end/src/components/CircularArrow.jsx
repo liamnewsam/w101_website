@@ -1,6 +1,11 @@
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useState } from "react";
 
+const SLANT = Math.PI / 2.0;
+const SEPARATION = 20;
+const WIDTH = 40;
+//const SLANT = Math.PI;
+
 /**
  * props:
  * - center: { x, y }
@@ -10,9 +15,9 @@ import { useEffect, useState } from "react";
  * - onComplete?: callback
  */
 export default function CircularArrow({
-  center,
+  playerCenter,
   radius = 80,
-  startAngle = 0,
+  playerAngle = 0,
   duration = 1,
   onComplete,
 }) {
@@ -21,23 +26,25 @@ export default function CircularArrow({
   const progress = useMotionValue(0);
 
   // Angle = startAngle + progress * 2π
+  // ANGLES ARE MESSED UP, WHEN INCREASED, THEY GO CLOCKWISE!!
   const angle = useTransform(
     progress,
-    v => startAngle + v * Math.PI * 2
+    v => (playerAngle-Math.PI/2 - (SLANT/2.0) - v * (Math.PI * 2 - SLANT))
   );
-
+  const arrowWidthOffsetX = -WIDTH/2 * Math.cos(playerAngle-Math.PI/2);
+  const arrowWidthOffsetY = -WIDTH/2 * Math.sin(playerAngle-Math.PI/2);
+  const arrowOrbitCenter = {
+    x: playerCenter.x - (radius + SEPARATION) * Math.cos(playerAngle) - arrowWidthOffsetX,
+    y: playerCenter.y - (radius + SEPARATION) * Math.sin(playerAngle) + arrowWidthOffsetY
+  };
   // Polar → Cartesian
-  const x = useTransform(angle, a =>
-    center.x + radius * Math.cos(a)
-  );
-  const y = useTransform(angle, a =>
-    center.y + radius * Math.sin(a)
-  );
+  const x = useTransform(angle, a => arrowOrbitCenter.x + radius * Math.cos(a+Math.PI/2));
+  const y = useTransform(angle, a => arrowOrbitCenter.y + radius * Math.sin(a+Math.PI/2));
+  // Tangent of a negated-y circle: dx/da = -r·sin(a), dy/da = -r·cos(a)
+  // → heading = atan2(-cos(a), -sin(a)) = -a·(180/π) - 90
+  const rotate = useTransform(angle, a => a * (180 / Math.PI));
 
-  // Tangent rotation
-  const rotate = useTransform(angle, a =>
-    (a * 180) / Math.PI + 90
-  );
+
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -57,7 +64,7 @@ export default function CircularArrow({
             x,
             y,
             rotate,
-            width: 40,
+            width: WIDTH,
             height: 6,
             background: "linear-gradient(to right, #fff, #ffcc66)",
             borderRadius: 3,

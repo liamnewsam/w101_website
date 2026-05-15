@@ -46,19 +46,6 @@ export default function OrbitalGraphic({
     player_angle[teamBottom[i].user_id] = angle;
   }
 
-  function get_image_path(user_id) {
-    //console.log(user_id);
-    for (let i = 0; i < lobbyState.players.length; i++) {
-        let player = lobbyState.players[i]
-        //console.log(player);
-        if (player.id == user_id) {
-            //console.log(player.image_path);
-            return player.image_path;
-        }
-    }
-    return "";
-  }
-
   function userSelectingTarget() {
     if (selectedCardIndex != null && selectedCardIndex >= 0 && selectedCardIndex < playerState.hand.length && playerState.hand[selectedCardIndex].targets.length > 0) {
         return true;

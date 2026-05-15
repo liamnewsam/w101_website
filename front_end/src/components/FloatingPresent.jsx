@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 export default function FloatingPresent({
   items,
   duration = 3000,
-  color = "#ffffff",
+  color = "#ff0000",
   pos = {x: 0, y: 0}
 }) {
   const [visible, setVisible] = useState(true);
@@ -32,12 +32,19 @@ export default function FloatingPresent({
           style={{
             position: "absolute",
             pointerEvents: "none",
-            display: "flex",
+            zIndex: 9999,
+            backgroundColor: "rgb(255, 255, 255)",
+            borderRadius: "8px",
+            border: "1px solid rgba(255, 255, 255, 0.4)",
+            padding: "4px 8px",
+            display: "inline-flex",
             alignItems: "center",
-            gap: "8px",
+            flexWrap: "nowrap",
+            gap: "4px",
             fontSize: "18px",
             fontWeight: "bold",
             textShadow: "0 0 6px rgba(0,0,0,0.6)",
+            whiteSpace: "nowrap",
           }}
         >
           {items.map((item, i) => {
@@ -45,7 +52,7 @@ export default function FloatingPresent({
               return (
                 <span
                   key={i}
-                  style={{ color: item.color || color }}
+                  style={{ color: item.color || color, whiteSpace: "nowrap" }}
                 >
                   {item.value}
                 </span>
@@ -58,7 +65,7 @@ export default function FloatingPresent({
                   key={i}
                   src={item.src}
                   alt=""
-                  style={{ width: 24, height: 24 }}
+                  style={{ width: 24, height: 24, verticalAlign: "middle", flexShrink: 0 }}
                 />
               );
             }

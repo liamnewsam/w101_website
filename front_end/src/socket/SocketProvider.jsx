@@ -16,36 +16,18 @@ export function SocketProvider({ children }) {
   useEffect(() => {
     if (!token) return;
 
-    // 🔒 Prevent duplicate sockets (StrictMode-safe)
     if (socketRef.current) return;
-
-    console.log("CREATING SOCKET");
 
     const s = io(BACKEND_URL, {
       transports: ["websocket"],
       auth: { token },
     });
 
-    s.on("connect", () => {
-      console.log("socket connected");
-      setConnected(true);
-    });
-
-    s.on("disconnect", (reason) => {
-      console.log("socket disconnected:", reason);
-      setConnected(false);
-    });
-
-    s.on("connect_error", (error) => {
-      console.log("connect_error:", error.message);
-    });
+    s.on("connect", () => setConnected(true));
+    s.on("disconnect", () => setConnected(false));
 
     socketRef.current = s;
 
-    return () => {
-      // 🚫 DO NOT disconnect here in StrictMode
-      // React will fake-unmount this component
-    };
   }, [token]);
 
   function disconnectSocket() {

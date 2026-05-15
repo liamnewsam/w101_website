@@ -7,13 +7,11 @@ import { PlayerProvider } from "./PlayerContext"
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
-  //<React.StrictMode>
-    <SocketProvider>
-      <BrowserRouter>
-        <PlayerProvider>
-          <App />
-        </PlayerProvider>
-      </BrowserRouter>
-    </SocketProvider>
-  //</React.StrictMode>
+  <SocketProvider>
+    <BrowserRouter>
+      <PlayerProvider>
+        <App />
+      </PlayerProvider>
+    </BrowserRouter>
+  </SocketProvider>
 );

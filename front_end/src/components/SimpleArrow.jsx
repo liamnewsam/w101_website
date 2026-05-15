@@ -8,50 +8,73 @@ import { useEffect, useState } from "react";
  * - duration: seconds
  * - onComplete?: callback
  */
+// Half-dimensions of the arrow bar (40×6). Subtracting these from x,y makes
+// Framer Motion's rotation pivot land exactly at the passed-in position rather
+// than 20px to the right of it (the default top-left anchor offset).
+const HALF_W = 20;
+const HALF_H = 3;
+const ARROWHEAD_LEN = 12; // borderLeft length in the arrowhead div
+const PLAYER_RADIUS = 32; // orbit_size / 2 — keeps the bar outside player circles
+
 export default function SimpleArrow({
   startPos,
   endPos,
   duration = 0.6,
+  endDuration = 0.1,
   onComplete,
 }) {
   const [visible, setVisible] = useState(true);
 
-  let startX = startPos.x;
-  let startY = startPos.y;
-  let endX = endPos.x;
-  let endY = endPos.y;
-
+  const startX = startPos.x;
+  const startY = startPos.y;
+  const endX = endPos.x;
+  const endY = endPos.y;
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setVisible(false);
+      //setVisible(false);
       onComplete?.();
     }, duration * 1000);
 
     return () => clearTimeout(t);
-  }, [duration, onComplete]);
+  }, [duration]);
 
-  // Compute rotation so arrow points toward target
-  const angle =
-    (Math.atan2(endY - startY, endX - startX) * 180) / Math.PI;
+  const dx = endX - startX;
+  const dy = endY - startY;
+  const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+  const nx = dx / dist;
+  const ny = dy / dist;
+
+  const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+
+  // Offset start forward by PLAYER_RADIUS so the bar begins at the source edge.
+  // Offset end back by PLAYER_RADIUS + ARROWHEAD_LEN so the tip stops at target edge.
+  // Subtract HALF_W/HALF_H so the rotation pivot is exactly at the computed position.
+  const adjStartX = startX + nx * PLAYER_RADIUS - HALF_W;
+  const adjStartY = startY + ny * PLAYER_RADIUS - HALF_H;
+  const adjEndX   = endX - nx * (PLAYER_RADIUS + ARROWHEAD_LEN) - HALF_W;
+  const adjEndY   = endY - ny * (PLAYER_RADIUS + ARROWHEAD_LEN) - HALF_H;
 
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
           initial={{
-            x: startX,
-            y: startY,
+            x: adjStartX,
+            y: adjStartY,
             opacity: 0,
             rotate: angle,
           }}
           animate={{
-            x: endX,
-            y: endY,
+            x: adjEndX,
+            y: adjEndY,
             opacity: 1,
           }}
       
-          exit={{ opacity: 0 }}
+          exit={{ 
+            opacity: 0,
+            transition: { duration: 0.1 }
+          }}
           transition={{ duration, ease: "easeOut" }}
           style={{
             position: "absolute",
