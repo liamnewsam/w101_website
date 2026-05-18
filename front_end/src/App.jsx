@@ -5,6 +5,7 @@ import LobbyPage from "./pages/LobbyPage";
 import GamePage from "./pages/GamePage";
 import ResultsPage from "./pages/ResultsPage";
 import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
 import {useSocket} from "./socket/socketContext"
 
 function ProtectedRoute({ element }) {
@@ -49,6 +50,11 @@ export default function App() {
       <Route
         path="/results/:gameId"
         element={<ProtectedRoute element={<ResultsPage />} />}
+      />
+
+      <Route
+        path="/profile"
+        element={<ProtectedRoute element={<ProfilePage />} />}
       />
 
       <Route path="*" element={<Navigate to="/menu" replace />} />

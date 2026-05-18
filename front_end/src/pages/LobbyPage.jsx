@@ -18,7 +18,7 @@ const SCHOOL_COLORS = {
 function PlayerTab({ p, isMe, onReady, onRemoveBot }) {
   const [hovered, setHovered] = useState(false);
   const isClickable = isMe || p.isBot;
-  const schoolColor = SCHOOL_COLORS[p.school] || "#888";
+  const schoolColor = SCHOOL_COLORS[p.school?.toLowerCase()] || "#888";
 
   function handleClick(e) {
     e.stopPropagation();
@@ -50,9 +50,9 @@ function PlayerTab({ p, isMe, onReady, onRemoveBot }) {
       <div className="tab-info">
         <div className="tab-name">{p.name}{isMe ? " (You)" : ""}</div>
         <div className="tab-school" style={{ color: schoolColor }}>
-          {p.school ? p.school.charAt(0).toUpperCase() + p.school.slice(1) : ""}
+          {p.school ? p.school.charAt(0).toUpperCase() + p.school.slice(1).toLowerCase() : ""}
         </div>
-        {p.deck_name && <div className="tab-deck">{p.deck_name}</div>}
+        <div className="tab-deck">Lv. {p.level ?? 1}</div>
       </div>
 
       <div className="tab-right">

@@ -58,20 +58,12 @@ export default function MenuPage() {
     <div className="page menu">
       <h1>Magic Duel — Menu</h1>
 
-      <div>
-        {player.name}
-      </div>
-
-      <div>
-        School: {player.school}
-      </div>
-
-      <div>
-        Main Deck: {player.deck.name}
-      </div>
-
+      <div>{player.name} — Lv. {player.level ?? 1}</div>
+      <div>School: {player.school}</div>
+      <div>{player.wins ?? 0}W / {player.losses ?? 0}L</div>
 
       <div className="menu-actions">
+        <button onClick={() => navigate("/profile")}>Profile</button>
         <button onClick={handleCreate}>Create Multiplayer Game</button>
         <button onClick={handleCreateBots}>Create vs Bots</button>
       </div>

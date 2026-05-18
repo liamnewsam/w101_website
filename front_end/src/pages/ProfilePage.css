@@ -1,0 +1,194 @@
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 28px 24px;
+  box-sizing: border-box;
+  gap: 24px;
+}
+
+.back-btn {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid #333;
+  color: #aaa;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+
+.back-btn:hover {
+  background: #1e1e1e;
+}
+
+/* ── Section wrapper ──────────────────────────────────── */
+
+.profile-section {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 20px 22px;
+}
+
+.section-title {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* ── Avatar / stats ───────────────────────────────────── */
+
+.profile-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #333;
+  flex-shrink: 0;
+}
+
+.profile-name {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+}
+
+.profile-level {
+  font-size: 0.95rem;
+  color: #c8a824;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.stat.win   { color: #3fb55c; font-weight: 600; }
+.stat.loss  { color: #e05c5c; font-weight: 600; }
+.stat.sep   { color: #555; }
+
+/* ── School grid ──────────────────────────────────────── */
+
+.school-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .school-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.school-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid transparent;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: #ccc;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.school-tile:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.school-tile.active {
+  background: color-mix(in srgb, var(--school-color) 15%, transparent);
+  color: #fff;
+}
+
+.school-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+/* ── Deck list ────────────────────────────────────────── */
+
+.no-decks {
+  color: #555;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.deck-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.deck-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.deck-row:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.deck-row.active {
+  border-color: #3fb55c;
+  background: rgba(63, 181, 92, 0.08);
+}
+
+.deck-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.deck-count {
+  font-size: 0.78rem;
+  color: #777;
+  margin-top: 2px;
+}
+
+.deck-active-mark {
+  font-size: 0.82rem;
+  color: #3fb55c;
+  font-weight: 600;
+}
+
+/* ── Feedback toast ───────────────────────────────────── */
+
+.profile-feedback {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e3a1e;
+  border: 1px solid #2e5a2e;
+  color: #7ec87e;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  pointer-events: none;
+}

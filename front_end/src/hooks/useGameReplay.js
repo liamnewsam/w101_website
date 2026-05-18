@@ -1,5 +1,5 @@
 import { useReducer, useEffect, useMemo } from "react";
-import { BACKEND_URL, BATTLE_PATH } from "../config";
+import { BACKEND_URL, BATTLE_PATH, goodColor, badColor } from "../config";
 
 export const ORBITAL_DIAMETER = 400;
 // Orbit radius for self-targeting circular arrow. Larger = more visible arc.
@@ -249,6 +249,33 @@ async function processEvent(
           if (target) target.health -= event.amount;
           break;
         }
+        case "drain": {
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: `-${event.amount.toFixed(1)}` }],
+            id: crypto.randomUUID(),
+            pos: {
+              x: playerPositions[event.target].x + FLOATING_PRESENT_OFFSET_X,
+              y: playerPositions[event.target].y + FLOATING_PRESENT_OFFSET_Y
+            },
+          }]);
+          const target = getPlayer(gs, event.target);
+          if (target) target.health -= event.amount;
+
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: `+${(event.amount / 2.0).toFixed(1)}` }],
+            id: crypto.randomUUID(),
+            pos: {
+              x: playerPositions[event.player].x + FLOATING_PRESENT_OFFSET_X,
+              y: playerPositions[event.player].y + FLOATING_PRESENT_OFFSET_Y
+            },
+          }]);
+          const player = getPlayer(gs, event.player);
+          target.player += event.amount / 2.0;
+          
+          break;
+        }
         case "pip_lose": {
           const player = getPlayer(gs, event.player);
           for (const pip_type in event.amount) {
@@ -264,14 +291,10 @@ async function processEvent(
           }
           break;
         }
-        case "charm":
-        case "curse":
-        case "ward":
-        case "jinx": {
-          const fieldMap = { charm: "charms", curse: "curses", ward: "wards", jinx: "jinxes" };
+        case "charm": {
           setVisualEffects(effects => [...effects, {
             type: "FLOATING_PRESENT",
-            items: [{ type: "text", value: `${event.aspect} gained` }],
+            items: [{ type: "text", value: `charm gained`, color: goodColor}],
             id: crypto.randomUUID(),
             pos: {
               x: playerPositions[event.target].x + FLOATING_PRESENT_OFFSET_X,
@@ -279,7 +302,49 @@ async function processEvent(
             },
           }]);
           const target = getPlayer(gs, event.target);
-          target[fieldMap[event.aspect]] = [...target[fieldMap[event.aspect]], event.value];
+          target['charms'] = [...target['charms'], event.value];
+          break;
+        }
+        case "curse": {
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: `curse gained`, color: badColor}],
+            id: crypto.randomUUID(),
+            pos: {
+              x: playerPositions[event.target].x + FLOATING_PRESENT_OFFSET_X,
+              y: playerPositions[event.target].y + FLOATING_PRESENT_OFFSET_Y
+            },
+          }]);
+          const target = getPlayer(gs, event.target);
+          target['curses'] = [...target['curses'], event.value];
+          break;
+        }
+        case "ward": {
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: `ward gained`, color: goodColor}],
+            id: crypto.randomUUID(),
+            pos: {
+              x: playerPositions[event.target].x + FLOATING_PRESENT_OFFSET_X,
+              y: playerPositions[event.target].y + FLOATING_PRESENT_OFFSET_Y
+            },
+          }]);
+          const target = getPlayer(gs, event.target);
+          target['wards'] = [...target['wards'], event.value];
+          break;
+        }
+        case "jinx": {
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: `jinx gained`, color: badColor}],
+            id: crypto.randomUUID(),
+            pos: {
+              x: playerPositions[event.target].x + FLOATING_PRESENT_OFFSET_X,
+              y: playerPositions[event.target].y + FLOATING_PRESENT_OFFSET_Y
+            },
+          }]);
+          const target = getPlayer(gs, event.target);
+          target['jinxes'] = [...target['jinxes'], event.value];
           break;
         }
         case "heal": {
@@ -339,6 +404,16 @@ async function processEvent(
           },
         }]);
         await wait(1000);
+      } else if (event.result === "dead") {
+        setVisualEffects(effects => [...effects, {
+          type: "FLOATING_PRESENT",
+          items: [{ type: "text", value: `RIP ${event.player}` }],
+          id: crypto.randomUUID(),
+          pos: {
+              x: playerPositions[event.player].x + FLOATING_PRESENT_OFFSET_X,
+              y: playerPositions[event.player].y + FLOATING_PRESENT_OFFSET_Y
+          },
+        }]);
       }
       break;
     }

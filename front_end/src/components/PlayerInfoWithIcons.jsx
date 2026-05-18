@@ -1,8 +1,9 @@
 import PlayerInfoCard from "./PlayerInfoCard";
 import "./PlayerInfoWithIcons.css";
-import {BACKEND_URL, BATTLE_PATH} from "../config";
+import {BACKEND_URL, BATTLE_PATH, goodColor, badColor} from "../config";
 import StatusGrid from "./StatusGrid";
 import PipGrid from "./PipGrid";
+
 
 
 const STATUS_CATEGORIES = [
@@ -15,8 +16,7 @@ const STATUS_CATEGORIES = [
   { key: "hots",    icon: "/icons/hot.png" },
 ];
 
-const goodColor = "green";
-const badColor = "red";
+
 
 function statusToPopup(status) {
   switch (status.type) {
@@ -25,27 +25,52 @@ function statusToPopup(status) {
         return [
           {"type": "text", "value": `+${status.amount}%`, "color": goodColor},
           {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
-          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`}
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Outgoing.png`}
+        ];
+      }
+      if (status["aspect"] == "heal") {
+        return [
+          {"type": "text", "value": `+${status.amount}%`, "color": goodColor},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Heal.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Outgoing.png`}
         ];
       }
     case "curse":
-      return [
-        {"type": "text", "value": `+${status.amount}%`, "color": badColor},
-        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
-        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`}
-      ];
+      if (status["aspect"] == "damage") {
+        return [
+          {"type": "text", "value": `${status.amount}%`, "color": badColor},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Outgoing.png`}
+        ];
+      }
+      if (status["aspect"] == "heal") {
+        return [
+          {"type": "text", "value": `${status.amount}%`, "color": badColor},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Heal.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Outgoing.png`}
+        ];
+      }
     case "ward":
-      return [
-        {"type": "text", "value": `+${status.amount}%`, "color": badColor},
-        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
-        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`}
-      ];
+      if (status["aspect"] == "damage") {
+        return [
+          {"type": "text", "value": `${status.amount}%`, "color": goodColor},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Incoming.png`}
+        ];
+      }
     case "jinx":
-      return [
-        {"type": "text", "value": `+${status.amount}%`, "color": badColor},
-        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
-        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`}
-      ];
+      if (status["aspect"] == "damage"){
+        return [
+          {"type": "text", "value": `+${status.amount}%`, "color": badColor},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Incoming.png`},
+        ];
+      }
     default:
       return [{"type": "text", "value": status.type ?? "unknown"}];
   }
