@@ -7,10 +7,10 @@ from Deck import *
 from utils import *
 
 def createBotPlayer(name, bot_id, image_path, school="random", deck=None, difficulty="easy"):
-    if school=="random":
-        school = random.choice(["Life", "Storm"])
-        deck = DECK_MASTER[difficulty][school]()
-    
+    if school == "random":
+        school = random.choice(list(DECK_MASTER[difficulty].keys()))
+    if deck is None:
+        deck = DECK_MASTER[difficulty].get(school, DECK_MASTER[difficulty]["Life"])()
     return Player(name, bot_id, school, deck, isBot=True, img_path=image_path)
 
 
@@ -22,7 +22,7 @@ def neededTargetType(card_def):
 
     if "enemy" in all_targets:
         return "enemy"
-    if "ally" in all_targets:
+    if "ally" in all_targets or "ally_same" in all_targets:
         return "ally"
     if "enemy_selected" in all_targets:
         return "enemy_selected"
@@ -126,8 +126,6 @@ class Game():
         self.start_turn()
 
 
-        
-
     def get_player(self, user_id):
         for player in self.teams[0] + self.teams[1]:
             if player.user_id == user_id:
@@ -196,19 +194,25 @@ class Game():
         log = []
         for player in self.current_team():
             log.append({"type": "action", "player": player.user_id, "action": "activate"})
+            print(log[-1])
 
+            
             action = self.player_actions[player.user_id]
+            print(action)
             if action["type"] == "pass":
                 log.append({"type": "action", "player": player.user_id, "action": "pass"})
+                print(log[-1])
                 continue
             
             #Otherwise, the player is casting a card
             card_index = action["index"]
             card = player.deck.play_hand[card_index]
             log.append({"type": "action", "player": player.user_id, "action": "attempt_cast", "school": card.card_def.school})
+            print(log[-1])
 
             if player.consume_dispel(card):
                 log.append({"type": "result", "player": player.user_id, "result": "dispel"})
+                print(log[-1])
                 player.deduct_pips(card)
                 player.deck.play_hand.pop(card_index)
                 player.deck.play_discard.append(card)
@@ -220,17 +224,21 @@ class Game():
 
             if extra_accuracy:
                 log.append({"type": "effect_resolve", "player": player.user_id, "aspect": "accuracy", "amount": extra_accuracy})
+                print(log[-1])
             
             if random.randint(1, 100) > card.card_def.accuracy + extra_accuracy:
                 #print(card.card_def.accuracy)
                 #print(extra_accuracy)
                 log.append({"type": "result", "player": player.user_id, "result": "fizzle"})
+                print(log[-1])
                 player.deck.play_hand.pop(card_index)
                 player.deck.play_cards.insert(random.randint(0, len(player.deck.play_cards)), card)
                 continue
             
             log.append({"type": "effect_resolve", "player": player.user_id, "aspect": "pip_lose", "amount": player.deduct_pips(card)})
+            print(log[-1])
             log.append({"type": "result", "player": player.user_id, "result": "success", "card": card.card_def.id})
+            print(log[-1])
             
 
             caster_accumulation = {
@@ -242,8 +250,10 @@ class Game():
             
             for charm in player.consume("charm", card, caster_accumulation):
                 log.append({"type": "effect_trigger", "player": player.user_id, "aspect": "charm", "value": charm.to_json()})
+                print(log[-1])
             for curse in player.consume("curse", card, caster_accumulation):
                 log.append({"type": "effect_trigger", "player": player.user_id, "aspect": "curse", "value": curse.to_json()})
+                print(log[-1])
             
             '''
             if card.card_def.target == "enemy_all":
@@ -256,33 +266,53 @@ class Game():
                     "health": {"in": 0, "out": 0}
             }
             
-            for jinx in action["target"].consume("jinx", card, target_accumulation):
-                log.append({"type": "effect_trigger", "player": action["target"].user_id, "aspect": "jinx", "value": jinx.to_json()})
-            for ward in action["target"].consume("ward", card, target_accumulation):
-                log.append({"type": "effect_trigger", "player": action["target"].user_id, "aspect": "ward", "value": ward.to_json()})
+            if action["target"]:
+                for jinx in action["target"].consume("jinx", card, target_accumulation):
+                    log.append({"type": "effect_trigger", "player": action["target"].user_id, "aspect": "jinx", "value": jinx.to_json()})
+                    print(log[-1])
+                for ward in action["target"].consume("ward", card, target_accumulation):
+                    log.append({"type": "effect_trigger", "player": action["target"].user_id, "aspect": "ward", "value": ward.to_json()})
+                    print(log[-1])
 
             for effect in card.card_def.effects:
+                print(f"Effect: {effect}")
                 critical_multiplier = 1
 
-                if effect["type"] in (["damage", "DoT", "heal", "HoT"]):
+                if effect["type"] in (["damage", "DoT", "heal", "HoT", "drain"]):
                     if random.randint(0, 99) < player.critical[card.card_def.school]: 
                         log.append({"type": "effect_resolve", "player": player.user_id, "aspect": "critical"})
+                        print(log[-1])
                         critical_multiplier = 2
                 
                 log.append(self.resolve_action(card, player, action["target"], effect, caster_accumulation, target_accumulation, critical_multiplier))
+                print(log[-1])
 
 
             player.deck.play_hand.pop(card_index)
             player.deck.play_discard.append(card)
         
-        for message in log:
-            print(message)
+        #for message in log:
+        #    print(message)
         self.log.extend(log)
 
         if self.check_end():
             self.log.append(f"TEAM {self.winner} WINS")
 
         return log
+
+    def resolve_action(self, card: Card, caster: Player, target: Player, effect: dict, caster_accumulation, target_accumulation, critical_multiplier):
+
+        effect = EFFECT_TYPE_TO_CLASS[effect["type"]](effect, caster, target, card)
+        if type(effect) in [DamageEffect, HealEffect, DoTEffect, HoTEffect, DrainEffect]:
+            result = effect.resolve(self, caster_accumulation, target_accumulation, critical_multiplier)
+        else:
+            result = effect.resolve(self)
+        return result
+
+    def struggle_punish(self, player):
+        if len(player.deck.play_cards) == 0 and len(self.playable_cards(player)) == 0:
+            player.health -= 10 * player.struggle_counter
+            player.struggle_counter += 1
 
     def is_playable(self, player, card):
         test = player.pips.copy()
@@ -314,9 +344,9 @@ class Game():
 
     
     def interpretTarget(self, player, targetType):
-        if targetType == "enemy":
+        if targetType in ["enemy", "enemy_same"]:
             return self.opposite_team()
-        if targetType == "ally":
+        if targetType in ["ally", "ally_same"]:
             return self.current_team()
         if targetType == "self":
             return [player]
@@ -368,19 +398,7 @@ class Game():
         
         
 
-    def resolve_action(self, card: Card, caster: Player, target: Player, effect: dict, caster_accumulation, target_accumulation, critical_multiplier):
 
-        effect = EFFECT_TYPE_TO_CLASS[effect["type"]](effect, caster, target, card)
-        if type(effect) in [DamageEffect, HealEffect, DoTEffect, HoTEffect]:
-            result = effect.resolve(self, caster_accumulation, target_accumulation, critical_multiplier)
-        else:
-            result = effect.resolve(self)
-        return result
-
-    def struggle_punish(self, player):
-        if len(player.deck.play_cards) == 0 and len(self.playable_cards(player)) == 0:
-            player.health -= 10 * player.struggle_counter
-            player.struggle_counter += 1
 
     def process_ongoing_effects(self, player):
 

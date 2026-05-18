@@ -74,7 +74,7 @@ def handle_exception(e):
 # ========================================================
 
 class LobbyPlayer:
-    def __init__(self, user_id, sid, name, image_path, school="balance", deck_name="", team="A", isBot=False):
+    def __init__(self, user_id, sid, name, image_path, school="Balance", level=1, team="A", isBot=False):
         self.id = user_id
         self.name = name
         self.team = team
@@ -83,7 +83,7 @@ class LobbyPlayer:
         self.image_path = image_path
         self.isBot = isBot
         self.school = school
-        self.deck_name = deck_name
+        self.level = level
 
 
 class Lobby:
@@ -118,7 +118,7 @@ class Lobby:
                     "isReady": p.isReady,
                     "image_path": p.image_path,
                     "school": p.school,
-                    "deck_name": p.deck_name,
+                    "level": p.level,
                     "isBot": p.isBot,
                 }
                 for p in self.players.values()
@@ -290,8 +290,8 @@ def create_game(data):
         sid=request.sid,
         name=db_player.get("name", user_id),
         image_path=db_player["image_path"],
-        school=db_player.get("school", "balance"),
-        deck_name=(db_player.get("deck") or {}).get("name", ""),
+        school=db_player.get("school", "Balance"),
+        level=db_player.get("level", 1),
     )
     lobby.players[user_id] = player
 
@@ -318,18 +318,18 @@ def create_bot_game(data):
         user_id, sid=request.sid,
         name=db_player.get("name", user_id),
         image_path=db_player["image_path"],
-        school=db_player.get("school", "balance"),
-        deck_name=(db_player.get("deck") or {}).get("name", ""),
+        school=db_player.get("school", "Balance"),
+        level=db_player.get("level", 1),
     )
 
     # add bots
     import random as _random
-    BOT_SCHOOLS = ["fire", "ice", "storm", "life", "death", "myth", "balance"]
+    BOT_SCHOOLS = ["Fire", "Ice", "Storm", "Life", "Death", "Myth", "Balance"]
     for i in range(3):
         bot_id = f"bot_{i}"
         lobby.players[bot_id] = LobbyPlayer(
             bot_id, None, f"Bot {i+1}", getRandomPlayerImage(),
-            school=_random.choice(BOT_SCHOOLS), deck_name="Bot Deck",
+            school=_random.choice(BOT_SCHOOLS), level=1,
             team="B", isBot=True,
         )
 
@@ -360,8 +360,8 @@ def join_game(data):
             sid=request.sid,
             name=db_player.get("name", user_id),
             image_path=db_player["image_path"],
-            school=db_player.get("school", "balance"),
-            deck_name=(db_player.get("deck") or {}).get("name", ""),
+            school=db_player.get("school", "Balance"),
+            level=db_player.get("level", 1),
             team=("A" if team_counts["A"] < team_counts["B"] else "B"),
         )
 
@@ -447,7 +447,7 @@ def add_bot(data):
     if not lobby:
         return
 
-    BOT_SCHOOLS = ["fire", "ice", "storm", "life", "death", "myth", "balance"]
+    BOT_SCHOOLS = ["Fire", "Ice", "Storm", "Life", "Death", "Myth", "Balance"]
     bot_num = sum(1 for p in lobby.players.values() if p.isBot) + 1
     bot_id = f"bot_{uuid.uuid4().hex[:6]}"
     lobby.players[bot_id] = LobbyPlayer(
@@ -456,7 +456,7 @@ def add_bot(data):
         name=f"Bot {bot_num}",
         image_path=getRandomPlayerImage(),
         school=_random.choice(BOT_SCHOOLS),
-        deck_name="Bot Deck",
+        level=1,
         team=team,
         isBot=True,
     )
@@ -521,7 +521,7 @@ def start_game(data):
             player = loadPlayer(player.to_dict())
         
         else:
-            player = createBotPlayer(p.name, p.id, p.image_path, school=p.school, deck=p.deck)
+            player = createBotPlayer(p.name, p.id, p.image_path, school=p.school, difficulty="easy")
 
 
         if p.team == "A":
@@ -541,6 +541,7 @@ def start_game(data):
         while not lobby.game.winner and attemptTurnResolution(lobby, lobby.game):
             continue
         if lobby.game.winner:
+            record_match_results(lobby, lobby.game.winner)
             socketio.emit("match_finished", lobby.game.winner, room=gameId)
             del lobbies[gameId]
     return {"ok": True}
@@ -649,6 +650,80 @@ def get_player_state(data):
     return build_player_view(lobby.game, player)
 
 
+VALID_SCHOOLS = {"Fire", "Ice", "Storm", "Life", "Death", "Myth", "Balance"}
+
+
+def record_match_results(lobby, winner_team):
+    """Increment wins/losses in the DB for all human players in the lobby."""
+    db = SessionLocal()
+    try:
+        for p in lobby.players.values():
+            if p.isBot:
+                continue
+            ps = db.query(PlayerState).filter_by(player_id=p.id).first()
+            if not ps:
+                continue
+            if p.team == winner_team:
+                ps.wins = (ps.wins or 0) + 1
+            else:
+                ps.losses = (ps.losses or 0) + 1
+        db.commit()
+    except Exception as e:
+        print(f"[record_match_results] Error: {e}")
+        db.rollback()
+    finally:
+        db.close()
+
+
+# ========================================================
+# Profile Events
+# ========================================================
+
+@socketio.on("update_player_school")
+def update_player_school(data):
+    user_id = get_user_identity(request.sid)
+    school = (data.get("school") or "").strip().title()
+
+    if not user_id or school not in VALID_SCHOOLS:
+        return {"ok": False, "error": "Invalid school"}
+
+    db = SessionLocal()
+    try:
+        ps = db.query(PlayerState).filter_by(player_id=user_id).first()
+        if not ps:
+            return {"ok": False, "error": "Player not found"}
+        ps.school = school
+        db.commit()
+        emit("player_info", ps.to_dict())
+        return {"ok": True}
+    finally:
+        db.close()
+
+
+@socketio.on("update_player_deck")
+def update_player_deck(data):
+    user_id = get_user_identity(request.sid)
+    deck_index = data.get("deckIndex", 0)
+
+    if not user_id:
+        return {"ok": False}
+
+    db = SessionLocal()
+    try:
+        ps = db.query(PlayerState).filter_by(player_id=user_id).first()
+        if not ps:
+            return {"ok": False, "error": "Player not found"}
+        decks = ps.decks or []
+        if deck_index < 0 or deck_index >= len(decks):
+            return {"ok": False, "error": "Invalid deck index"}
+        ps.selected_deck_index = deck_index
+        db.commit()
+        emit("player_info", ps.to_dict())
+        return {"ok": True}
+    finally:
+        db.close()
+
+
 def attemptTurnResolution(lobby, game):
     print("attempting turn resolution")
     if game.allActionsReceived():
@@ -730,6 +805,7 @@ def player_action(data):
         emit("game_state_update", lobby.game.to_json_public(), room=gameId)
 
         if lobby.game.check_end():
+            record_match_results(lobby, game.winner)
             emit("match_finished", game.winner, room=gameId)
             del lobbies[gameId]
 
@@ -760,6 +836,7 @@ def player_action(data):
         continue
 
     if game.winner:
+        record_match_results(lobby, game.winner)
         emit("match_finished", game.winner, room=gameId)
         game.print_log()
         del lobbies[gameId]

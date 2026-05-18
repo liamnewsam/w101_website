@@ -16,21 +16,52 @@ class PlayerState(Base):
 
     player_id = Column(String, primary_key=True)  # can be user.id or guest_id
     is_guest = Column(Boolean, default=False)
-    
+
     name = Column(String)
-    
     school = Column(String)
+
+    # Legacy single-deck field — kept for rows not yet migrated
     deck = Column(JSON)
+
+    # Multi-deck support
+    decks = Column(JSON, default=list)
+    selected_deck_index = Column(Integer, default=0)
+
+    # Match history — level is derived from these
+    wins = Column(Integer, default=0)
+    losses = Column(Integer, default=0)
 
     image_path = Column(String)
 
+    def _compute_level(self):
+        wins = self.wins or 0
+        losses = self.losses or 0
+        # 3 wins = 1 level; losses also contribute slightly
+        return 1 + wins // 3 + losses // 10
+
+    def _selected_deck(self):
+        """Return the currently selected deck dict (falls back to legacy deck field)."""
+        decks = self.decks or []
+        if decks:
+            idx = min(self.selected_deck_index or 0, len(decks) - 1)
+            return decks[idx]
+        return self.deck  # legacy fallback
+
     def to_dict(self):
+        wins = self.wins or 0
+        losses = self.losses or 0
+        decks = self.decks or []
         return {
             "name": self.name,
             "school": self.school,
-            "deck": self.deck,
+            "deck": self._selected_deck(),   # for loadPlayer compat
+            "decks": decks,
+            "selected_deck_index": self.selected_deck_index or 0,
             "user_id": self.player_id,
-            "image_path": self.image_path
+            "image_path": self.image_path,
+            "wins": wins,
+            "losses": losses,
+            "level": self._compute_level(),
         }
 
 

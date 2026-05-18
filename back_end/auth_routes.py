@@ -47,7 +47,10 @@ def guest_login():
             is_guest=True,
             name=f"Guest {guest_id[:6]}",
             school="Life",
-            deck=simple_life().to_dict(),
+            decks=[simple_life().to_dict()],
+            selected_deck_index=0,
+            wins=0,
+            losses=0,
             image_path=getRandomPlayerImage()
         ))
         db.commit()

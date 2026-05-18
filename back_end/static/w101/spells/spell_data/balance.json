@@ -130,9 +130,9 @@
         "pips": 5,
         "description": "Applies Fire, Ice, and Storm Dispel Charms",
         "effects": [
-            {"type": "curse", "aspect": "dispel", "school": "fire", "target": "enemy_same"},
-            {"type": "curse", "aspect": "dispel", "school": "ice", "target": "enemy_same"},
-            {"type": "curse", "aspect": "dispel", "school": "storm", "target": "enemy_same"}
+            {"type": "dispel", "school": "fire", "target": "enemy_same"},
+            {"type": "dispel", "school": "ice", "target": "enemy_same"},
+            {"type": "dispel", "school": "storm", "target": "enemy_same"}
         ],
         "image": "static/w101/spells/balance/(Spell)_Elemental_Defuse.png",
         "id": "elemental_defuse",
@@ -299,11 +299,11 @@
     {
         "name": "Black Mantle",
         "school": "balance",
-        "type": "charm",
+        "type": "curse",
         "pips": 0,
         "description": "Applies a -45% Accuracy Charm",
         "effects": [
-            {"type": "charm", "aspect": "accuracy", "amount": -45, "target": "enemy"}
+            {"type": "curse", "aspect": "accuracy", "amount": -45, "target": "enemy"}
         ],
         "image": "static/w101/spells/balance/(Spell)_Black_Mantle.png",
         "id": "black_mantle",
@@ -312,13 +312,13 @@
     {
         "name": "Spirit Weakness",
         "school": "balance",
-        "type": "charm",
+        "type": "curse",
         "pips": 1,
         "description": "Applies -30% Death, Myth, and Life Damage Charms",
         "effects": [
-            {"type": "charm", "aspect": "damage", "school": "death", "amount": -30, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "school": "myth", "amount": -30, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "school": "life", "amount": -30, "target": "enemy_same"}
+            {"type": "curse", "aspect": "damage", "school": "death", "amount": -30, "target": "enemy_same"},
+            {"type": "curse", "aspect": "damage", "school": "myth", "amount": -30, "target": "enemy_same"},
+            {"type": "curse", "aspect": "damage", "school": "life", "amount": -30, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/balance/(Spell)_Spirit_Weakness.png",
         "id": "spirit_weakness",
@@ -348,7 +348,7 @@
         "pips": 0,
         "description": "Applies a +30% Damage Ward",
         "effects": [
-            {"type": "trap", "amount": "30"}
+            {"type": "trap", "amount": "30", "target": "enemy"}
         ],
         "image": "static/w101/spells/balance/(Spell)_Hex.png",
         "id": "hex",
@@ -405,7 +405,7 @@
         "effects": [
             {"type": "damage", "school": "balance", "amount": 700, "target": "enemy_same"},
             {"type": "DoT", "school": "balance", "amount": 210, "rounds": 3, "wait": true, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy_same"}
+            {"type": "curse", "aspect": "damage", "amount": -25, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/balance/(Spell)_Wheel_of_Fortune.png",
         "id": "wheel_of_fortune",
@@ -468,11 +468,11 @@
     {
         "name": "Weakness",
         "school": "balance",
-        "type": "charm",
+        "type": "curse",
         "pips": 0,
         "description": "Applies a -25% Damage Charm",
         "effects": [
-            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy"}
+            {"type": "curse", "aspect": "damage", "amount": -25, "target": "enemy"}
         ],
         "image": "static/w101/spells/balance/(Spell)_Weakness.png",
         "id": "weakness",
@@ -500,8 +500,8 @@
         "description": "Deals 315-395 Balance Damage to and applies -15% Damage and -25% Accuracy Charms on target",
         "effects": [
             {"type": "damage", "school": "balance", "min": 315, "max": 395, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "amount": -15, "target": "enemy_same"},
-            {"type": "charm", "aspect": "accuracy", "amount": -25, "target": "enemy_same"}
+            {"type": "curse", "aspect": "damage", "amount": -15, "target": "enemy_same"},
+            {"type": "curse", "aspect": "accuracy", "amount": -25, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/balance/(Spell)_Loremaster.png",
         "id": "loremaster",
@@ -713,13 +713,13 @@
     {
         "name": "Elemental Weakness",
         "school": "balance",
-        "type": "charm",
+        "type": "curse",
         "pips": 1,
         "description": "Applies -30% Ice, Storm, and Fire Damage Charms",
         "effects": [
-            {"type": "charm", "aspect": "damage", "school": "ice", "amount": -30, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "school": "storm", "amount": -30, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "school": "fire", "amount": -30, "target": "enemy_same"}
+            {"type": "curse", "aspect": "damage", "school": "ice", "amount": -30, "target": "enemy_same"},
+            {"type": "curse", "aspect": "damage", "school": "storm", "amount": -30, "target": "enemy_same"},
+            {"type": "curse", "aspect": "damage", "school": "fire", "amount": -30, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/balance/(Spell)_Elemental_Weakness.png",
         "id": "elemental_weakness",
@@ -729,7 +729,7 @@
     {
         "name": "Unbalance",
         "school": "balance",
-        "type": "charm",
+        "type": "curse",
         "pips": 2,
         "description": "Applies a Balance Dispel Charm",
         "effects": [

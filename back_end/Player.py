@@ -177,7 +177,7 @@ class Player:
         hangingEffectList = {"charm": self.charms, "curse": self.curses, "ward": self.wards, "jinx": self.jinxes}[type]
         used = []
         for effect in card.card_def.effects:
-            if effect["type"] in ["damage", "DoT", "heal", "HoT"]:
+            if effect["type"] in ["damage", "DoT", "drain"]:
                 i = 0
                 while i < len(hangingEffectList):
                     hangingEffect = hangingEffectList[i]
@@ -188,48 +188,12 @@ class Player:
                         print(f"Adding {hangingEffect.amount}% damage")
                     else:
                         i += 1
+            elif effect["type"] in ["heal", "HoT"]:
+                pass
 
         return used
 
-    def consumeCharms(self, card, accumulation): # Automatically assumes we are the caster
-        used_charms = []
-        for effect in card.card_def.effects:
-            if effect["type"] in ["damage", "DoT", "heal", "HoT"]:
-                for charm in self.charms:
-                    if charm.aspect == "damage" and effect["type"] in ["damage", "DoT"] and charm.school in ["any", effect["school"]] and not isRedundant(used_charms, charm):
-                        accumulation["damage"][charm.school] += charm.amount
-                        self.charms.remove(charm)
-                        used_charms.append(charm)
-                        print(f"Adding {charm.amount}% damage")
-        
-        return used_charms
 
-
-    def consumeCurses(self, card, accumulation): # Automatically assumes we are the caster
-        used_curses = []
-        for effect in card.card_def.effects:
-            if effect["type"] in ["damage", "DoT", "heal", "HoT"]:
-                for curse in self.curses:
-                    if curse.aspect == "damage" and curse.school in ["any", effect["school"]] and not isRedundant(used_curses, curse):
-                        accumulation["damage"][curse.school] += curse.amount
-                        self.curses.remove(curse)
-                        used_curses.append(curse)
-                        #print(f"Adding {curse.amount}% damage")
-        
-        return used_curses
-
-    def consumeWards(self, card, accumulation): # Automatically assumes we are the target
-        used_wards = []
-        for effect in card.card_def.effects:
-            if effect["type"] in ["damage", "DoT", "heal", "HoT"]:
-                for ward in self.wards:
-                    if ward.type == "damage" and ward.school in ["any", effect["school"]] and not isRedundant(used_wards, ward):
-                        accumulation["damage"][ward.school] -= ward.amount
-                        self.charms.remove(ward)
-                        used_wards.append(ward)
-                        print(f"Removing {ward.amount}% damage")
-        
-        return used_wards
 
     def to_json(self):
         return {
@@ -432,7 +396,10 @@ class WardEffect(Effect):
 class JinxEffect(Effect):
     def __init__(self, template, owner, target, card):
         super().__init__(template, owner, target, card)
-        self.aspect = template["aspect"]
+        if template["type"] == "trap":
+            self.aspect = "damage"
+        else:
+            self.aspect = template["aspect"]
         self.amount = self.get_amount()
         self.school = template.get("school", None)
 
@@ -558,10 +525,22 @@ class ReshuffleEffect(Effect):
         super().__init__(template, owner, target, card)
         self.amount = self.get_amount()
 
-class StealEffect(Effect):
+class DrainEffect(Effect):
     def __init__(self, template, owner, target, card):
         super().__init__(template, owner, target, card)
         self.amount = self.get_amount()
+
+        self.damageEffect = DamageEffect(template, owner, target, card)
+
+    def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
+        result = self.damageEffect.resolve(game, caster_accumulation, target_accumulation, critical_multiplier)
+        result["aspect"] = "drain"
+
+        self.owner.health += result["amount"] / 2.0
+
+        return result
+
+
 
 class TakeEffect(Effect):
     def __init__(self, template, owner, target, card):
@@ -575,6 +554,8 @@ EFFECT_TYPE_TO_CLASS = {
     "curse": CurseEffect,
     "ward": WardEffect,
     "jinx": JinxEffect,
+    "trap": JinxEffect,
+    "shield": WardEffect,
 
     "damage": DamageEffect,
     "heal": HealEffect,
@@ -596,7 +577,7 @@ EFFECT_TYPE_TO_CLASS = {
     "pip": PipEffect,
     "repeat": RepeatEffect,
     "reshuffle": ReshuffleEffect,
-    "steal": StealEffect,
+    "drain": DrainEffect,
     "take": TakeEffect,
 }
 

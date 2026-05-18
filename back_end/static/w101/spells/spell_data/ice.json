@@ -230,9 +230,9 @@
         "effects": [
             {
                 "type": "gambit", 
-                "condition": {"type": "amount", "aspect": "charm_negative", "amount": 4, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "curse", "amount": 4, "target": "enemy"}, 
                 "true": [
-                    {"type": "destroy", "aspect": "charm_negative", "target": "enemy", "times": 4},
+                    {"type": "destroy", "aspect": "curse", "target": "enemy", "times": 4},
                     {"type": "damage", "school": "ice", "amount": 1420}
                 ], 
                 "false": [
@@ -303,11 +303,11 @@
     {
         "name": "Ice Weakness",
         "school": "ice",
-        "type": "charm",
+        "type": "curse",
         "pips": 0,
         "description": "Applies a -35% Ice Damage Charm",
         "effects": [
-            {"type": "charm", "aspect": "damage", "school": "ice", "amount": -35, "target": "enemy"}
+            {"type": "curse", "aspect": "damage", "school": "ice", "amount": -35, "target": "enemy"}
         ],
         "image": "static/w101/spells/ice/(Spell)_Ice_Weakness.png",
         "id": "ice_weakness",
@@ -378,9 +378,9 @@
         "pips": 2,
         "description": "Removes three helpful Charms from target",
         "effects": [
-            {"type": "destroy", "aspect": "charm_positive", "target": "enemy_same"},
-            {"type": "destroy", "aspect": "charm_positive", "target": "enemy_same"},
-            {"type": "destroy", "aspect": "charm_positive", "target": "enemy_same"}
+            {"type": "destroy", "aspect": "charm", "target": "enemy_same"},
+            {"type": "destroy", "aspect": "charm", "target": "enemy_same"},
+            {"type": "destroy", "aspect": "charm", "target": "enemy_same"}
         ],
         "image": "static/w101/spells/ice/(Spell)_Impair.png",
         "id": "impair",
@@ -393,14 +393,14 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes up to three helpful Charms from target to apply up to three +15% Ice Damage Traps on target",
-        "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"},
+        "condition": {"type": "amount", "aspect": "charm", "amount": 1, "target": "enemy"},
         "effects": [
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "charm", "amount": 1, "target": "enemy"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "charm_positive", "target": "enemy"},
+                    {"type": "destroy", "aspect": "charm", "target": "enemy"},
                     {"type": "trap", "school": "ice", "amount": 15}
                 ]
             }
@@ -492,9 +492,9 @@
             {
                 "type": "repeat", 
                 "up_to": 8, 
-                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "charm", "amount": 1, "target": "enemy"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "charm_positive", "target": "enemy"}
+                    {"type": "destroy", "aspect": "charm", "target": "enemy"}
                 ]
             }
         ],
@@ -524,15 +524,15 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes up to three harmful Charms from caster to apply up to three -10% Damage Charms on enemy",
-        "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "self"},
+        "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "self"},
         "effects": [
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "self"},
+                "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "self"},
                 "effects": [
-                    {"type": "destroy", "aspect": "charm_negative", "target": "self"},
-                    {"type": "charm", "aspect": "damage", "amount": -10, "target": "enemy"}
+                    {"type": "destroy", "aspect": "curse", "target": "self"},
+                    {"type": "curse", "aspect": "damage", "amount": -10, "target": "enemy"}
                 ]
             }
         ],
@@ -549,7 +549,7 @@
         "description": "Deals 330 Ice Damage to and applies a -30% Damage Charm on target",
         "effects": [
             {"type": "damage", "school": "ice", "amount": 330, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "amount": -30, "target": "enemy_same"}
+            {"type": "curse", "aspect": "damage", "amount": -30, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/ice/(Spell)_Ice_Elemental.png",
         "id": "ice_elemental",
@@ -574,14 +574,14 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes up to three harmful Charms from ally to apply up to three -20% Damage or Steal Wards on ally",
-        "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "ally"},
+        "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "ally"},
         "effects": [
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "ally"}, 
+                "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "ally"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "charm_negative", "target": "ally"},
+                    {"type": "destroy", "aspect": "curse", "target": "ally"},
                     {"type": "shield", "aspect": ["damage", "steal"], "amount": -20, "target": "ally"}
                 ]
             }
@@ -640,15 +640,15 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes up to three helpful Charms from target to apply up to three -20% Damage or Steal Wards on caster",
-        "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"},
+        "condition": {"type": "amount", "aspect": "charm", "amount": 1, "target": "enemy"},
         "effects": [
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "charm", "amount": 1, "target": "enemy"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "charm_positive", "target": "enemy"},
-                    {"type": "shield", "aspect": {"AND": ["damage", "steal"]}, "amount": -20, "target": "self"}
+                    {"type": "destroy", "aspect": "charm", "target": "enemy"},
+                    {"type": "shield", "aspect": "damage", "amount": -20, "target": "self"}
                 ]
             }
         ],

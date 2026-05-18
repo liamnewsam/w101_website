@@ -122,11 +122,11 @@
     {
         "name": "Fire Weakness",
         "school": "fire",
-        "type": "charm",
+        "type": "curse",
         "pips": 0,
         "description": "Applies a -35% Fire Damage Charm",
         "effects": [
-            {"type": "charm", "aspect": "damage", "school": "fire", "amount": -35, "target": "enemy"}
+            {"type": "curse", "aspect": "damage", "school": "fire", "amount": -35, "target": "enemy"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Fire_Weakness.png",
         "id": "fire_weakness",
@@ -394,7 +394,7 @@
         "pips": 1,
         "description": "Steals a helpful Charm",
         "effects": [
-            {"type": "take", "aspect": "charm_positive", "target": "enemy"}
+            {"type": "take", "aspect": "charm", "target": "enemy"}
 
         ],
         "image": "static/w101/spells/fire/(Spell)_Steal_Charm.png",
@@ -480,7 +480,7 @@
     {
         "name": "Quench",
         "school": "fire",
-        "type": "charm",
+        "type": "curse",
         "pips": 2,
         "description": "Applies a Fire Dispel Charm",
         "effects": [
@@ -494,11 +494,11 @@
     {
         "name": "Smoke Screen",
         "school": "fire",
-        "type": "charm",
+        "type": "curse",
         "pips": 1,
         "description": "Applies a -40% Accuracy Charm on all enemies",
         "effects": [
-            {"type": "charm", "aspect": "accuracy", "amount": 40, "target": "enemy_all"}
+            {"type": "curse", "aspect": "accuracy", "amount": -40, "target": "enemy_all"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Smoke_Screen.png",
         "id": "smoke_screen",
@@ -616,7 +616,7 @@
         "description": "Deals 420-460 Fire Damage to and applies a -45% Accuracy Charm on target",
         "effects": [
             {"type": "damage", "school": "fire", "min": 420, "max": 460, "target": "enemy_same"},
-            {"type": "charm", "aspect": "accuracy", "amount": -45, "target": "enemy_same"}
+            {"type": "curse", "aspect": "accuracy", "amount": -45, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Krampus.png",
         "id": "krampus",

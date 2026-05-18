@@ -47,7 +47,7 @@
     {
         "name": "Dissipate",
         "school": "storm",
-        "type": "charm",
+        "type": "curse",
         "pips": 2,
         "description": "Applies a Storm Dispel Charm",
         "effects": [
@@ -235,7 +235,7 @@
         "pips": 0,
         "description": "Removes 1 negative Charm",
         "effects": [
-            {"type": "destroy", "aspect": "charm_negative", "target": "self"}
+            {"type": "destroy", "aspect": "curse", "target": "self"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Cleanse_Charm.png",
         "id": "cleanse_charm",
@@ -296,7 +296,7 @@
         "description": "Deals 1,145 Storm Damage to and applies a -25% Damage Charm on target and applies a +35% Storm Damage Charm on caster",
         "effects": [
             {"type": "damage", "school": "storm", "amount": 1145, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy_same"},
+            {"type": "curse", "aspect": "damage", "amount": -25, "target": "enemy_same"},
             {"type": "charm", "aspect": "damage", "school": "storm", "amount": 35, "target": "self"}
         ],
         "image": "static/w101/spells/storm/(Spell)_The_Tower.png",
@@ -326,7 +326,7 @@
         "pips": 0,
         "description": "Removes a positive Charm",
         "effects": [
-            {"type": "destroy", "aspect": "charm_positive", "target": "enemy"}
+            {"type": "destroy", "aspect": "charm", "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Disarm.png",
         "id": "disarm",
@@ -349,11 +349,11 @@
     {
         "name": "Storm Weakness",
         "school": "storm",
-        "type": "charm",
+        "type": "curse",
         "pips": 0,
         "description": "Deals 105-145 Storm Damage",
         "effects": [
-            {"type": "charm", "aspect": "damage", "school": "storm", "amount": -35, "target": "enemy"}
+            {"type": "curse", "aspect": "damage", "school": "storm", "amount": -35, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Storm_Weakness.png",
         "id": "storm_weakness",
@@ -489,7 +489,7 @@
         "description": "Deals 650 Storm Damage to and applies a -35% Damage Charm on target",
         "effects": [
             {"type": "damage", "school": "storm", "amount": 650, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "amount": -35, "target": "enemy_same"}
+            {"type": "curse", "aspect": "damage", "amount": -35, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Catalan.png",
         "id": "catalan",
@@ -659,8 +659,8 @@
         "condition": {"type": "amount", "aspect": "DoT", "amount": 1, "target": "self"},
         "effects": [
             {"type": "destroy", "aspect": "DoT", "target": "self"},
-            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy_same"}
+            {"type": "curse", "aspect": "damage", "amount": -25, "target": "enemy_same"},
+            {"type": "curse", "aspect": "damage", "amount": -25, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Oni's_Attrition.png",
         "id": "oni's_attrition",

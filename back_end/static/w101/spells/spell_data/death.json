@@ -18,12 +18,12 @@
         "school": "death",
         "type": "manipulation",
         "pips": 3,
-        "description": "Removes a Heal over Time effect from target to apply two -50% Damage or Steal Wards on caster",
+        "description": "Removes a Heal over Time effect from target to apply two -50% Damage Wards on caster",
         "condition": {"type": "amount", "aspect": "HoT", "amount": 1, "target": "enemy"},
         "effects": [
             {"type": "destroy", "aspect": "HoT", "target": "enemy"},
-            {"type": "shield", "aspect": {"AND": ["damage", "steal"]}, "amount": -50, "target": "self"},
-            {"type": "shield", "aspect": {"AND": ["damage", "steal"]}, "amount": -50, "target": "self"}
+            {"type": "shield", "aspect": "damage", "amount": -50, "target": "self"},
+            {"type": "shield", "aspect": "damage", "amount": -50, "target": "self"}
 
         ],
         "image": "static/w101/spells/death/(Spell)_Oni's_Morbidity.png",
@@ -34,11 +34,11 @@
     {
         "name": "Ghoul",
         "school": "death",
-        "type": "steal",
+        "type": "drain",
         "pips": 2,
         "description": "Deals 160 Death Drain Damage and heals the caster for half the Damage dealt",
         "effects": [
-            {"type": "steal", "school": "death", "amount": 160}
+            {"type": "drain", "school": "death", "amount": 160, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Ghoul.png",
         "id": "ghoul",
@@ -47,11 +47,11 @@
     {
         "name": "Gravestorm",
         "school": "death",
-        "type": "steal",
+        "type": "drain",
         "pips": {"regular": 3, "storm": 1},
         "description": "Deals 485 Death Drain Damage and heals the caster for half the Damage dealt",
         "effects": [
-            {"type": "steal", "school": "death", "amount": 485}
+            {"type": "drain", "school": "death", "amount": 485, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Gravestorm.png",
         "id": "gravestorm",
@@ -184,11 +184,11 @@
     {
         "name": "Wraith",
         "school": "death",
-        "type": "steal",
+        "type": "drain",
         "pips": 6,
         "description": "Deals 500 Death Drain Damage and heals the caster for half the Damage dealt",
         "effects": [
-            {"type": "steal", "school": "death", "amount": 500}
+            {"type": "drain", "school": "death", "amount": 500, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Wraith.png",
         "id": "wraith",
@@ -226,7 +226,7 @@
     {
         "name": "Steal Health",
         "school": "death",
-        "type": "steal",
+        "type": "drain",
         "pips": 1,
         "description": "Deals 300 Death Drain Damage to friendly Minion and heals the caster for the Damage dealt",
         "effects": [],
@@ -262,11 +262,11 @@
     {
         "name": "Vampire",
         "school": "death",
-        "type": "steal",
+        "type": "drain",
         "pips": 4,
         "description": "Deals 335 Death Drain Damage and heals the caster for half the Damage dealt",
         "effects": [
-            {"type": "steal", "school": "death", "amount": 335}
+            {"type": "drain", "school": "death", "amount": 335, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Vampire.png",
         "id": "vampire",
@@ -275,7 +275,7 @@
     {
         "name": "Strangle",
         "school": "death",
-        "type": "charm",
+        "type": "curse",
         "pips": 2,
         "description": "Applies a Death Dispel Charm",
         "effects": [
@@ -303,12 +303,12 @@
     {
         "name": "Dr. Von's Monster",
         "school": "death",
-        "type": "steal",
+        "type": "drain",
         "pips": 9,
         "description": "Deals 720 Death Drain Damage and heals the caster for half the Damage dealt, and applies a -65% Healing Charm on target",
         "effects": [
-            {"type": "steal", "school": "death", "amount": 720, "target": "enemy_same"},
-            {"type": "charm", "aspect": "heal", "amount": -65, "target": "enemy_same"}
+            {"type": "drain", "school": "death", "amount": 720, "target": "enemy_same"},
+            {"type": "curse", "aspect": "heal", "amount": -65, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/death/(Spell)_Dr._Von's_Monster.png",
         "id": "dr._von's_monster",
@@ -351,7 +351,7 @@
         "description": "Deals 710 Death Damage to and applies a -65% Healing Charm on target, and applies a +10% Death Armor Piercing Charm on caster",
         "effects": [
             {"type": "damage", "school": "death", "amount": 710, "target": "enemy_same"},
-            {"type": "charm", "aspect": "heal", "amount": -65, "target": "enemy_same"},
+            {"type": "curse", "aspect": "heal", "amount": -65, "target": "enemy_same"},
             {"type": "charm", "aspect": "armor_piercing", "school": "death", "amount": 10, "target": "self"}
         ],
         "image": "static/w101/spells/death/(Spell)_King_Artorius_(Death).png",
@@ -364,7 +364,7 @@
         "school": "death",
         "type": "global",
         "pips": 2,
-        "description": "Applies a -50% Healing Global (does not affect Steal Spells)",
+        "description": "Applies a -50% outgoing Healing Global",
         "effects": [
             {"type": "global", "aspect": "heal", "amount": -50}
         ],
@@ -376,13 +376,13 @@
     {
         "name": "Threefold Fever",
         "school": "death",
-        "type": "charm",
+        "type": "curse",
         "pips": 2,
         "description": "Applies three -65% Healing Charms",
         "effects": [
-            {"type": "charm", "aspect": "heal", "amount": -65, "target": "enemy"},
-            {"type": "charm", "aspect": "heal", "amount": -65, "target": "enemy"},
-            {"type": "charm", "aspect": "heal", "amount": -65, "target": "enemy"}
+            {"type": "curse", "aspect": "heal", "amount": -65, "target": "enemy"},
+            {"type": "curse", "aspect": "heal", "amount": -65, "target": "enemy"},
+            {"type": "curse", "aspect": "heal", "amount": -65, "target": "enemy"}
 
         ],
         "image": "static/w101/spells/death/(Spell)_Threefold_Fever.png",
@@ -407,12 +407,12 @@
     {
         "name": "Lord of Night",
         "school": "death",
-        "type": "steal",
+        "type": "drain",
         "pips": {"regular": 3, "death": 1},
         "description": "Deals 445 Death Drain Damage, heals the caster for half the Damage dealt, and applies a -55% Healing Charm on target",
         "effects": [
-            {"type": "steal", "school": "death", "amount": 445, "target": "enemy_same"},
-            {"type": "charm", "aspect": "heal", "amount": -55, "target": "enemy_same"}
+            {"type": "drain", "school": "death", "amount": 445, "target": "enemy_same"},
+            {"type": "curse", "aspect": "heal", "amount": -55, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/death/(Spell)_Lord_of_Night.png",
         "id": "lord_of_night",
@@ -494,7 +494,7 @@
         "description": "Deals 405 Death Damage to target and applies a -20% Damage Charm on all enemies",
         "effects": [
             {"type": "damage", "school": "death", "amount": 405},
-            {"type": "charm", "aspect": "damage", "amount": -20, "target": "enemy_all"}
+            {"type": "curse", "aspect": "damage", "amount": -20, "target": "enemy_all"}
         ],
         "image": "static/w101/spells/death/(Spell)_Winged_Sorrow.png",
         "id": "winged_sorrow",
@@ -506,7 +506,7 @@
         "school": "death",
         "type": "damage",
         "pips": 4,
-        "description": "Deals 405 Death Damage to target and applies a -20% Damage Charm on all enemies",
+        "description": "Deals 340 Death Damage split among selected enemies",
         "effects": [
             {"type": "damage", "school": "death", "amount": 340, "target": "enemy_select"}
         ],
@@ -536,7 +536,7 @@
         "pips": 0,
         "description": "Applies a +35% Death Damage or Steal Charm",
         "effects": [
-            {"type": "charm", "aspect": ["damage", "steal"], "school": "death", "amount": 35, "target": "ally"}
+            {"type": "charm", "aspect": "damage", "school": "death", "amount": 35, "target": "ally"}
         ],
         "image": "static/w101/spells/death/(Spell)_Deathblade.png",
         "id": "deathblade",
@@ -565,9 +565,9 @@
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "charm", "amount": 1, "target": "enemy"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "charm_positive", "target": "enemy"},
+                    {"type": "destroy", "aspect": "charm", "target": "enemy"},
                     {"type": "charm", "aspect": "damage", "school": "death", "amount": 15, "target": "self"}
                 ]
             }
@@ -595,11 +595,11 @@
     {
         "name": "Infection",
         "school": "death",
-        "type": "charm",
+        "type": "curse",
         "pips": 0,
         "description": "Applies a -65% Healing Charm",
         "effects": [
-            {"type": "charm", "aspect": "heal", "amount": -65, "target": "enemy"}
+            {"type": "curse", "aspect": "heal", "amount": -65, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Infection.png",
         "id": "infection",
@@ -643,7 +643,8 @@
         "description": "Removes a Heal over Time effect from target to apply two -65% Healing Charms on target",
         "effects": [
             {"type": "destroy", "aspect": "HoT", "target": "enemy_same"},
-            {"type": "charm", "aspect": "heal", "amount": 10, "target": "enemy_same", "times": 2}
+            {"type": "curse", "aspect": "heal", "amount": 10, "target": "enemy_same"},
+            {"type": "curse", "aspect": "heal", "amount": 10, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/death/(Spell)_Contagion.png",
         "id": "contagion",
@@ -656,15 +657,15 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes up to three helpful Charms from target to apply up to three -10% Damage Charms on target",
-        "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"},
+        "condition": {"type": "amount", "aspect": "charm", "amount": 1, "target": "enemy"},
         "effects": [
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 1, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "charm", "amount": 1, "target": "enemy"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "charm_positive", "target": "enemy_same"},
-                    {"type": "charm", "aspect": "damage", "amount": -10, "target": "enemy_same"}
+                    {"type": "destroy", "aspect": "charm", "target": "enemy_same"},
+                    {"type": "curse", "aspect": "damage", "amount": -10, "target": "enemy_same"}
                 ]
             }
         ],
@@ -690,11 +691,11 @@
     {
         "name": "Mass Infection",
         "school": "death",
-        "type": "charm",
+        "type": "curse",
         "pips": 1,
         "description": "Applies a -45% Healing Charm on all enemies",
         "effects": [
-            {"type": "charm", "aspect": "heal", "amount": -45, "target": "enemy_all"}
+            {"type": "curse", "aspect": "heal", "amount": -45, "target": "enemy_all"}
         ],
         "image": "static/w101/spells/death/(Spell)_Mass_Infection.png",
         "id": "mass_infection",
@@ -704,11 +705,11 @@
     {
         "name": "Plague",
         "school": "death",
-        "type": "charm",
+        "type": "curse",
         "pips": 1,
         "description": "Applies a -20% Damage Charm on all enemies",
         "effects": [
-            {"type": "charm", "aspect": "damage", "amount": -20, "target": "enemy_all"}
+            {"type": "curse", "aspect": "damage", "amount": -20, "target": "enemy_all"}
         ],
         "image": "static/w101/spells/death/(Spell)_Plague.png",
         "id": "plague",

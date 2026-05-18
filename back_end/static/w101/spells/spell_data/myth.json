@@ -34,14 +34,14 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes up to three harmful Charms from caster to deal 60 Myth Damage per harmful Charm after 3 Rounds to target",
-        "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "self"},
+        "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "self"},
         "effects": [
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "self"}, 
+                "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "self"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "charm_negative", "target": "self"},
+                    {"type": "destroy", "aspect": "curse", "target": "self"},
                     {"type": "DoT", "school": "myth", "amount": 60, "rounds": 3, "wait": true}
                 ]
             }
@@ -73,7 +73,7 @@
         "pips": 0,
         "description": "Applies a +40% Myth Damage Ward",
         "effects": [
-            {"type": "trap", "school": "myth", "amount": 40}
+            {"type": "trap", "school": "myth", "amount": 40, "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Myth_Trap.png",
         "id": "myth_trap",
@@ -169,14 +169,14 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes up to three harmful Charms from caster to apply up to three +15% Myth Damage Traps on target",
-        "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "self"},
+        "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "self"},
         "effects": [
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "charm_negative", "amount": 1, "target": "self"}, 
+                "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "self"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "charm_negative", "target": "self"},
+                    {"type": "destroy", "aspect": "curse", "target": "self"},
                     {"type": "trap", "school": "myth", "amount": 15}
                 ]
             }
@@ -252,7 +252,7 @@
         "school": "myth",
         "type": "manipulation",
         "pips": 3,
-        "description": "Removes up to three helpful Wards from target to apply up to three -20% Damage or Steal Wards on caster",
+        "description": "Removes up to three helpful Wards from target to apply up to three -20% Damage Wards on caster",
         "effects": [
             {
                 "type": "repeat", 
@@ -260,7 +260,7 @@
                 "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}, 
                 "effects": [
                     {"type": "destroy", "aspect": "ward_positive", "target": "enemy"},
-                    {"type": "shield", "aspect": ["damage", "steal"], "amount": -20, "target": "self"}
+                    {"type": "shield", "aspect": "damage", "amount": -20, "target": "self"}
                 ]
             }
         ],
@@ -418,7 +418,7 @@
         "school": "myth",
         "type": "damage",
         "pips": {"regular": 3, "myth": 1},
-        "description": "Deals 520 Myth Damage to target and applies a -35% Damage or Steal Ward on caster",
+        "description": "Deals 520 Myth Damage to target and applies a -35% Damage Ward on caster",
         "effects": [
             {"type": "damage", "school": "myth", "amount": 520},
             {"type": "shield", "aspect": "damage", "amount": -35, "target": "self"}
@@ -537,11 +537,11 @@
     {
         "name": "Myth Weakness",
         "school": "myth",
-        "type": "charm",
+        "type": "curse",
         "pips": 0,
         "description": "Applies a -35% Myth Damage Charm",
         "effects": [
-            {"type": "charm", "aspect": "damage", "school": "myth", "amount": -35, "target": "enemy"}
+            {"type": "curse", "aspect": "damage", "school": "myth", "amount": -35, "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Myth_Weakness.png",
         "id": "myth_weakness",
@@ -578,7 +578,7 @@
     {
         "name": "Vaporize",
         "school": "myth",
-        "type": "charm",
+        "type": "curse",
         "pips": 2,
         "description": "Applies a Myth Dispel Charm",
         "effects": [
@@ -614,8 +614,8 @@
             {"type": "damage", "school": "myth", "amount": 425, "target": "enemy_same"},
             {"type": "DoT", "school": "myth", "amount": 220, "rounds": 3, "wait": true}
         ],
-        "image": "static/w101/spells/myth/(Spell)_Snake_Charmer.png",
-        "id": "snake_charmer",
+        "image": "static/w101/spells/myth/(Spell)_Barbarians_Saga.png",
+        "id": "barbarians_saga",
         "accuracy": 80,
         "pvp_level": 140
     },
@@ -677,7 +677,7 @@
         "pips": 2,
         "description": "Removes three harmful Charms from target",
         "effects": [
-            {"type": "repeat", "up_to": 3, "effects": [{"type": "destroy", "aspect": "charm_negative", "target": "ally_same"}]}
+            {"type": "repeat", "up_to": 3, "effects": [{"type": "destroy", "aspect": "curse", "target": "ally_same"}]}
         ],
         "image": "static/w101/spells/myth/(Spell)_Purge.png",
         "id": "purge",
