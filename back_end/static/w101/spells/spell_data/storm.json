@@ -171,11 +171,11 @@
     {
         "name": "Storm Trap",
         "school": "storm",
-        "type": "ward",
+        "type": "jinx",
         "pips": 0,
         "description": "Applies a +40% Storm Damage Ward",
         "effects": [
-            {"type": "trap", "school": "storm", "amount": 40}
+            {"type": "trap", "school": "storm", "amount": 40, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Storm_Trap.png",
         "id": "storm_trap",

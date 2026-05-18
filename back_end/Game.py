@@ -7,11 +7,15 @@ from Deck import *
 from utils import *
 
 def createBotPlayer(name, bot_id, image_path, school="random", deck=None, difficulty="easy"):
+    '''
     if school == "random":
         school = random.choice(list(DECK_MASTER[difficulty].keys()))
     if deck is None:
-        deck = DECK_MASTER[difficulty].get(school, DECK_MASTER[difficulty]["Life"])()
+        deck = DECK_MASTER[difficulty][school]()
     return Player(name, bot_id, school, deck, isBot=True, img_path=image_path)
+    '''
+    return Player(name, bot_id, school, contrived_enemy_deck(), isBot=True, img_path=image_path)
+
 
 
 def neededTargetType(card_def):
@@ -28,6 +32,10 @@ def neededTargetType(card_def):
         return "enemy_selected"
     if "ally_selected" in all_targets:
         return "ally_selected"
+    if "enemy_same" in all_targets:
+        return "enemy_same"
+    if "ally_same" in all_targets:
+        return "ally_same"
     
     if "self" in all_targets or "enemy_all" in all_targets or "ally_all" in all_targets:
         return None
@@ -244,7 +252,7 @@ class Game():
             caster_accumulation = {
                     "damage": {"any": 0, "myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0},
                     "armor_piercing": {"any": 0, "myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0},
-                    "health": {"in": 0, "out": 0}
+                    "heal": 0
             }
             
             
@@ -263,7 +271,7 @@ class Game():
             target_accumulation = {
                     "damage": {"any": 0, "myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0},
                     "armor_piercing": {"any": 0, "myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0},
-                    "health": {"in": 0, "out": 0}
+                    "heal": 0
             }
             
             if action["target"]:
@@ -284,7 +292,7 @@ class Game():
                         print(log[-1])
                         critical_multiplier = 2
                 
-                log.append(self.resolve_action(card, player, action["target"], effect, caster_accumulation, target_accumulation, critical_multiplier))
+                log.extend(self.resolve_action(card, player, action["target"], effect, caster_accumulation, target_accumulation, critical_multiplier))
                 print(log[-1])
 
 
@@ -307,6 +315,9 @@ class Game():
             result = effect.resolve(self, caster_accumulation, target_accumulation, critical_multiplier)
         else:
             result = effect.resolve(self)
+
+        if type(result) is dict:
+            result = [result]
         return result
 
     def struggle_punish(self, player):

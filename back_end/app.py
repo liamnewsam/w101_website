@@ -325,7 +325,7 @@ def create_bot_game(data):
     # add bots
     import random as _random
     BOT_SCHOOLS = ["Fire", "Ice", "Storm", "Life", "Death", "Myth", "Balance"]
-    for i in range(3):
+    for i in range(1):
         bot_id = f"bot_{i}"
         lobby.players[bot_id] = LobbyPlayer(
             bot_id, None, f"Bot {i+1}", getRandomPlayerImage(),

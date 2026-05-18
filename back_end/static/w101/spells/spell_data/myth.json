@@ -69,7 +69,7 @@
     {
         "name": "Myth Trap",
         "school": "myth",
-        "type": "ward",
+        "type": "jinx",
         "pips": 0,
         "description": "Applies a +40% Myth Damage Ward",
         "effects": [

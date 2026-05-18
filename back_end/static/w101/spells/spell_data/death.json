@@ -447,11 +447,11 @@
     {
         "name": "Death Trap",
         "school": "death",
-        "type": "ward",
+        "type": "jinx",
         "pips": 0,
         "description": "Applies a +40% Death Damage Ward",
         "effects": [
-            {"type": "trap", "school": "death", "amount": 40}
+            {"type": "trap", "school": "death", "amount": 40, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Death_Trap.png",
         "id": "death_trap",

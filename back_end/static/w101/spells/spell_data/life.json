@@ -90,7 +90,7 @@
         "pips": 0,
         "description": "Applies a +40% Life Damage Ward",
         "effects": [
-            {"type": "jinx", "aspect": "damage", "school": "life", "amount": 40}
+            {"type": "trap", "school": "life", "amount": 40, "target": "enemy"}
         ],
         "image": "static/w101/spells/life/(Spell)_Life_Trap.png",
         "id": "life_trap",

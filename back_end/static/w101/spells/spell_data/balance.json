@@ -344,7 +344,7 @@
     {
         "name": "Hex",
         "school": "balance",
-        "type": "ward",
+        "type": "jinx",
         "pips": 0,
         "description": "Applies a +30% Damage Ward",
         "effects": [
@@ -872,5 +872,21 @@
         "id": "bladestorm",
         "accuracy": 80,
         "pvp_level": 100
+    },
+    {
+        "name": "Judgement",
+        "school": "balance",
+        "type": "damage",
+        "pips": 0,
+        "description": "__",
+        "effects": [
+            {"type": "damage", "school": "balance", "amount": 500, "target": "enemy"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Judgement.png",
+        "id": "judgement",
+        "accuracy": 80,
+        "pvp_level": 100
     }
+    
+    
 ]

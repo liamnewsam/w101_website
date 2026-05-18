@@ -189,7 +189,16 @@ class Player:
                     else:
                         i += 1
             elif effect["type"] in ["heal", "HoT"]:
-                pass
+                i = 0
+                while i < len(hangingEffectList):
+                    hangingEffect = hangingEffectList[i]
+                    if hangingEffect.aspect == "heal" and not isRedundant(used, hangingEffect):
+                        accumulation["heal"] += hangingEffect.amount
+                        hangingEffectList.remove(hangingEffect)
+                        used.append(hangingEffect)
+                        print(f"Adding {hangingEffect.amount}% health")
+                    else:
+                        i += 1
 
         return used
 
@@ -348,20 +357,50 @@ class DamageEffect(Effect):
         if dmg < 0:
             dmg = 0
 
+        print(f"{self.owner.name} deals {int(dmg)} {school} damage to {self.target.name}!")
+        dmg_message = {"type": "effect_resolve", "player": self.owner.user_id, "aspect": "damage", "amount": dmg, "target": self.target.user_id, "school": self.school}
+
+        if self.target.health - dmg <= 0:
+            self.target.health = 0
+            return [
+                dmg_message, 
+                {"type": "result", "result": "die", "player": self.target.user_id}
+            ]
+        
         self.target.health -= dmg
 
-        print(f"{self.owner.name} deals {int(dmg)} {school} damage to {self.target.name}!")
-
-        return {"type": "effect_resolve", "player": self.owner.user_id, "aspect": "damage", "amount": dmg, "target": self.target.user_id, "school": self.school}
+        return  dmg_message
 
     
 
 class HealEffect(Effect):
-    def resolve(self, game, caster_consumed_charms, target_consumed_charms, critical_multiplier):
-        amount = self.get_amount()
-        self.target.health += amount
-        print(f"{self.owner.name} heals {self.target.name} for {amount}!")
-        return {"type": "effect_resolve", "player": self.owner.user_id, "aspect": "heal", "amount": amount, "target": self.target.user_id}
+    def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
+        hp = self.get_amount()  
+
+        hp *= (1 + self.owner.healing_out / 100.0)
+        out_mult = 1.0 + caster_accumulation["heal"] / 100.0
+                    
+
+        in_mult = 1.0 + target_accumulation["heal"] / 100.0
+
+        hp *= out_mult * in_mult
+
+        hp *= critical_multiplier
+
+        if hp < 0:
+            hp = 0
+
+        if self.target.health + hp > self.target.maxHealth:
+            hp = self.maxHealth - self.target.health
+            self.target.health = self.target.maxHealth
+        else:
+            self.target.health += hp
+            
+
+        print(f"{self.owner.name} heals {self.target.name} for {int(hp)} hp!")
+        
+
+        return {"type": "effect_resolve", "player": self.owner.user_id, "aspect": "heal", "amount": hp, "target": self.target.user_id}
     
 class WardEffect(Effect):
     def __init__(self, template, owner, target, card):
@@ -459,7 +498,7 @@ class CurseEffect(Effect):
         self.aspect = template["aspect"]
     def resolve(self, game):
         self.target.curses.append(self)
-        return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "curses", "value": self.to_json()}
+        return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "curse", "value": self.to_json()}
     
     def to_json(self):
         return {"type": "curse", "aspect": self.aspect, "school": self.school, "amount": self.amount}

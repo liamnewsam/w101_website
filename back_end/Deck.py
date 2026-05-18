@@ -54,11 +54,18 @@ def simple_life():
     #cards.append()
     return Deck("SimpleLifeDeck", cards)
 
-def circular_arrow():
+def contrived_enemy_deck():
     cards = []
-    cards.extend([Card(CARD_BY_ID["lifeblade"]) for _ in range(10)])
-    #cards.append()
-    return Deck("CircularArrow", cards)
+    cards.extend([Card(CARD_BY_ID["infection"]) for _ in range(8)])
+    return Deck("ContrivedEnemyDeck", cards)
+
+
+
+def contrived_player_deck():
+    cards = []
+    cards.extend([Card(CARD_BY_ID["judgement"]) for _ in range(8)])
+    return Deck("ContrivedPlayerDeck", cards)
+
 
 
 def simple_storm():

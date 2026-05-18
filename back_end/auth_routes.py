@@ -6,7 +6,7 @@ from database import SessionLocal
 from models import User, GuestSession, PlayerState
 from jwt_utils import create_jwt
 from config import GUEST_SESSION_LIFETIME
-from Deck import simple_life, circular_arrow
+from Deck import *
 from utils import getRandomPlayerImage
 
 auth = Blueprint("auth", __name__)
@@ -47,7 +47,7 @@ def guest_login():
             is_guest=True,
             name=f"Guest {guest_id[:6]}",
             school="Life",
-            decks=[simple_life().to_dict()],
+            decks=[contrived_player_deck().to_dict()],
             selected_deck_index=0,
             wins=0,
             losses=0,
