@@ -11,7 +11,8 @@ export default function FloatingPresent({
   items,
   duration = 3000,
   color = "#ff0000",
-  pos = {x: 0, y: 0}
+  pos = {x: 0, y: 0},
+  align = "left",
 }) {
   const [visible, setVisible] = useState(true);
 
@@ -21,18 +22,25 @@ export default function FloatingPresent({
   }, [duration]);
 
   return (
+      <div
+        style={{
+          position: "absolute",
+          left: pos.x,
+          top: pos.y,
+          transform: align === "center" ? "translate(-50%, -50%)" : "none",
+          pointerEvents: "none",
+          zIndex: 9999,
+        }}
+      >
         <motion.div
-          initial={{ x: pos.x, y: pos.y, opacity: 1 }}
-          animate={{ x: pos.x, y: pos.y-60, opacity: 0 }}
+          initial={{ y: 0, opacity: 1 }}
+          animate={{ y: -60, opacity: 0 }}
           exit={{ opacity: 0 }}
           transition={{
             duration: duration / 1000,
             ease: "easeOut",
           }}
           style={{
-            position: "absolute",
-            pointerEvents: "none",
-            zIndex: 9999,
             backgroundColor: "rgb(255, 255, 255)",
             borderRadius: "8px",
             border: "1px solid rgba(255, 255, 255, 0.4)",
@@ -73,5 +81,6 @@ export default function FloatingPresent({
             return null;
           })}
         </motion.div>
+      </div>
   );
 }

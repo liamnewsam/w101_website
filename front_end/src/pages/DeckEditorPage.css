@@ -1,0 +1,307 @@
+.deck-editor-page {
+  min-height: 100vh;
+  background: #0a0a14;
+  color: #e8e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 48px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* ── Header ── */
+.de-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid #2a2a3a;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.de-back-btn {
+  background: none;
+  border: 1px solid #2a2a3a;
+  color: #aaa;
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  margin: 0;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.de-back-btn:hover { background: #1e1e2e; color: #e8e8f0; }
+
+.de-name-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  color: #e8e8f0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 7px 12px;
+  outline: none;
+  transition: border-color 0.18s;
+  min-width: 0;
+}
+.de-name-input:focus { border-color: #ffd700; }
+
+.de-save-btn {
+  background: #ffd700;
+  color: #0a0a14;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 8px 22px;
+  cursor: pointer;
+  margin: 0;
+  flex-shrink: 0;
+  transition: background 0.18s, opacity 0.18s;
+}
+.de-save-btn:hover { background: #ffe840; }
+.de-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.de-error {
+  color: #e05c5c;
+  font-size: 0.85rem;
+  margin: 8px 0 0;
+  text-align: center;
+}
+
+/* ── Sections ── */
+.de-section {
+  width: 100%;
+  max-width: 900px;
+  margin-top: 20px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.de-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.de-section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.de-count {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #666;
+}
+.de-count.at-limit { color: #e05c5c; }
+
+.de-limit-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #e05c5c;
+  background: rgba(224, 92, 92, 0.1);
+  border: 1px solid rgba(224, 92, 92, 0.3);
+  border-radius: 5px;
+  padding: 2px 8px;
+}
+
+.de-empty {
+  color: #444;
+  font-size: 0.88rem;
+  text-align: center;
+  padding: 16px 0;
+  margin: 0;
+}
+
+/* ── Current deck grid ── */
+.de-deck-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #2a2a3a;
+  border-radius: 12px;
+  padding: 12px;
+  min-height: 80px;
+}
+
+.de-deck-card {
+  position: relative;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 7px;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  width: 58px;
+  height: 72px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.de-deck-card:hover { border-color: #e05c5c; }
+.de-deck-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 5px;
+}
+.de-remove-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(224, 92, 92, 0.75);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.de-deck-card:hover .de-remove-overlay { opacity: 1; }
+
+/* ── School tabs ── */
+.de-school-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.de-school-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+  color: #888;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.de-school-tab:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #e8e8f0;
+}
+.de-school-tab.active {
+  background: color-mix(in srgb, var(--school-color) 12%, transparent);
+  border-color: var(--school-color);
+  color: #e8e8f0;
+}
+
+.de-school-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Browser grid ── */
+.de-browser-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+}
+
+.de-browser-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid transparent;
+  border-radius: 9px;
+  padding: 4px;
+  margin: 0;
+  cursor: pointer;
+  aspect-ratio: 0.75;
+  overflow: hidden;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+}
+.de-browser-card:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #ffd700;
+  transform: scale(1.04);
+}
+.de-browser-card:disabled { cursor: not-allowed; }
+
+.de-browser-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 6px;
+}
+
+/* Pip badge */
+.de-pip-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffd700;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 1px 5px;
+  line-height: 1.4;
+}
+
+/* Lock overlay */
+.de-browser-card.locked img { filter: brightness(0.25) saturate(0.2); }
+.de-lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+}
+.de-lock-icon { font-size: 1.1rem; line-height: 1; }
+.de-lock-level {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #aaa;
+  background: rgba(0,0,0,0.6);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+/* Copy count badge */
+.de-copy-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(255, 215, 0, 0.85);
+  color: #0a0a14;
+  font-size: 0.65rem;
+  font-weight: 800;
+  border-radius: 4px;
+  padding: 1px 4px;
+  line-height: 1.4;
+}
+.de-copy-badge.maxed {
+  background: rgba(224, 92, 92, 0.85);
+  color: #fff;
+}
+.de-browser-card.maxed img { filter: brightness(0.5); }

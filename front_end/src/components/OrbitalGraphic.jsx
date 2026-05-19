@@ -24,7 +24,8 @@ export default function OrbitalGraphic({
   size = 400,          // diameter of the main circle
   board_info = {},
   selectedCardIndex,
-  onSelectTarget
+  onSelectTarget,
+  deadPlayerIds = new Set(),
 }) {
   const center = size / 2;
 
@@ -47,7 +48,7 @@ export default function OrbitalGraphic({
   }
 
   function userSelectingTarget() {
-    if (selectedCardIndex != null && selectedCardIndex >= 0 && selectedCardIndex < playerState.hand.length && playerState.hand[selectedCardIndex].targets.length > 0) {
+    if (selectedCardIndex != null && selectedCardIndex >= 0 && playerState && playerState.hand && selectedCardIndex < playerState.hand.length && playerState.hand[selectedCardIndex]?.targets?.length > 0) {
         return true;
     }
     return false;
@@ -149,7 +150,8 @@ export default function OrbitalGraphic({
                     alt=""
                     className={`
                         player-image
-                        ${userSelectingTarget() ? (targetIsValid(player.user_id) ? "valid-target" : "invalid-target") : ""}
+                        ${(player.health == 0 || deadPlayerIds.has(player.user_id)) ? "dead" : userSelectingTarget() ? (targetIsValid(player.user_id) ? "valid-target" : "invalid-target") : ""}
+                        
                     `}
                     onClick={(userSelectingTarget() && targetIsValid(player.user_id)) ? () => onSelectTarget(player.user_id) : undefined}
                     style={{
@@ -223,7 +225,7 @@ export default function OrbitalGraphic({
                     alt=""
                     className={`
                         player-image
-                        ${userSelectingTarget() ? (targetIsValid(player.user_id) ? "valid-target" : "invalid-target") : ""}
+                        ${(player.health == 0 || deadPlayerIds.has(player.user_id)) ? "dead" : userSelectingTarget() ? (targetIsValid(player.user_id) ? "valid-target" : "invalid-target") : ""}
                     `}
                     onClick={(userSelectingTarget() && targetIsValid(player.user_id)) ? () => onSelectTarget(player.user_id) : undefined}
                     style={{

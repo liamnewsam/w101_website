@@ -1,0 +1,241 @@
+.menu-page {
+  min-height: 100vh;
+  background: #0a0a14;
+  color: #e8e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px 48px;
+  box-sizing: border-box;
+  gap: 20px;
+  font-family: inherit;
+}
+
+/* ── Page title ── */
+.menu-title {
+  margin: 0 0 4px;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ffd700;
+  text-shadow:
+    0 0 20px rgba(255, 215, 0, 0.6),
+    0 0 50px rgba(255, 180, 0, 0.3);
+}
+
+/* ── Player banner ── */
+.menu-player-banner {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2a2a3a;
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.menu-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #2a2a3a;
+  flex-shrink: 0;
+  background: #1a1a2a;
+}
+
+.menu-player-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.menu-player-name {
+  margin: 0 0 2px;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.menu-player-meta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.menu-level {
+  color: #ffd700;
+  font-weight: 600;
+}
+
+.menu-school {
+  color: #aaa;
+}
+
+.menu-record {
+  display: flex;
+  gap: 4px;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.menu-rating { color: #c8a824; font-weight: 600; }
+.menu-sep    { color: #444; }
+
+.menu-profile-btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #2a2a3a;
+  color: #aaa;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  margin: 0;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.menu-profile-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e8e8f0;
+}
+
+/* ── Section wrapper ── */
+.menu-section {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2a2a3a;
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.menu-section-title {
+  margin: 0 0 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Play buttons ── */
+.menu-play-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-play-btn {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 9px;
+  font-size: 0.97rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin: 0;
+  text-align: left;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.menu-play-btn.primary {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+}
+
+.menu-play-btn.primary:hover {
+  background: rgba(255, 215, 0, 0.18);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.menu-play-btn.secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: #2a2a3a;
+  color: #ccc;
+}
+
+.menu-play-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: #3a3a5a;
+  color: #e8e8f0;
+}
+
+/* ── Open games list ── */
+.menu-game-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-empty {
+  color: #444;
+  font-size: 0.88rem;
+  text-align: center;
+  padding: 16px 0;
+  margin: 0;
+}
+
+.menu-game-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2a2a3a;
+  border-radius: 9px;
+}
+
+.menu-game-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #e8e8f0;
+}
+
+.menu-game-count {
+  font-size: 0.8rem;
+  color: #555;
+  margin-top: 2px;
+}
+
+.menu-join-btn {
+  padding: 7px 16px;
+  background: rgba(63, 181, 92, 0.1);
+  border: 1px solid rgba(63, 181, 92, 0.35);
+  color: #3fb55c;
+  border-radius: 7px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0;
+  transition: background 0.15s;
+}
+
+.menu-join-btn:hover {
+  background: rgba(63, 181, 92, 0.2);
+}
+
+/* ── Logout ── */
+.menu-logout-btn {
+  width: 100%;
+  max-width: 600px;
+  padding: 11px 0;
+  background: transparent;
+  border: 1px solid #2a2a3a;
+  color: #555;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.menu-logout-btn:hover {
+  background: rgba(224, 92, 92, 0.08);
+  border-color: rgba(224, 92, 92, 0.3);
+  color: #e05c5c;
+}

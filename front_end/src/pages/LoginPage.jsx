@@ -1,16 +1,15 @@
 // src/pages/LoginPage.jsx
-import LoginForm from "../components/LoginForm";
-import GuestButton from "../components/GuestButton";
-import { getToken } from "../api/auth";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {useSocket} from "../socket/socketContext"
+import { useSocket } from "../socket/socketContext";
+import LoginForm from "../components/LoginForm";
+import GuestButton from "../components/GuestButton";
+import "./LoginPage.css";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { socket, connected, disconnectSocket } = useSocket();
+  const { connected } = useSocket();
 
-  // Auto redirect if already logged in
   useEffect(() => {
     if (connected) {
       navigate("/menu");
@@ -18,8 +17,11 @@ export default function LoginPage() {
   }, [connected]);
 
   return (
-    <div className="login-container">
+    <div className="login-page">
+      <h1 className="login-page-title">Wizard101</h1>
+      <p className="login-page-subtitle">Sign in to continue your adventure</p>
       <LoginForm />
+      <div className="guest-divider" style={{ width: "100%", maxWidth: 360 }}>or</div>
       <GuestButton />
     </div>
   );

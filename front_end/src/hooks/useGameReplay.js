@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useMemo } from "react";
+import { useReducer, useEffect, useMemo, useState, useRef } from "react";
 import { BACKEND_URL, BATTLE_PATH, goodColor, badColor } from "../config";
 
 export const ORBITAL_DIAMETER = 400;
@@ -169,7 +169,7 @@ function replayReducer(state, action) {
 }
 
 async function processEvent(
-  event, gs, ps, playerAngles, playerPositions, setVisualEffects, setActivatedPlayerID
+  event, gs, ps, playerAngles, playerPositions, setVisualEffects, setActivatedPlayerID, onPlayerDead
 ) {
   switch (event.type) {
     case "turn_end": {
@@ -246,7 +246,10 @@ async function processEvent(
             },
           }]);
           const target = getPlayer(gs, event.target);
-          if (target) target.health -= event.amount;
+          if (target) {
+            target.health = Math.max(0, target.health - event.amount);
+            if (target.health === 0) onPlayerDead(target.user_id);
+          }
           break;
         }
         case "drain": {
@@ -260,7 +263,10 @@ async function processEvent(
             },
           }]);
           const target = getPlayer(gs, event.target);
-          if (target) target.health -= event.amount;
+          if (target) {
+            target.health = Math.max(0, target.health - event.amount);
+            if (target.health === 0) onPlayerDead(target.user_id);
+          }
 
           setVisualEffects(effects => [...effects, {
             type: "FLOATING_PRESENT",
@@ -399,9 +405,10 @@ async function processEvent(
           items: [{ type: "text", value: "FIZZLE!" }],
           id: crypto.randomUUID(),
           pos: {
-              x: playerPositions[event.player].x + FLOATING_PRESENT_OFFSET_X,
-              y: playerPositions[event.player].y + FLOATING_PRESENT_OFFSET_Y
+              x: 0,
+              y: 0
           },
+          align: "center"
         }]);
         await wait(1000);
       } else if (event.result === "dead") {
@@ -410,10 +417,12 @@ async function processEvent(
           items: [{ type: "text", value: `RIP ${event.player}` }],
           id: crypto.randomUUID(),
           pos: {
-              x: playerPositions[event.player].x + FLOATING_PRESENT_OFFSET_X,
-              y: playerPositions[event.player].y + FLOATING_PRESENT_OFFSET_Y
+              x: 0,
+              y: 0
           },
+          align: "center"
         }]);
+        await wait(2000);
       }
       break;
     }
@@ -426,6 +435,12 @@ async function processEvent(
 export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setActivatedPlayerID }) {
   const [replayState, dispatch] = useReducer(replayReducer, initialReplayState);
   const { visual, replaying, eventQueue, turnQueue } = replayState;
+  const [deadPlayerIds, setDeadPlayerIds] = useState(new Set());
+  const pendingResultRef = useRef(null);
+  const [hasPendingResult, setHasPendingResult] = useState(false);
+
+  const addDeadPlayer = (userId) =>
+    setDeadPlayerIds(ids => { const s = new Set(ids); s.add(userId); return s; });
 
   const allUserIds = useMemo(() => {
     if (!visual.game) return [];
@@ -455,7 +470,8 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
     });
 
     socket.on("match_finished", result => {
-      navigate(`/results/${gameId}`, { state: { result } });
+      pendingResultRef.current = result;
+      setHasPendingResult(true);
     });
 
     socket.emit("get_game_state", { gameId }, gs => {
@@ -497,7 +513,7 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
       await processEvent(
         event, visual.game, visual.player,
         playerAngles, playerPositions,
-        setVisualEffects, setActivatedPlayerID
+        setVisualEffects, setActivatedPlayerID, addDeadPlayer
       );
       if (!cancelled) dispatch({ type: ACTIONS.ADVANCE_EVENT });
     };
@@ -506,12 +522,24 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
     return () => { cancelled = true; };
   }, [eventQueue, replaying]);
 
-  // Finish replay once the event queue drains
+  // Finish replay once the event queue drains, then navigate if a result is ready
   useEffect(() => {
     if (replaying && eventQueue.length === 0) {
       dispatch({ type: ACTIONS.FINISH_REPLAY });
+      setDeadPlayerIds(new Set());
+      const result = pendingResultRef.current;
+      if (result) {
+        navigate(`/results/${gameId}`, { state: { result } });
+      }
     }
   }, [eventQueue.length, replaying]);
+
+  // Navigate immediately when result arrives and no animation is in progress
+  useEffect(() => {
+    if (hasPendingResult && !replaying && turnQueue.length === 0) {
+      navigate(`/results/${gameId}`, { state: { result: pendingResultRef.current } });
+    }
+  }, [hasPendingResult, replaying, turnQueue.length]);
 
   return {
     visual,
@@ -519,5 +547,6 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
     dispatch,
     playerAngles,
     authoritative: replayState.authoritative,
+    deadPlayerIds,
   };
 }

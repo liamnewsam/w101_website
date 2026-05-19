@@ -1,0 +1,194 @@
+.results-page {
+  min-height: 100vh;
+  background: #0a0a14;
+  color: #e8e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 4rem;
+  gap: 2rem;
+  font-family: inherit;
+}
+
+/* ── Victory / Defeat banner ── */
+.outcome-banner {
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  animation: bannerFadeIn 0.6s ease-out;
+}
+.outcome-banner.victory {
+  color: #ffd700;
+  text-shadow:
+    0 0 24px rgba(255, 215, 0, 0.8),
+    0 0 60px rgba(255, 180, 0, 0.4);
+}
+.outcome-banner.defeat {
+  color: #888;
+  text-shadow: 0 0 16px rgba(120, 120, 120, 0.4);
+}
+
+@keyframes bannerFadeIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Teams layout ── */
+.results-teams {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 860px;
+}
+
+.results-divider {
+  width: 2px;
+  background: #2a2a3a;
+  align-self: stretch;
+  margin: 0 1.5rem;
+  flex-shrink: 0;
+}
+
+.results-team-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.team-heading {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.5rem;
+  text-align: center;
+}
+.team-winner .team-heading {
+  color: #ffd700;
+}
+.team-loser .team-heading {
+  color: #555;
+}
+
+/* ── Player cards ── */
+.result-player-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+.winner-card {
+  background: rgba(255, 215, 0, 0.06);
+  border-color: rgba(255, 215, 0, 0.25);
+  box-shadow: 0 0 18px rgba(255, 215, 0, 0.08);
+}
+.loser-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+  filter: brightness(0.7);
+}
+
+.result-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #1a1a2a;
+}
+
+.result-player-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.result-player-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e8e8f0;
+}
+
+.result-school-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.result-school-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.result-bot-label {
+  font-size: 0.75rem;
+  color: #555;
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+/* ── Elo change ── */
+.elo-change-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.elo-rating {
+  font-size: 0.8rem;
+  color: #aaa;
+  font-weight: 600;
+}
+
+.elo-delta {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.elo-gain { color: #4caf82; }
+.elo-loss { color: #e05c5c; }
+
+.level-delta {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+.level-up {
+  background: rgba(76, 175, 130, 0.18);
+  color: #4caf82;
+}
+.level-down {
+  background: rgba(224, 92, 92, 0.15);
+  color: #e05c5c;
+}
+
+/* ── Home button ── */
+.home-btn {
+  margin-top: 1rem;
+  padding: 0.7rem 2.5rem;
+  background: #1e1e34;
+  color: #c8c8e0;
+  border: 1px solid #3a3a5a;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.home-btn:hover {
+  background: #2a2a4a;
+  border-color: #6060a0;
+  color: #fff;
+}

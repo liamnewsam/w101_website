@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 import { useParams, useNavigate } from "react-router-dom";
@@ -26,18 +26,40 @@ export default function GamePage() {
   const [visualEffects, setVisualEffects] = useState([]);
   const [activatedPlayerID, setActivatedPlayerID] = useState();
 
+  const triangleAccRef = useRef({ lastNorm: null, cumulative: 0 });
+
   // Clear all effects on unmount so no stale animations linger
   useEffect(() => {
     return () => setVisualEffects([]);
   }, []);
 
-  const { visual, replaying, dispatch, playerAngles, authoritative } = useGameReplay({
+  const { visual, replaying, dispatch, playerAngles, authoritative, deadPlayerIds } = useGameReplay({
     socket,
     gameId,
     navigate,
     setVisualEffects,
     setActivatedPlayerID,
   });
+
+  // Compute clockwise-only cumulative rotation during render.
+  // Using a ref (not state) avoids double-render; reading current angle
+  // every render handles mutable playerAngles objects correctly.
+  let triangleRotateDeg = triangleAccRef.current.cumulative;
+  if (activatedPlayerID != null && playerAngles[activatedPlayerID] != null) {
+    const rawDeg = 90 + (playerAngles[activatedPlayerID] * 180) / Math.PI;
+    const normTarget = ((rawDeg % 360) + 360) % 360;
+    const { lastNorm, cumulative } = triangleAccRef.current;
+    if (lastNorm === null) {
+      triangleAccRef.current = { lastNorm: normTarget, cumulative: rawDeg };
+      triangleRotateDeg = rawDeg;
+    } else if (Math.abs(normTarget - lastNorm) > 0.001) {
+      let diff = normTarget - lastNorm;
+      if (diff > 0) diff -= 360;
+      const next = cumulative + diff;
+      triangleAccRef.current = { lastNorm: normTarget, cumulative: next };
+      triangleRotateDeg = next;
+    }
+  }
 
   /* ============================
      INPUT HELPERS
@@ -115,13 +137,14 @@ export default function GamePage() {
           }}
           selectedCardIndex={selectedCardIndex}
           onSelectTarget={onTargetSelected}
+          deadPlayerIds={deadPlayerIds}
         />
 
         <motion.img
           src={BACKEND_URL + "/static/w101/battle_triangle.png"}
           animate={
             activatedPlayerID != null
-              ? { rotate: 90 + (playerAngles[activatedPlayerID] * 180) / Math.PI }
+              ? { rotate: triangleRotateDeg }
               : false
           }
           transition={{ duration: 0.4, ease: "linear" }}

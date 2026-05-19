@@ -1,19 +1,126 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { usePlayer } from "../PlayerContext";
+import { BACKEND_URL } from "../config";
+import "./ResultsPage.css";
+
+const SCHOOL_COLORS = {
+  fire:    "#e05c2c",
+  ice:     "#73b6f0",
+  storm:   "#9b59d0",
+  life:    "#3fb55c",
+  death:   "#9b8fe5",
+  myth:    "#c8a824",
+  balance: "#c8a85c",
+};
+
+function schoolColor(school) {
+  return SCHOOL_COLORS[school?.toLowerCase()] ?? "#aaa";
+}
+
+function computeLevel(elo) {
+  return Math.max(1, Math.min(100, Math.floor((elo - 100) / 50) + 1));
+}
+
+function EloChange({ elo, eloChange }) {
+  const newElo = Math.max(100, elo + eloChange);
+  const newLevel = computeLevel(newElo);
+  const oldLevel = computeLevel(elo);
+  const levelDelta = newLevel - oldLevel;
+  const sign = eloChange >= 0 ? "+" : "";
+
+  return (
+    <div className="elo-change-wrap">
+      <span className="elo-rating">{newElo} Rating</span>
+      <span className={`elo-delta ${eloChange >= 0 ? "elo-gain" : "elo-loss"}`}>
+        {sign}{eloChange}
+      </span>
+      {levelDelta !== 0 && (
+        <span className={`level-delta ${levelDelta > 0 ? "level-up" : "level-down"}`}>
+          {levelDelta > 0 ? `▲ Lv.${newLevel}` : `▼ Lv.${newLevel}`}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function PlayerCard({ p, isWinner }) {
+  const color = schoolColor(p.school);
+  return (
+    <div className={`result-player-card${isWinner ? " winner-card" : " loser-card"}`}>
+      <img
+        className="result-avatar"
+        src={`${BACKEND_URL}/${p.image_path}`}
+        alt={p.name}
+        onError={e => { e.target.style.display = "none"; }}
+      />
+      <div className="result-player-info">
+        <div className="result-player-name">{p.name}</div>
+        <div className="result-school-badge" style={{ color }}>
+          <span className="result-school-dot" style={{ background: color }} />
+          {p.school}
+        </div>
+        {!p.isBot && (
+          <EloChange elo={p.elo} eloChange={p.elo_change} />
+        )}
+        {p.isBot && <div className="result-bot-label">Bot</div>}
+      </div>
+    </div>
+  );
+}
 
 export default function ResultsPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { player: currentPlayer } = usePlayer();
 
-  const result = state?.result || { winner: "unknown" };
+  const result = state?.result;
+  const winner = typeof result === "string" ? result : result?.winner;
+  const players = Array.isArray(result?.players) ? result.players : [];
 
-  console.log(state)
+  const myId = currentPlayer?.user_id;
+  const myEntry = players.find(p => p.id === myId);
+  const isVictory = myEntry ? myEntry.team === winner : null;
+
+  const teamA = players.filter(p => p.team === "A");
+  const teamB = players.filter(p => p.team === "B");
+
+  const teamAWins = winner === "A";
+  const teamBWins = winner === "B";
 
   return (
-    <div className="page results">
-      <h1>Match Results</h1>
-      <div>Winner: {result.winner}</div>
-      <button onClick={() => navigate("/menu")}>Back to Menu</button>
+    <div className="results-page">
+      {isVictory !== null && (
+        <div className={`outcome-banner ${isVictory ? "victory" : "defeat"}`}>
+          {isVictory ? "VICTORY" : "DEFEATED"}
+        </div>
+      )}
+
+      <div className="results-teams">
+        <div className={`results-team-panel${teamAWins ? " team-winner" : " team-loser"}`}>
+          <h2 className="team-heading">
+            {teamAWins ? "⭐ Team A" : "Team A"}
+          </h2>
+          {teamA.map((p) => (
+            <PlayerCard key={p.id} p={p} isWinner={teamAWins} />
+          ))}
+        </div>
+
+        <div className="results-divider" />
+
+        <div className={`results-team-panel${teamBWins ? " team-winner" : " team-loser"}`}>
+          <h2 className="team-heading">
+            {teamBWins ? "⭐ Team B" : "Team B"}
+          </h2>
+          {teamB.map((p) => (
+            <PlayerCard key={p.id} p={p} isWinner={teamBWins} />
+          ))}
+        </div>
+      </div>
+
+      <button className="home-btn" onClick={() => navigate("/menu")}>
+        Return to Home
+      </button>
     </div>
   );
 }

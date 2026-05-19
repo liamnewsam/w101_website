@@ -32,6 +32,11 @@
     pointer-events: none;
 }
 
+.dead {
+    filter: grayscale(100%) brightness(45%) blur(1px);
+    pointer-events: none;
+}
+
 .valid-target {
     filter: grayscale(0%);
     transition: transform 0.15s ease;
