@@ -144,7 +144,7 @@
         ],
         "image": "static/w101/spells/fire/(Spell)_Fireblade.png",
         "id": "fireblade",
-        "accuracy": 0
+        "accuracy": 100
     },
     {
         "name": "Ammut",
@@ -569,7 +569,7 @@
         ],
         "image": "static/w101/spells/fire/(Spell)_Fire_Elf.png",
         "id": "fire_elf",
-        "accuracy": 0
+        "accuracy": 75
     },
     {
         "name": "Burning Rampage",
@@ -620,7 +620,7 @@
         ],
         "image": "static/w101/spells/fire/(Spell)_Krampus.png",
         "id": "krampus",
-        "accuracy": 0
+        "accuracy": 75
     },
     {
         "name": "Wyldfire",

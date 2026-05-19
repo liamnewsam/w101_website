@@ -51,6 +51,46 @@ def favicon():
     return "", 200
 
 
+@app.route("/cards", methods=["GET"])
+def get_cards():
+    from Card import CARDS_BY_SCHOOL
+    result = {}
+    for school, cards in CARDS_BY_SCHOOL.items():
+        def norm_level(v):
+            return v if isinstance(v, int) and not isinstance(v, bool) else 0
+        def norm_pips(p):
+            if isinstance(p, dict):
+                return sum(p.values())
+            return p if isinstance(p, int) else 0
+        result[school] = sorted(
+            [
+                {
+                    "id": card.id,
+                    "name": card.name,
+                    "school": card.school,
+                    "pips": norm_pips(card.pips),
+                    "pvp_level": norm_level(card.pvp_level),
+                    "img_path": card.img_path,
+                }
+                for card in cards
+            ],
+            key=lambda c: c["pvp_level"]
+        )
+    return jsonify(result)
+
+
+@app.route("/avatars", methods=["GET"])
+def list_avatars():
+    from config import CHARACTER_IMAGE_PATH
+    import os
+    try:
+        files = sorted(f for f in os.listdir(CHARACTER_IMAGE_PATH) if f.lower().endswith(".png"))
+        paths = [os.path.join(CHARACTER_IMAGE_PATH, f).replace("\\", "/") for f in files]
+        return jsonify({"avatars": paths})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 '''
 @app.after_request
 def add_cors_headers(response):
@@ -73,8 +113,32 @@ def handle_exception(e):
 # In-Memory Data Models
 # ========================================================
 
+BOT_ELO = 1000
+ELO_K = 32
+ELO_FLOOR = 100
+
+
+def _compute_level(elo):
+    return max(1, min(100, (elo - 100) // 50 + 1))
+
+
+def _compute_elo_changes(lobby, winner_team):
+    """Return {player_id: {"elo_change": int, "new_elo": int}} for every human player."""
+    human = [p for p in lobby.players.values() if not p.isBot]
+    changes = {}
+    for p in human:
+        opponents = [op for op in lobby.players.values() if op.team != p.team and not op.isBot]
+        opp_avg = sum(op.elo for op in opponents) / len(opponents) if opponents else BOT_ELO
+        expected = 1 / (1 + 10 ** ((opp_avg - p.elo) / 400))
+        actual = 1.0 if p.team == winner_team else 0.0
+        delta = round(ELO_K * (actual - expected))
+        new_elo = max(ELO_FLOOR, p.elo + delta)
+        changes[p.id] = {"elo_change": delta, "new_elo": new_elo}
+    return changes
+
+
 class LobbyPlayer:
-    def __init__(self, user_id, sid, name, image_path, school="Balance", level=1, team="A", isBot=False):
+    def __init__(self, user_id, sid, name, image_path, school="Balance", level=1, wins=0, losses=0, elo=100, team="A", isBot=False):
         self.id = user_id
         self.name = name
         self.team = team
@@ -84,6 +148,9 @@ class LobbyPlayer:
         self.isBot = isBot
         self.school = school
         self.level = level
+        self.wins = wins
+        self.losses = losses
+        self.elo = elo
 
 
 class Lobby:
@@ -197,15 +264,11 @@ def on_disconnect():
         if user_id not in lobby.players:
             continue
 
-        del lobby.players[user_id]
         print(f"[disconnect] removed player {user_id} from lobby {gameID}")
 
-        if not lobby.players:
-            gameID_to_remove = gameID
-        elif not lobby.started:
-            socketio.emit("update_lobby_state", lobby.snapshot(), room=gameID)
-        else:
-            # Give the disconnected player a pass so the turn can still resolve
+        if lobby.started:
+            # Give the disconnected player a pass so the turn can still resolve.
+            # Build match result BEFORE removing from lobby.players so payload is complete.
             game = lobby.game
             player = game.get_player(user_id)
             if player and player in game.current_team() and game.player_actions.get(player.user_id) is None:
@@ -213,8 +276,20 @@ def on_disconnect():
                 while not game.winner and attemptTurnResolution(lobby, game):
                     continue
                 if game.winner:
-                    socketio.emit("match_finished", game.winner, room=gameID)
+                    elo_changes = _compute_elo_changes(lobby, game.winner)
+                    match_result = build_match_result(lobby, game.winner, elo_changes)
+                    record_match_results(lobby, game.winner, elo_changes)
+                    del lobby.players[user_id]
+                    socketio.emit("match_finished", match_result, room=gameID)
                     gameID_to_remove = gameID
+                    break
+            del lobby.players[user_id]
+        else:
+            del lobby.players[user_id]
+            if not any(not p.isBot for p in lobby.players.values()):
+                gameID_to_remove = gameID
+            else:
+                socketio.emit("update_lobby_state", lobby.snapshot(), room=gameID)
 
         break  # a socket belongs to only one lobby
     
@@ -292,6 +367,9 @@ def create_game(data):
         image_path=db_player["image_path"],
         school=db_player.get("school", "Balance"),
         level=db_player.get("level", 1),
+        wins=db_player.get("wins", 0),
+        losses=db_player.get("losses", 0),
+        elo=db_player.get("elo", 100),
     )
     lobby.players[user_id] = player
 
@@ -320,12 +398,15 @@ def create_bot_game(data):
         image_path=db_player["image_path"],
         school=db_player.get("school", "Balance"),
         level=db_player.get("level", 1),
+        wins=db_player.get("wins", 0),
+        losses=db_player.get("losses", 0),
+        elo=db_player.get("elo", 100),
     )
 
     # add bots
     import random as _random
     BOT_SCHOOLS = ["Fire", "Ice", "Storm", "Life", "Death", "Myth", "Balance"]
-    for i in range(1):
+    for i in range(3):
         bot_id = f"bot_{i}"
         lobby.players[bot_id] = LobbyPlayer(
             bot_id, None, f"Bot {i+1}", getRandomPlayerImage(),
@@ -362,6 +443,9 @@ def join_game(data):
             image_path=db_player["image_path"],
             school=db_player.get("school", "Balance"),
             level=db_player.get("level", 1),
+            wins=db_player.get("wins", 0),
+            losses=db_player.get("losses", 0),
+            elo=db_player.get("elo", 100),
             team=("A" if team_counts["A"] < team_counts["B"] else "B"),
         )
 
@@ -541,8 +625,10 @@ def start_game(data):
         while not lobby.game.winner and attemptTurnResolution(lobby, lobby.game):
             continue
         if lobby.game.winner:
-            record_match_results(lobby, lobby.game.winner)
-            socketio.emit("match_finished", lobby.game.winner, room=gameId)
+            elo_changes = _compute_elo_changes(lobby, lobby.game.winner)
+            match_result = build_match_result(lobby, lobby.game.winner, elo_changes)
+            record_match_results(lobby, lobby.game.winner, elo_changes)
+            socketio.emit("match_finished", match_result, room=gameId)
             del lobbies[gameId]
     return {"ok": True}
 
@@ -561,7 +647,7 @@ def leave_lobby(data):
 
     leave_room(gameId)
 
-    if len(lobby.players) == 0:
+    if not any(not p.isBot for p in lobby.players.values()):
         del lobbies[gameId]
         list_games()
     else:
@@ -653,8 +739,27 @@ def get_player_state(data):
 VALID_SCHOOLS = {"Fire", "Ice", "Storm", "Life", "Death", "Myth", "Balance"}
 
 
-def record_match_results(lobby, winner_team):
-    """Increment wins/losses in the DB for all human players in the lobby."""
+def build_match_result(lobby, winner_team, elo_changes):
+    """Build a match result payload with pre-match Elo and computed deltas."""
+    players = []
+    for p in lobby.players.values():
+        ec = elo_changes.get(p.id, {"elo_change": 0, "new_elo": 0})
+        players.append({
+            "id": p.id,
+            "name": p.name,
+            "team": p.team,
+            "image_path": p.image_path,
+            "school": p.school,
+            "level": p.level,
+            "elo": 0 if p.isBot else (p.elo or 100),
+            "isBot": p.isBot,
+            "elo_change": ec["elo_change"],
+        })
+    return {"winner": winner_team, "players": players}
+
+
+def record_match_results(lobby, winner_team, elo_changes):
+    """Update wins/losses and Elo in the DB for all human players."""
     db = SessionLocal()
     try:
         for p in lobby.players.values():
@@ -667,6 +772,9 @@ def record_match_results(lobby, winner_team):
                 ps.wins = (ps.wins or 0) + 1
             else:
                 ps.losses = (ps.losses or 0) + 1
+            ec = elo_changes.get(p.id)
+            if ec:
+                ps.elo = ec["new_elo"]
         db.commit()
     except Exception as e:
         print(f"[record_match_results] Error: {e}")
@@ -693,6 +801,147 @@ def update_player_school(data):
         if not ps:
             return {"ok": False, "error": "Player not found"}
         ps.school = school
+        db.commit()
+        emit("player_info", ps.to_dict())
+        return {"ok": True}
+    finally:
+        db.close()
+
+
+@socketio.on("update_player_avatar")
+def update_player_avatar(data):
+    user_id = get_user_identity(request.sid)
+    image_path = (data.get("image_path") or "").strip()
+
+    if not user_id:
+        return {"ok": False, "error": "Not authenticated"}
+
+    from config import CHARACTER_IMAGE_PATH
+    import os
+    valid_paths = {
+        os.path.join(CHARACTER_IMAGE_PATH, f).replace("\\", "/")
+        for f in os.listdir(CHARACTER_IMAGE_PATH)
+        if f.lower().endswith(".png")
+    }
+    if image_path not in valid_paths:
+        return {"ok": False, "error": "Invalid avatar"}
+
+    db = SessionLocal()
+    try:
+        ps = db.query(PlayerState).filter_by(player_id=user_id).first()
+        if not ps:
+            return {"ok": False, "error": "Player not found"}
+        ps.image_path = image_path
+        db.commit()
+        emit("player_info", ps.to_dict())
+        return {"ok": True}
+    finally:
+        db.close()
+
+
+@socketio.on("update_player_name")
+def update_player_name(data):
+    user_id = get_user_identity(request.sid)
+    name = (data.get("name") or "").strip()
+
+    if not user_id:
+        return {"ok": False, "error": "Not authenticated"}
+    if not name:
+        return {"ok": False, "error": "Name cannot be empty"}
+    if len(name) > 32:
+        return {"ok": False, "error": "Name too long (max 32 characters)"}
+
+    db = SessionLocal()
+    try:
+        ps = db.query(PlayerState).filter_by(player_id=user_id).first()
+        if not ps:
+            return {"ok": False, "error": "Player not found"}
+        ps.name = name
+        db.commit()
+        emit("player_info", ps.to_dict())
+        return {"ok": True}
+    finally:
+        db.close()
+
+
+DECK_MAX_CARDS = 30
+DECK_MAX_COPIES = 4
+
+
+def _validate_deck_cards(card_ids):
+    """Returns an error string or None if valid."""
+    from Card import CARD_BY_ID
+    from collections import Counter
+    if len(card_ids) > DECK_MAX_CARDS:
+        return f"Deck cannot exceed {DECK_MAX_CARDS} cards"
+    counts = Counter(card_ids)
+    if any(v > DECK_MAX_COPIES for v in counts.values()):
+        return f"Maximum {DECK_MAX_COPIES} copies of any card"
+    unknown = [cid for cid in card_ids if cid not in CARD_BY_ID]
+    if unknown:
+        return f"Unknown card(s): {', '.join(unknown[:3])}"
+    return None
+
+
+@socketio.on("save_deck")
+def save_deck(data):
+    user_id = get_user_identity(request.sid)
+    if not user_id:
+        return {"ok": False, "error": "Not authenticated"}
+
+    deck_index = data.get("deckIndex")   # None → create new
+    name = (data.get("name") or "New Deck").strip()[:32]
+    card_ids = data.get("card_ids", [])
+
+    err = _validate_deck_cards(card_ids)
+    if err:
+        return {"ok": False, "error": err}
+
+    db = SessionLocal()
+    try:
+        ps = db.query(PlayerState).filter_by(player_id=user_id).first()
+        if not ps:
+            return {"ok": False, "error": "Player not found"}
+        decks = list(ps.decks or [])
+        if deck_index is None:
+            decks.append({"name": name, "card_ids": card_ids})
+            new_index = len(decks) - 1
+        else:
+            if deck_index < 0 or deck_index >= len(decks):
+                return {"ok": False, "error": "Invalid deck index"}
+            decks[deck_index] = {"name": name, "card_ids": card_ids}
+            new_index = deck_index
+        ps.decks = decks
+        db.commit()
+        emit("player_info", ps.to_dict())
+        return {"ok": True, "deckIndex": new_index}
+    finally:
+        db.close()
+
+
+@socketio.on("delete_deck")
+def delete_deck(data):
+    user_id = get_user_identity(request.sid)
+    if not user_id:
+        return {"ok": False, "error": "Not authenticated"}
+
+    deck_index = data.get("deckIndex")
+    if deck_index is None:
+        return {"ok": False, "error": "Missing deckIndex"}
+
+    db = SessionLocal()
+    try:
+        ps = db.query(PlayerState).filter_by(player_id=user_id).first()
+        if not ps:
+            return {"ok": False, "error": "Player not found"}
+        decks = list(ps.decks or [])
+        if deck_index < 0 or deck_index >= len(decks):
+            return {"ok": False, "error": "Invalid deck index"}
+        decks.pop(deck_index)
+        # Keep selected_deck_index in bounds
+        if ps.selected_deck_index >= len(decks):
+            ps.selected_deck_index = max(0, len(decks) - 1)
+        ps.decks = decks
         db.commit()
         emit("player_info", ps.to_dict())
         return {"ok": True}
@@ -805,8 +1054,10 @@ def player_action(data):
         emit("game_state_update", lobby.game.to_json_public(), room=gameId)
 
         if lobby.game.check_end():
-            record_match_results(lobby, game.winner)
-            emit("match_finished", game.winner, room=gameId)
+            elo_changes = _compute_elo_changes(lobby, game.winner)
+            match_result = build_match_result(lobby, game.winner, elo_changes)
+            record_match_results(lobby, game.winner, elo_changes)
+            emit("match_finished", match_result, room=gameId)
             del lobbies[gameId]
 
         return {"ok": True}
@@ -836,9 +1087,11 @@ def player_action(data):
         continue
 
     if game.winner:
-        record_match_results(lobby, game.winner)
-        emit("match_finished", game.winner, room=gameId)
+        elo_changes = _compute_elo_changes(lobby, game.winner)
+        match_result = build_match_result(lobby, game.winner, elo_changes)
+        record_match_results(lobby, game.winner, elo_changes)
         game.print_log()
+        socketio.emit("match_finished", match_result, room=gameId)
         del lobbies[gameId]
     
     return {"ok": True}

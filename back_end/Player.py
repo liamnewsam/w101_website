@@ -181,8 +181,12 @@ class Player:
                 i = 0
                 while i < len(hangingEffectList):
                     hangingEffect = hangingEffectList[i]
-                    if hangingEffect.aspect == "damage" and hangingEffect.school in ["any", effect["school"]] and not isRedundant(used, hangingEffect):
-                        accumulation["damage"][hangingEffect.school] += hangingEffect.amount
+                    if hangingEffect.aspect == "damage" and (not hangingEffect.school or hangingEffect.school in ["any", effect["school"]]) and not isRedundant(used, hangingEffect):
+                        if not hangingEffect.school:
+                            for school in SCHOOLS:
+                                accumulation["damage"][school] += hangingEffect.amount
+                        else:
+                            accumulation["damage"][hangingEffect.school] += hangingEffect.amount
                         hangingEffectList.remove(hangingEffect)
                         used.append(hangingEffect)
                         print(f"Adding {hangingEffect.amount}% damage")
@@ -319,10 +323,10 @@ class Effect(ABC):
     
     def to_json(self):
         return {"type": type(self).__name__, "school": self.school}
-    
-class DamageEffect(Effect):
-    def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
 
+
+class DamageEffect(Effect):
+    def compute_dmg(self, game, caster_accumulation, target_accumulation, critical_multiplier):
         base = self.get_amount()  
         dmg = base + self.owner.flat_boost[self.school]
         dmg *= (1 + self.owner.boost[self.school] / 100.0)
@@ -351,6 +355,12 @@ class DamageEffect(Effect):
         if dmg < 0:
             dmg = 0
 
+        return dmg
+
+    def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
+
+        dmg = self.compute_dmg(game, caster_accumulation, target_accumulation, critical_multiplier)
+
         #absorbed = self.target.absorb_shield(dmg) Should be replaced with looking at wards with absorption aspect
         #dmg -= absorbed
 
@@ -364,7 +374,7 @@ class DamageEffect(Effect):
             self.target.health = 0
             return [
                 dmg_message, 
-                {"type": "result", "result": "die", "player": self.target.user_id}
+                {"type": "result", "result": "dead", "player": self.target.user_id}
             ]
         
         self.target.health -= dmg
@@ -407,8 +417,6 @@ class WardEffect(Effect):
         super().__init__(template, owner, target, card)
         self.aspect = template["aspect"]
         self.amount = self.get_amount()
-
-        self.is_lingering = True  # shields always linger
 
     def resolve(self, game):
         # Add the shield to target's shield list
@@ -461,7 +469,33 @@ class JinxEffect(Effect):
 class DoTEffect(Effect):
     def __init__(self, template, owner, target, card):
         super().__init__(template, owner, target, card)
-        self.amount = self.get_amount()
+        self.rounds = template["rounds"]
+    
+    def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
+        self.target.dots.append(self)
+        self.amount = DamageEffect(self.template, self.owner, self.target, self.card).compute_dmg(game, caster_accumulation, target_accumulation, critical_multiplier)
+
+        print(f"{self.target.name} is hit with a {self.rounds}-round DoT for a total of {self.amount}")
+
+    def tick(self, game):
+        log = []
+        template = {"type": "damage", "school": self.school, "amount": self.amount * 1.0 / self.rounds}
+
+        damage = DamageEffect(template, None, self.target, self.card).resolve()
+        if type(damage) == list:
+            log.extend(damage)
+        else:
+            log.append(damage)
+
+        self.rounds -= 1
+        if self.rounds == 0:
+            self.target.remove(self)
+            log.append({"type": "effect_trigger", "player": self.target.user_id, "aspect": "dot", "value": self.to_json()})
+
+        return log
+    
+    def to_json(self):
+        return {"type": "dot", "school": self.school, "amount": self.amount, "rounds": self.rounds}
 
 class HoTEffect(Effect):
     def __init__(self, template, owner, target, card):
@@ -573,9 +607,19 @@ class DrainEffect(Effect):
 
     def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
         result = self.damageEffect.resolve(game, caster_accumulation, target_accumulation, critical_multiplier)
-        result["aspect"] = "drain"
+        if type(result) is list:
+            result[0]["aspect"] = "drain"
+            hp = result[0]["amount"] / 2.0
+        else:
+            result["aspect"] = "drain"
 
-        self.owner.health += result["amount"] / 2.0
+            hp = result["amount"] / 2.0
+        
+        if self.owner.health + hp > self.owner.maxHealth:
+            hp = self.owner.maxHealth - self.owner.health
+            self.owner.health = self.owner.maxHealth
+        else:
+            self.owner.health += hp
 
         return result
 

@@ -7,14 +7,14 @@ from Deck import *
 from utils import *
 
 def createBotPlayer(name, bot_id, image_path, school="random", deck=None, difficulty="easy"):
-    '''
+    
     if school == "random":
         school = random.choice(list(DECK_MASTER[difficulty].keys()))
     if deck is None:
         deck = DECK_MASTER[difficulty][school]()
     return Player(name, bot_id, school, deck, isBot=True, img_path=image_path)
-    '''
-    return Player(name, bot_id, school, contrived_enemy_deck(), isBot=True, img_path=image_path)
+    
+    #return Player(name, bot_id, school, contrived_enemy_deck(), isBot=True, img_path=image_path)
 
 
 
@@ -87,17 +87,17 @@ class Game():
         self.playing_team_i = (self.playing_team_i + 1) % 2
 
 
-        for player in self.teams[0] + self.teams[1]:
+        for player in self.current_team(aliveOnly=True) + self.opposite_team(aliveOnly=True):
             player.deck.draw_cards()
 
-        for player in self.current_team():
+        for player in self.current_team(aliveOnly=True):
             log.append(player.receive_pip())
         
         self.update_playability()
 
         self.player_actions = {player.user_id: None for player in self.getPlayers()}
 
-        for player in self.current_team():
+        for player in self.current_team(aliveOnly=True):
             if player.isBot: #Immediately do a random action
                 self.takeRandomAction(player)
 
@@ -151,12 +151,15 @@ class Game():
 
     def allActionsReceived(self):
         #print(self.player_actions)
-        for player in self.current_team():
+        for player in self.current_team(aliveOnly=True):
             if self.player_actions[player.user_id] == None:
                 return False
         return True
 
     def player_discard(self, player, card_id):
+        if player not in self.current_team(aliveOnly=True):
+            print(f"[invalid discard] Player {player.user_id} attempted an illegal discard")
+            return False
         for i, card in enumerate(player.deck.play_hand):
             if card.instance_id == card_id:
                 player.deck.play_hand.pop(i)
@@ -170,13 +173,15 @@ class Game():
         return False
     
     def player_pass(self, player):
+        if player not in self.current_team(aliveOnly=True):
+            print(f"[invalid pass] Player {player.user_id} attempted an illegal pass")
         self.player_actions[player.user_id] = {"type": "pass"}
         
         return True
 
     def player_cast(self, player, i, target):
-        if player not in self.current_team():
-            print("[invalid] Player action not valid")
+        if player not in self.current_team(aliveOnly=True):
+            print(f"[invalid cast] Player {player.user_id} attempted an illegal cast")
             return False
         
         if i<0 or i>= len(player.deck.play_hand):
@@ -193,14 +198,12 @@ class Game():
 
         self.player_actions[player.user_id] = {"type": "cast", "index": i, "target": self.get_player(target)}
 
-        
-
         return True
 
 
     def resolve_actions(self):
         log = []
-        for player in self.current_team():
+        for player in self.current_team(aliveOnly=True):
             log.append({"type": "action", "player": player.user_id, "action": "activate"})
             print(log[-1])
 
@@ -350,6 +353,7 @@ class Game():
             return True
         
         # TODO: Deal with conditions
+        # TODO: Deal with not having any targets available
 
         return False
 
@@ -395,7 +399,7 @@ class Game():
                         player_playability.append({"card": card, "playable": True, "targets": []})
                         continue
                     for target in self.interpretTarget(player, targetType):
-                        if self.conditionMet(player, card.card_def.condition, target):
+                        if target.health > 0 and self.conditionMet(player, card.card_def.condition, target):
                             valid_targets.append(target)
                     
                     if valid_targets:
@@ -414,38 +418,34 @@ class Game():
     def process_ongoing_effects(self, player):
 
         #Process DoTs
-        remaining = []
+        log = []
         for dot in player.dots:
-            alive = dot.tick(self)
-            if alive:
-                remaining.append(dot)
-            else:
-                print(f"{dot.type} on {player.name} expired.")
-        player.dots = remaining
+            
+            log.extend(dot.tick())
+            
+            if player.health == 0:
+                return log
+
 
         #Process HoTs
-        remaining = []
-        for hot in player.hots:
-            alive = hot.tick(self)
-            if alive:
-                remaining.append(hot)
-            else:
-                print(f"{hot.type} on {player.name} expired.")
-        player.hots = remaining
 
+        #for hot in player.hots:
+        #    log.extend(hot.tick())
+
+        return log
     def check_end(self):
         for player in self.teams[0]:
             if player.health > 0:
                 break
         else:
-            self.winner = "A"
+            self.winner = "B"
             return True
         
         for player in self.teams[1]:
             if player.health > 0:
                 break
         else:
-            self.winner = "B"
+            self.winner = "A"
             return True
         
         return False

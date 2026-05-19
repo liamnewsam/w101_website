@@ -27,17 +27,19 @@ class PlayerState(Base):
     decks = Column(JSON, default=list)
     selected_deck_index = Column(Integer, default=0)
 
-    # Match history — level is derived from these
+    # Match history
     wins = Column(Integer, default=0)
     losses = Column(Integer, default=0)
+
+    # Elo rating — level is derived from this
+    elo = Column(Integer, default=100)
 
     image_path = Column(String)
 
     def _compute_level(self):
-        wins = self.wins or 0
-        losses = self.losses or 0
-        # 3 wins = 1 level; losses also contribute slightly
-        return 1 + wins // 3 + losses // 10
+        elo = self.elo or 100
+        # Level 1 at 100 Elo, +1 level per 50 Elo, capped at 100
+        return max(1, min(100, (elo - 100) // 50 + 1))
 
     def _selected_deck(self):
         """Return the currently selected deck dict (falls back to legacy deck field)."""
@@ -61,6 +63,7 @@ class PlayerState(Base):
             "image_path": self.image_path,
             "wins": wins,
             "losses": losses,
+            "elo": self.elo or 100,
             "level": self._compute_level(),
         }
 
