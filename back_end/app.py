@@ -1093,7 +1093,7 @@ def player_action(data):
         game.print_log()
         socketio.emit("match_finished", match_result, room=gameId)
         del lobbies[gameId]
-    
+
     return {"ok": True}
 
 # ========================================================

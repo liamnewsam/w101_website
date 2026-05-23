@@ -328,17 +328,17 @@ class Effect(ABC):
 class DamageEffect(Effect):
     def compute_dmg(self, game, caster_accumulation, target_accumulation, critical_multiplier):
         base = self.get_amount()  
-        dmg = base + self.owner.flat_boost[self.school]
-        dmg *= (1 + self.owner.boost[self.school] / 100.0)
-        blade_mult = 1.0 + caster_accumulation["damage"]["any"] / 100.0
+        dmg = base + (self.owner.flat_boost[self.school] if self.owner else 0)
+        dmg *= (1 + (self.owner.boost[self.school] / 100.0 if self.owner else 0))
+        blade_mult = 1.0 + (caster_accumulation["damage"]["any"] / 100.0 if caster_accumulation else 0)
                     
         if self.school != "any":
-            blade_mult += caster_accumulation["damage"][self.school] / 100.0
+            blade_mult += (caster_accumulation["damage"][self.school] / 100.0 if caster_accumulation else 0)
 
-        trap_mult = 1.0 + target_accumulation["damage"]["any"] / 100.0
+        trap_mult = 1.0 + (target_accumulation["damage"]["any"] / 100.0 if target_accumulation else 0)
 
         if self.school != "any":
-            blade_mult += target_accumulation["damage"][self.school] / 100.0
+            blade_mult += (target_accumulation["damage"][self.school] / 100.0 if target_accumulation else 0)
         
         dmg *= blade_mult * trap_mult
 
@@ -347,7 +347,7 @@ class DamageEffect(Effect):
         dmg -= self.target.flat_resistance[school]
 
         resist = self.target.resistance[school]
-        pierce = self.owner.armor_piercing[school]
+        pierce = self.owner.armor_piercing[school] if self.owner else 0
 
         effective_resist = max(resist - pierce, 0)
         dmg *= (1 - effective_resist / 100.0)
@@ -367,8 +367,11 @@ class DamageEffect(Effect):
         if dmg < 0:
             dmg = 0
 
-        print(f"{self.owner.name} deals {int(dmg)} {school} damage to {self.target.name}!")
-        dmg_message = {"type": "effect_resolve", "player": self.owner.user_id, "aspect": "damage", "amount": dmg, "target": self.target.user_id, "school": self.school}
+        if self.owner:
+            print(f"{self.owner.name} deals {int(dmg)} {self.school} damage to {self.target.name}!")
+        else:
+            print(f"{int(dmg)} {self.school} damage to {self.target.name}!")
+        dmg_message = {"type": "effect_resolve", "player": self.owner.user_id if self.owner else None, "aspect": "damage", "amount": dmg, "target": self.target.user_id, "school": self.school}
 
         if self.target.health - dmg <= 0:
             self.target.health = 0
@@ -384,14 +387,14 @@ class DamageEffect(Effect):
     
 
 class HealEffect(Effect):
-    def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
+    def compute_heal(self, caster_accumulation, target_accumulation, critical_multiplier):
         hp = self.get_amount()  
 
-        hp *= (1 + self.owner.healing_out / 100.0)
-        out_mult = 1.0 + caster_accumulation["heal"] / 100.0
+        hp *= (1 + (self.owner.healing_out / 100.0 if self.owner else 0))
+        out_mult = 1.0 + (caster_accumulation["heal"] / 100.0 if caster_accumulation else 0)
                     
 
-        in_mult = 1.0 + target_accumulation["heal"] / 100.0
+        in_mult = 1.0 + (target_accumulation["heal"] / 100.0 if caster_accumulation else 0)
 
         hp *= out_mult * in_mult
 
@@ -400,8 +403,14 @@ class HealEffect(Effect):
         if hp < 0:
             hp = 0
 
+        return hp
+    def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
+        
+        hp = self.compute_heal(caster_accumulation, target_accumulation, critical_multiplier)
+        
+
         if self.target.health + hp > self.target.maxHealth:
-            hp = self.maxHealth - self.target.health
+            hp = self.target.maxHealth - self.target.health
             self.target.health = self.target.maxHealth
         else:
             self.target.health += hp
@@ -476,20 +485,23 @@ class DoTEffect(Effect):
         self.amount = DamageEffect(self.template, self.owner, self.target, self.card).compute_dmg(game, caster_accumulation, target_accumulation, critical_multiplier)
 
         print(f"{self.target.name} is hit with a {self.rounds}-round DoT for a total of {self.amount}")
+        return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "dot", "value": self.to_json()}
 
-    def tick(self, game):
+    def tick(self, target_accumulation):
         log = []
-        template = {"type": "damage", "school": self.school, "amount": self.amount * 1.0 / self.rounds}
+        dmg = self.amount * 1.0 / self.rounds
+        template = {"type": "damage", "school": self.school, "amount": dmg}
 
-        damage = DamageEffect(template, None, self.target, self.card).resolve()
+        damage = DamageEffect(template, None, self.target, self.card).resolve(None, None, target_accumulation, 1)
         if type(damage) == list:
             log.extend(damage)
         else:
             log.append(damage)
 
         self.rounds -= 1
+        self.amount -= dmg
         if self.rounds == 0:
-            self.target.remove(self)
+            self.target.dots.remove(self)
             log.append({"type": "effect_trigger", "player": self.target.user_id, "aspect": "dot", "value": self.to_json()})
 
         return log
@@ -500,7 +512,32 @@ class DoTEffect(Effect):
 class HoTEffect(Effect):
     def __init__(self, template, owner, target, card):
         super().__init__(template, owner, target, card)
-        self.amount = self.get_amount()
+        self.rounts = template["rounds"]
+    def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
+        self.target.hots.append(self)
+        self.amount = HealEffect(self.template, self.owner, self.target, self.card).compute_heal(caster_accumulation, target_accumulation, critical_multiplier)
+        print(f"{self.target.name} receives a {self.rounds}-round HoT for a total of {self.amount}")
+        return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "hot", "value": self.to_json()}
+    def tick(self, target_accumulation):
+        log = []
+        hp = self.amount * 1.0 / self.rounds
+        template = {"type": "heal", "amount": hp}
+
+        hpEffect = HealEffect(template, None, self.target, self.card).resolve(None, None, None, 1)
+        if type(hp) == list:
+            log.extend(hpEffect)
+        else:
+            log.append(hpEffect)
+
+        self.rounds -= 1
+        self.amount -= hp
+        if self.rounds == 0:
+            self.target.hots.remove(self)
+            log.append({"type": "effect_trigger", "player": self.target.user_id, "aspect": "hot", "value": self.to_json()})
+
+        return log
+    def to_json(self):
+        return {"type": "hot", "amount": self.amount, "rounds": self.rounds}
 
 class AuraEffect(Effect):
     def __init__(self, template, owner, target, card):

@@ -204,10 +204,17 @@ class Game():
     def resolve_actions(self):
         log = []
         for player in self.current_team(aliveOnly=True):
+
+            
+
             log.append({"type": "action", "player": player.user_id, "action": "activate"})
             print(log[-1])
 
-            
+            log.extend(self.process_ongoing_effects(player))
+            if player.health == 0: #They died
+                continue
+
+
             action = self.player_actions[player.user_id]
             print(action)
             if action["type"] == "pass":
@@ -413,15 +420,28 @@ class Game():
         
         
 
-
-
     def process_ongoing_effects(self, player):
 
         #Process DoTs
         log = []
         for dot in player.dots:
-            
-            log.extend(dot.tick())
+
+            target_accumulation = {
+                    "damage": {"any": 0, "myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0},
+                    "armor_piercing": {"any": 0, "myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0},
+                    "heal": 0
+            }
+
+            for jinx in dot.target.consume("jinx", dot.card, target_accumulation):
+                log.append({"type": "effect_trigger", "player": dot.target.user_id, "aspect": "jinx", "value": jinx.to_json()})
+                print(log[-1])
+            for ward in dot.target.consume("ward", dot.card, target_accumulation):
+                log.append({"type": "effect_trigger", "player": dot.target.user_id, "aspect": "ward", "value": ward.to_json()})
+                print(log[-1])
+        
+
+
+            log.extend(dot.tick(target_accumulation))
             
             if player.health == 0:
                 return log
@@ -429,8 +449,8 @@ class Game():
 
         #Process HoTs
 
-        #for hot in player.hots:
-        #    log.extend(hot.tick())
+        for hot in player.hots:
+            log.extend(hot.tick())
 
         return log
     def check_end(self):
