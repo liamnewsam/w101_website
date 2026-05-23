@@ -7,13 +7,13 @@ import PipGrid from "./PipGrid";
 
 
 const STATUS_CATEGORIES = [
-  { key: "wards", icon: "Ward.png", popupItems: [{"type": "text", "value":"HI"}]},
-  { key: "jinxes",   icon: "Jinx.png" },
-  { key: "charms",  icon: "Charm.png", popupItems: [{"type": "text", "value":"HI"}]},
+  { key: "wards", icon: "Ward.png"},
+  { key: "jinxes",   icon: "Jinx.png"},
+  { key: "charms",  icon: "Charm.png"},
   { key: "curses", icon: "Curse.png"},
-  { key: "auras",   icon: "/icons/aura.png" },
-  { key: "dots",    icon: "/icons/dot.png" },
-  { key: "hots",    icon: "/icons/hot.png" },
+  { key: "auras",   icon: "Aura.png"},
+  { key: "dots",    icon: "Damage_over_Time.png" },
+  { key: "hots",    icon: "Heal_over_Time.png" },
 ];
 
 
@@ -71,6 +71,16 @@ function statusToPopup(status) {
           {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Incoming.png`},
         ];
       }
+
+    case "dot":
+      return [
+        {"type": "text", "value": `${status.amount}`, "color": badColor},
+        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
+        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`},
+        {"type": "text", "value": `over ${status.rounds}`, "color": badColor},
+        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Round.png`}
+
+      ]
     default:
       return [{"type": "text", "value": status.type ?? "unknown"}];
   }

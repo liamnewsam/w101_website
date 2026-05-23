@@ -197,7 +197,8 @@ async function processEvent(
     }
 
     case "effect_resolve": {
-      if (event.target) {
+
+      if (event.player && event.target) {
         let effect;
         if (event.player === event.target) {
           effect = {
@@ -278,7 +279,7 @@ async function processEvent(
             },
           }]);
           const player = getPlayer(gs, event.player);
-          target.player += event.amount / 2.0;
+          player.health += event.amount / 2.0;
           
           break;
         }
@@ -351,6 +352,20 @@ async function processEvent(
           }]);
           const target = getPlayer(gs, event.target);
           target['jinxes'] = [...target['jinxes'], event.value];
+          break;
+        }
+        case "dot": {
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: `DoT gained`, color: badColor}],
+            id: crypto.randomUUID(),
+            pos: {
+              x: playerPositions[event.target].x + FLOATING_PRESENT_OFFSET_X,
+              y: playerPositions[event.target].y + FLOATING_PRESENT_OFFSET_Y
+            },
+          }]);
+          const target = getPlayer(gs, event.target);
+          target['dots'] = [...target['dots'], event.value];
           break;
         }
         case "heal": {
@@ -522,15 +537,11 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
     return () => { cancelled = true; };
   }, [eventQueue, replaying]);
 
-  // Finish replay once the event queue drains, then navigate if a result is ready
+  // Finish replay once the event queue drains
   useEffect(() => {
     if (replaying && eventQueue.length === 0) {
       dispatch({ type: ACTIONS.FINISH_REPLAY });
       setDeadPlayerIds(new Set());
-      const result = pendingResultRef.current;
-      if (result) {
-        navigate(`/results/${gameId}`, { state: { result } });
-      }
     }
   }, [eventQueue.length, replaying]);
 
