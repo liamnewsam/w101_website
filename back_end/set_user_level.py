@@ -1,31 +1,40 @@
 #!/usr/bin/env python3
 """
-set_user_level.py — Update a user's level in the database.
+set_user_level.py — Set a player's display level for a specific school.
 
-Level is derived from ELO: level = max(1, min(100, (elo - 100) // 50 + 1))
-This script computes the ELO needed for the target level and writes it.
+Level is derived from per-school ELO: level = clamp(10, 170, (elo - 100) // 32 + 10)
+This script sets school_elos for the given school to produce the target level.
 
 Usage:
-    python set_user_level.py <username> <level>
+    python set_user_level.py <username> <school> <level>
 
 Examples:
-    python set_user_level.py Liam 10
-    python set_user_level.py "GuestUser" 50
+    python set_user_level.py Liam fire 10
+    python set_user_level.py Liam balance 40
+
+Valid schools: fire, ice, storm, life, death, myth, balance
+Valid level range: 10–170
 """
 
 import sys
 from database import SessionLocal
-from models import User, PlayerState
+from sqlalchemy.orm.attributes import flag_modified
+from models import User, PlayerState, SCHOOLS_LIST, _ELO_FLOOR, _ELO_PER_LEVEL, _SCHOOL_LEVEL_MIN, _SCHOOL_LEVEL_MAX
 
 
 def level_to_elo(level: int) -> int:
-    level = max(1, min(100, level))
-    return (level - 1) * 50 + 100
+    level = max(_SCHOOL_LEVEL_MIN, min(_SCHOOL_LEVEL_MAX, level))
+    return _ELO_FLOOR + (level - _SCHOOL_LEVEL_MIN) * _ELO_PER_LEVEL
 
 
-def set_user_level(username: str, level: int) -> None:
-    if not (1 <= level <= 100):
-        print(f"Error: level must be between 1 and 100 (got {level})")
+def set_user_school_level(username: str, school: str, level: int) -> None:
+    school = school.lower()
+    if school not in SCHOOLS_LIST:
+        print(f"Error: unknown school '{school}'. Valid: {', '.join(SCHOOLS_LIST)}")
+        sys.exit(1)
+
+    if not (_SCHOOL_LEVEL_MIN <= level <= _SCHOOL_LEVEL_MAX):
+        print(f"Error: level must be between {_SCHOOL_LEVEL_MIN} and {_SCHOOL_LEVEL_MAX} (got {level})")
         sys.exit(1)
 
     db = SessionLocal()
@@ -40,28 +49,33 @@ def set_user_level(username: str, level: int) -> None:
             print(f"Error: no player state found for user '{username}' (id={user.id})")
             sys.exit(1)
 
-        old_level = state._compute_level()
-        new_elo = level_to_elo(level)
+        old_level = state._compute_school_level(school)
+        elo_needed = level_to_elo(level)
 
-        state.elo = new_elo
+        school_elos = dict(state.school_elos or {})
+        school_elos[school] = elo_needed
+        state.school_elos = school_elos
+        flag_modified(state, "school_elos")
         db.commit()
         db.refresh(state)
 
-        print(f"Updated '{username}': level {old_level} -> {state._compute_level()} (elo={state.elo})")
+        new_level = state._compute_school_level(school)
+        print(f"Updated '{username}' [{school}]: level {old_level} -> {new_level} (elo={elo_needed})")
     finally:
         db.close()
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         print(__doc__)
         sys.exit(1)
 
     username_arg = sys.argv[1]
+    school_arg = sys.argv[2]
     try:
-        level_arg = int(sys.argv[2])
+        level_arg = int(sys.argv[3])
     except ValueError:
-        print(f"Error: level must be an integer (got '{sys.argv[2]}')")
+        print(f"Error: level must be an integer (got '{sys.argv[3]}')")
         sys.exit(1)
 
-    set_user_level(username_arg, level_arg)
+    set_user_school_level(username_arg, school_arg, level_arg)

@@ -4,7 +4,17 @@ from sqlalchemy.sql import func
 from database import Base
 
 SCHOOLS_LIST = ["fire", "ice", "storm", "life", "death", "myth", "balance"]
-_WINS_PER_LEVEL = 5
+
+# ELO-to-level mapping — kept in sync with frontend levelUtils.js
+_ELO_FLOOR       = 100   # starting / minimum ELO for each school
+_ELO_PER_LEVEL   = 32    # ~1 win vs same-level opponent (K=64, expected≈0.5) = ~1 level
+_SCHOOL_LEVEL_MIN = 10
+_SCHOOL_LEVEL_MAX = 170
+
+
+def _elo_to_level(elo: int) -> int:
+    return max(_SCHOOL_LEVEL_MIN, min(_SCHOOL_LEVEL_MAX, (elo - _ELO_FLOOR) // _ELO_PER_LEVEL + _SCHOOL_LEVEL_MIN))
+
 
 class User(Base):
     __tablename__ = "users"
@@ -30,22 +40,29 @@ class PlayerState(Base):
     decks = Column(JSON, default=list)
     selected_deck_index = Column(Integer, default=0)
 
-    # Match history
+    # Overall match history (display only)
     wins = Column(Integer, default=0)
     losses = Column(Integer, default=0)
 
-    # Per-school win counts — drives per-school leveling
-    school_wins = Column(JSON, default=dict)
+    # Per-school win/loss counts (display only — level is driven by school_elos)
+    school_wins   = Column(JSON, default=dict)
+    school_losses = Column(JSON, default=dict)
 
-    # Elo rating — used for matchmaking
+    # Per-school ELO — drives per-school level
+    school_elos = Column(JSON, default=dict)
+
+    # Legacy global ELO (kept for backward compat; matchmaking now uses school_elos)
     elo = Column(Integer, default=100)
 
     image_path = Column(String)
 
+    def _school_elo(self, school: str) -> int:
+        """Return the ELO for a specific school, defaulting to the floor."""
+        return (self.school_elos or {}).get(school.lower(), _ELO_FLOOR)
+
     def _compute_school_level(self, school: str) -> int:
-        """Return the level for a specific school based on wins with that school."""
-        sw = (self.school_wins or {}).get(school.lower(), 0)
-        return min(100, sw // _WINS_PER_LEVEL + 1)
+        """Return the display level for a specific school."""
+        return _elo_to_level(self._school_elo(school))
 
     def _compute_level(self):
         """Return the level for the player's currently active school."""
@@ -64,19 +81,23 @@ class PlayerState(Base):
         losses = self.losses or 0
         decks = self.decks or []
         school_levels = {s: self._compute_school_level(s) for s in SCHOOLS_LIST}
+        school_elos = {s: self._school_elo(s) for s in SCHOOLS_LIST}
         return {
             "name": self.name,
             "school": self.school,
-            "deck": self._selected_deck(),   # for loadPlayer compat
+            "deck": self._selected_deck(),
             "decks": decks,
             "selected_deck_index": self.selected_deck_index or 0,
             "user_id": self.player_id,
             "image_path": self.image_path,
             "wins": wins,
             "losses": losses,
-            "elo": self.elo or 100,
-            "level": self._compute_level(),          # active school's level
-            "school_levels": school_levels,           # all seven school levels
+            "elo": self.elo or _ELO_FLOOR,
+            "level": self._compute_level(),
+            "school_levels": school_levels,
+            "school_elos": school_elos,
+            "school_wins":   dict(self.school_wins   or {}),
+            "school_losses": dict(self.school_losses or {}),
         }
 
 
@@ -86,3 +107,15 @@ class GuestSession(Base):
     guest_id = Column(String, primary_key=True)
     created_at = Column(DateTime, server_default=func.now())
     expire_at = Column(DateTime)
+
+
+class GameLog(Base):
+    __tablename__ = "game_logs"
+
+    game_id = Column(String, primary_key=True)
+    created_at = Column(DateTime, server_default=func.now())
+    winner = Column(String)           # "A" or "B"
+    player_ids = Column(JSON)         # list of human player ID strings
+    players = Column(JSON)            # match result player data (for display)
+    initial_game_state = Column(JSON) # public game state before any turns
+    turns = Column(JSON)              # [{log: [...], finalGameState: {...}}] per turn
