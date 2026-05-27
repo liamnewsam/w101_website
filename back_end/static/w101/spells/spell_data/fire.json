@@ -27,7 +27,8 @@
         ],
         "image": "static/w101/spells/fire/(Spell)_Whitehart_Fire.png",
         "id": "whitehart_fire",
-        "accuracy": 70
+        "accuracy": 70,
+        "pvp_level": 40
     },
     {
         "name": "Oni's Forge",
@@ -278,7 +279,8 @@
         ],
         "image": "static/w101/spells/fire/(Spell)_Brimstone_Revenant.png",
         "id": "brimstone_revenant",
-        "accuracy": 70
+        "accuracy": 70,
+        "pvp_level": 40
     },
     
     {
@@ -300,7 +302,8 @@
         ],
         "image": "static/w101/spells/fire/(Spell)_A-baahh-calypse.png",
         "id": "a-baahh-calypse",
-        "accuracy": 70
+        "accuracy": 70,
+        "pvp_level": 42
     },
     {
         "name": "Inferno Salamander",
@@ -531,7 +534,8 @@
         ],
         "image": "static/w101/spells/fire/(Spell)_Hephaestus.png",
         "id": "hephaestus",
-        "accuracy": 70
+        "accuracy": 70,
+        "pvp_level": 42
     },
     {
         "name": "Immolate",
@@ -545,7 +549,8 @@
         ],
         "image": "static/w101/spells/fire/(Spell)_Immolate.png",
         "id": "immolate",
-        "accuracy": 75
+        "accuracy": 75,
+        "pvp_level": 38
     },
     {
         "name": "Fire Elf",
@@ -574,7 +579,8 @@
         ],
         "image": "static/w101/spells/fire/(Spell)_Burning_Rampage.png",
         "id": "burning_rampage",
-        "accuracy": 70
+        "accuracy": 70,
+        "pvp_level": 40
     },
     {
         "name": "Backfire",
@@ -610,7 +616,8 @@
         ],
         "image": "static/w101/spells/fire/(Spell)_Krampus.png",
         "id": "krampus",
-        "accuracy": 75
+        "accuracy": 75,
+        "pvp_level": 42
     },
     {
         "name": "Wyldfire",

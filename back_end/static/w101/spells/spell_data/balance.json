@@ -41,12 +41,13 @@
         "description": "Reshuffles all used or discarded cards back into the deck",
         "effects": [
             {
-                "type": "reshuffle"
+                "type": "reshuffle", "target": "self"
             }
         ],
         "image": "static/w101/spells/balance/(Spell)_Reshuffle.png",
         "id": "reshuffle",
         "accuracy": 100,
+        "pvp_level": 50,
         "reshuffle": false
     },
     {
@@ -324,7 +325,8 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Elemental_Golem.png",
         "id": "elemental_golem",
-        "accuracy": 85
+        "accuracy": 85,
+        "pvp_level": 42
     },
     {
         "name": "Terminus' Strike",
@@ -365,53 +367,10 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Terminus'_Strike.png",
         "id": "terminus'_strike",
-        "accuracy": 85
-    },
-    {
-        "name": "Courageous Charge",
-        "school": "balance",
-        "type": "damage",
-        "pips": 2,
-        "description": "Deals 130 Balance Damage to target and applies a +20% outgoing Armor Piercing Aura on caster for 4 Rounds if target has a helpful Aura",
-        "effects": [
-            {
-                "type": "gambit",
-                "condition": {
-                    "type": "amount",
-                    "aspect": "aura_positive",
-                    "amount": 1,
-                    "target": "enemy"
-                },
-                "true": [
-                    {
-                        "type": "damage",
-                        "school": "balance",
-                        "amount": 130,
-                        "target": "enemy"
-                    },
-                    {
-                        "type": "aura",
-                        "aspect": "armor_piercing",
-                        "amount": 20,
-                        "rounds": 4,
-                        "target": "self"
-                    }
-                ],
-                "false": [
-                    {
-                        "type": "damage",
-                        "school": "balance",
-                        "amount": 130,
-                        "target": "enemy"
-                    }
-                ]
-            }
-        ],
-        "image": "static/w101/spells/balance/(Spell)_Courageous_Charge.png",
-        "id": "courageous_charge",
         "accuracy": 85,
-        "pvp_level": 75
+        "pvp_level": 80
     },
+    
     {
         "name": "Duststorm Jinn",
         "school": "balance",
@@ -493,7 +452,8 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Duststorm_Jinn.png",
         "id": "duststorm_jinn",
-        "accuracy": 80
+        "accuracy": 80,
+        "pvp_level": 70
     },
     {
         "name": "Oni's Shadow",
@@ -576,7 +536,8 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Black_Mantle.png",
         "id": "black_mantle",
-        "accuracy": 100
+        "accuracy": 100,
+        "pvp_level": 10
     },
     {
         "name": "Spirit Weakness",
@@ -674,7 +635,8 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Samoorai.png",
         "id": "samoorai",
-        "accuracy": 80
+        "accuracy": 80,
+        "pvp_level": 42
     },
     {
         "name": "Spiritual Tribunal",
@@ -699,7 +661,8 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Spiritual_Tribunal.png",
         "id": "spiritual_tribunal",
-        "accuracy": 80
+        "accuracy": 80,
+        "pvp_level": 40
     },
     {
         "name": "Chimera",
@@ -923,7 +886,8 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Loremaster.png",
         "id": "loremaster",
-        "accuracy": 80
+        "accuracy": 80,
+        "pvp_level": 45
     },
     {
         "name": "Scarab",
@@ -1089,7 +1053,8 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Helping_Hands.png",
         "id": "helping_hands",
-        "accuracy": 85
+        "accuracy": 85,
+        "pvp_level": 38
     },
     {
         "name": "Precision",
@@ -1130,35 +1095,10 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Steal_Pip.png",
         "id": "steal_pip",
-        "accuracy": 100
+        "accuracy": 100,
+        "pvp_level": 26
     },
-    {
-        "name": "Brave Sir Badger",
-        "school": "balance",
-        "type": "damage",
-        "pips": {
-            "regular": 3,
-            "balance": 1
-        },
-        "description": "Deals 390 Balance Damage to target and applies a +25% outgoing Damage Aura on caster for 4 Rounds",
-        "effects": [
-            {
-                "type": "damage",
-                "school": "balance",
-                "amount": 390,
-                "target": "enemy"
-            },
-            {
-                "type": "aura",
-                "amount": 25,
-                "rounds": 4,
-                "target": "self"
-            }
-        ],
-        "image": "static/w101/spells/balance/(Spell)_Brave_Sir_Badger.png",
-        "id": "brave_sir_badger",
-        "accuracy": 80
-    },
+    
     {
         "name": "Elemental Spear",
         "school": "balance",
@@ -1240,7 +1180,8 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Gearhead_Destroyer.png",
         "id": "gearhead_destroyer",
-        "accuracy": 85
+        "accuracy": 85,
+        "pvp_level": 38
     },
     {
         "name": "Elemental Weakness",
@@ -1315,7 +1256,8 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Ninja_Piglets.png",
         "id": "ninja_piglets",
-        "accuracy": 80
+        "accuracy": 80,
+        "pvp_level": 42
     },
     {
         "name": "Balanceblade",
@@ -1458,7 +1400,8 @@
         ],
         "image": "static/w101/spells/balance/(Spell)_Savage_Paw.png",
         "id": "savage_paw",
-        "accuracy": 80
+        "accuracy": 80,
+        "pvp_level": 45
     },
     {
         "name": "Tribunal Oni",

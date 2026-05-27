@@ -7,6 +7,7 @@ import uuid
 from Game import Game, createBotPlayer
 from Player import loadPlayer
 from Card import CARD_BY_ID
+from stats import compute_stats, compute_school_chart
 
 # ===== Auth System =====
 from auth_routes import auth
@@ -330,6 +331,41 @@ def get_player_info():
         db.close()
 
 
+@socketio.on("get_player_stats")
+def get_player_stats():
+    print(f"[get_player_stats] received from sid={request.sid}")
+    user_id = get_user_identity(request.sid)
+    if not user_id:
+        print("[get_player_stats] not authenticated")
+        emit("player_stats", {"error": "Not authenticated"})
+        return
+
+    db = SessionLocal()
+    try:
+        player = db.query(PlayerState).filter_by(player_id=user_id).first()
+        if not player:
+            print(f"[get_player_stats] player not found for user_id={user_id}")
+            emit("player_stats", {"error": "Player not found"})
+            return
+
+        school = (player.school or "Balance").lower()
+        level  = player._compute_school_level(school)
+        print(f"[get_player_stats] computing stats for level={level} school={school}")
+        stats        = compute_stats(level, school)
+        school_chart = compute_school_chart(level, school)
+        if stats is None:
+            emit("player_stats", {"error": f"Unknown school: {school}"})
+            return
+
+        print(f"[get_player_stats] emitting stats: {stats}")
+        emit("player_stats", {"ok": True, "stats": stats, "school_chart": school_chart})
+    except Exception as e:
+        print(f"[get_player_stats] ERROR: {e}")
+        emit("player_stats", {"error": str(e)})
+    finally:
+        db.close()
+
+
 @socketio.on("list_games")
 def list_games():
     open_games = []
@@ -605,7 +641,7 @@ def start_game(data):
             player = loadPlayer(player.to_dict())
         
         else:
-            player = createBotPlayer(p.name, p.id, p.image_path, school=p.school, difficulty="easy")
+            player = createBotPlayer(p.name, p.id, p.image_path, school=p.school, difficulty="easy", level=p.level)
 
 
         if p.team == "A":
@@ -771,6 +807,10 @@ def record_match_results(lobby, winner_team, elo_changes):
                 continue
             if p.team == winner_team:
                 ps.wins = (ps.wins or 0) + 1
+                sw = dict(ps.school_wins or {})
+                school_key = (p.school or "balance").lower()
+                sw[school_key] = sw.get(school_key, 0) + 1
+                ps.school_wins = sw
             else:
                 ps.losses = (ps.losses or 0) + 1
             ec = elo_changes.get(p.id)
@@ -903,6 +943,12 @@ def save_deck(data):
         ps = db.query(PlayerState).filter_by(player_id=user_id).first()
         if not ps:
             return {"ok": False, "error": "Player not found"}
+
+        active_level = ps._compute_school_level(ps.school or "balance")
+        for card_id in card_ids:
+            card_def = CARD_BY_ID.get(card_id)
+            if card_def and card_def.pvp_level and card_def.pvp_level > active_level:
+                return {"ok": False, "error": f"Deck contains cards above your current level (Lv.{active_level})"}
         decks = list(ps.decks or [])
         if deck_index is None:
             decks.append({"name": name, "card_ids": card_ids})
@@ -966,6 +1012,14 @@ def update_player_deck(data):
         decks = ps.decks or []
         if deck_index < 0 or deck_index >= len(decks):
             return {"ok": False, "error": "Invalid deck index"}
+
+        from Card import CARD_BY_ID
+        active_level = ps._compute_school_level(ps.school or "balance")
+        for card_id in (decks[deck_index].get("card_ids") or []):
+            card_def = CARD_BY_ID.get(card_id)
+            if card_def and card_def.pvp_level and card_def.pvp_level > active_level:
+                return {"ok": False, "error": f"Deck contains cards above your current level (Lv.{active_level})"}
+
         ps.selected_deck_index = deck_index
         db.commit()
         emit("player_info", ps.to_dict())
@@ -1127,6 +1181,23 @@ try:
 except Exception as e:
     print(f"[startup] Guest cleanup failed: {e}")
 
+# Add school_wins column to existing databases that predate this feature
+try:
+    from sqlalchemy import text as _text
+    with engine.connect() as _conn:
+        existing = [row[1] for row in _conn.execute(_text("PRAGMA table_info(player_state)"))]
+        if "school_wins" not in existing:
+            _conn.execute(_text("ALTER TABLE player_state ADD COLUMN school_wins JSON"))
+            _conn.commit()
+            print("[startup] Added school_wins column to player_state")
+except Exception as e:
+    print(f"[startup] school_wins migration failed: {e}")
+
 if __name__ == "__main__":
+    import signal, sys
+    def _shutdown(sig, frame):
+        sys.exit(0)
+    signal.signal(signal.SIGINT, _shutdown)
+    signal.signal(signal.SIGTERM, _shutdown)
     #Only for dev use, not on google cloud
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False)

@@ -163,8 +163,7 @@
         ],
         "image": "static/w101/spells/ice/(Spell)_Iceblade.png",
         "id": "iceblade",
-        "accuracy": 100,
-        "pvp_level": 38
+        "accuracy": 100
     },
     {
         "name": "Legion Shield",
@@ -532,7 +531,8 @@
         ],
         "image": "static/w101/spells/ice/(Spell)_Ice_Elemental.png",
         "id": "ice_elemental",
-        "accuracy": 75
+        "accuracy": 75,
+        "pvp_level": 35
     },
     {
         "name": "Snow Serpent",

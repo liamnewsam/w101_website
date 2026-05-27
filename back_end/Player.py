@@ -9,30 +9,60 @@ ACTIONS= ["Choose Card", "Pass", "Print State"]
 
 
 class Player:
-    def __init__(self, name: str, user_id, school: str, deck: Deck, isBot=False, img_path=None):
+    def __init__(self, name: str, user_id, school: str, deck: Deck, isBot=False, img_path=None, base_stats=None, school_chart=None):
         self.isBot = isBot
-        
+
         self.name = name
         self.user_id = user_id
-        self.maxHealth = 3000 if isBot else 3000
-        self.health = self.maxHealth
-        self.mana = 300
         self.school = school.lower()
         self.deck = deck
-        self.boost = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
-        self.resistance = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
-        self.flat_boost = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
-        self.flat_resistance = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
-        self.accuracy = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
-        self.critical = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
-        self.block = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
-        self.armor_piercing = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
-        self.pip_conversion = {"myth": 100, "life": 100, "fire": 100, "ice": 100, "storm": 100, "death": 100, "balance": 100}
+
+        if base_stats:
+            self.maxHealth = base_stats["health"]
+            self.mana      = base_stats["mana"]
+        else:
+            self.maxHealth = 3000
+            self.mana      = 300
+        self.health = self.maxHealth
+
+        self.boost            = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
+        self.resistance       = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
+        self.flat_boost       = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
+        self.flat_resistance  = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
+        self.accuracy         = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
+        self.critical         = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
+        self.block            = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
+        self.armor_piercing   = {"myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
+        self.pip_conversion   = {"myth": 100, "life": 100, "fire": 100, "ice": 100, "storm": 100, "death": 100, "balance": 100}
         self.power_pip_chance = 100
         self.school_pip_chance = 60
-        self.stun_resistance = 0
-        self.healing_in = 0
-        self.healing_out = 0
+        self.stun_resistance  = 0
+        self.healing_in       = 0
+        self.healing_out      = 0
+
+        if base_stats:
+            s = self.school
+            # Per-school boost and resistance — use chart when available so all
+            # school slots are populated (triangle bonuses/penalties included)
+            if school_chart:
+                for entry in school_chart:
+                    es = entry["school"]
+                    if es in self.boost:
+                        self.boost[es]      = entry["damage"]
+                        self.resistance[es] = entry["resistance"]
+            elif s in self.boost:
+                self.boost[s]      = base_stats["damage"]
+                self.resistance[s] = base_stats["resistance"]
+
+            # Own-school only stats
+            if s in self.critical:
+                self.critical[s]       = base_stats["critical"]
+                self.block[s]          = base_stats["block"]
+                self.armor_piercing[s] = base_stats["pierce"]
+            self.power_pip_chance = base_stats["power_pip"]
+            self.healing_in       = base_stats["heal_in"]
+            self.healing_out      = base_stats["heal_out"]
+            self.stun_resistance  = base_stats["stun_res"]
 
         self.active = False
         self.pips = {"regular": 0, "powerpip": 0, "myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
@@ -424,16 +454,24 @@ class Player:
     
 
 def loadPlayer(data):
-    player_name = data["name"]
+    from stats import compute_stats, compute_school_chart
+    player_name   = data["name"]
     player_school = data["school"]
-    img_path = data["image_path"]
+    level         = data.get("level", 1)
+    img_path      = data["image_path"]
     cards = []
-    #for card_id in data["decks"][0]["cards"]:
     print(data["deck"])
     for card_id in data["deck"]["card_ids"]:
-        cards.append(Card(CARD_BY_ID[card_id]))
-    player_deck = Deck(data["deck"]["name"], cards)
-    return Player(player_name, data["user_id"], player_school, player_deck, img_path=img_path)
+        card_def = CARD_BY_ID.get(card_id)
+        if card_def is None:
+            continue
+        if card_def.pvp_level and card_def.pvp_level > level:
+            continue
+        cards.append(Card(card_def))
+    player_deck  = Deck(data["deck"]["name"], cards)
+    base_stats   = compute_stats(level, player_school)
+    school_chart = compute_school_chart(level, player_school)
+    return Player(player_name, data["user_id"], player_school, player_deck, img_path=img_path, base_stats=base_stats, school_chart=school_chart)
 
 
 #-------------------------------- EFFECTS ------------------------------------------------
@@ -713,6 +751,7 @@ class HoTEffect(Effect):
         return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "hot", "value": self.to_json()}
     def tick(self):
         log = []
+        prev = self.to_json()
         hp = self.amount * 1.0 / self.rounds
         template = {"type": "heal", "amount": hp}
 
@@ -727,6 +766,8 @@ class HoTEffect(Effect):
         if self.rounds == 0:
             self.target.hots.remove(self)
             log.append({"type": "effect_trigger", "player": self.target.user_id, "aspect": "hot", "value": self.to_json()})
+        else:
+            log.append({"type": "effect_resolve", "player": self.target.user_id, "aspect": "update", "aspectType": "hot", "from":  prev, "to": self.to_json()})
 
         return log
     def to_json(self):
@@ -829,6 +870,16 @@ class ExtendEffect(Effect):
     def __init__(self, template, owner, target, card):
         super().__init__(template, owner, target, card)
         self.amount = self.get_amount()
+        self.aspect = template["aspect"]
+    
+    def resolve(self, game):
+        
+        if self.aspect == "HoT":
+            hot = self.target.hots[random.randint(0, len(self.target.hots)-1)]
+            hot_before = hot.to_json()
+            hot.amount *= 1.0 * (hot.rounds + self.amount) / (hot.rounds)
+            hot.rounds += self.amount
+            return {"type": "effect_resolve", "target": self.target.user_id, "aspect": "update", "aspectType": "hot", "from": hot_before, "to": hot.to_json()}
 
 class GlobalEffect(Effect):
     def __init__(self, template, owner, target, card):
@@ -879,7 +930,13 @@ class PrismEffect(Effect):
 class ReshuffleEffect(Effect):
     def __init__(self, template, owner, target, card):
         super().__init__(template, owner, target, card)
-        self.amount = self.get_amount()
+    
+    def resolve(self, game):
+        self.owner.deck.play_cards.extend(self.owner.deck.play_discard)
+        self.owner.deck.play_discard = []
+        random.shuffle(self.owner.deck.play_cards)
+
+        return {"type": "effect_resolve", "target": self.owner.user_id, "aspect": "reshuffle"}
 
 class DrainEffect(Effect):
     def __init__(self, template, owner, target, card):

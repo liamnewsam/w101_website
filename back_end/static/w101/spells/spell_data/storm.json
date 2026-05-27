@@ -94,7 +94,8 @@
         ],
         "image": "static/w101/spells/storm/(Spell)_Storm_Shield.png",
         "id": "storm_shield",
-        "accuracy": 100
+        "accuracy": 100,
+        "pvp_level": 10
     },
     {
         "name": "Wild Bolt",
@@ -200,21 +201,7 @@
         "accuracy": 65,
         "pvp_level": 100
     },
-    {
-        "name": "Stormwing",
-        "school": "storm",
-        "type": "damage",
-        "pips": 5,
-        "description": "Deals 515 Storm Damage to target and applies a +30% outgoing Storm Damage Aura for 4 Rounds on self",
-        "effects": [
-            {"type": "damage", "school": "storm", "amount": 515, "target": "enemy"},
-            {"type": "aura", "school": "storm", "amount": 30, "rounds": 4, "target": "self"}
-        ],
-        "image": "static/w101/spells/storm/(Spell)_Stormwing.png",
-        "id": "stormwing",
-        "accuracy": 70,
-        "pvp_level": 60
-    },
+    
     {
         "name": "Storm Owl",
         "school": "storm",
@@ -478,7 +465,8 @@
         ],
         "image": "static/w101/spells/storm/(Spell)_Catalan.png",
         "id": "catalan",
-        "accuracy": 65
+        "accuracy": 65,
+        "pvp_level": 40
     }, 
     {
         "name": "Thermic Shield",
@@ -494,21 +482,7 @@
         "id": "thermic_shield",
         "accuracy": 100
     },
-    {
-        "name": "Jupiter's Might",
-        "school": "storm",
-        "type": "damage",
-        "pips": 7,
-        "description": "Deals 730 Storm Damage to and applies a +35% incoming Damage Aura of caster's School for 4 Rounds on target",
-        "effects": [
-            {"type": "damage", "school": "storm", "amount": 730, "target": "enemy_same"},
-            {"type": "aura", "aspect": "damage_incoming", "school": "caster", "amount": 35, "rounds": 4, "target": "enemy_same"}
-        ],
-        "image": "static/w101/spells/storm/(Spell)_Jupiter's_Might.png",
-        "id": "jupiter's_might",
-        "accuracy": 70,
-        "pvp_level": 90
-    },
+    
     {
         "name": "Jinn's Restoration",
         "school": "storm",
@@ -575,11 +549,24 @@
         "description": "Deals 375 Storm Damage to target and extends the duration of a Heal over Time effect by 2 Rounds on caster",
         "effects": [
             {"type": "damage", "school": "storm", "amount": 375, "target": "enemy"},
-            {"type": "extend", "aspect": "HoT", "rounds": 2, "target": "self"}
+            {
+                "type": "repeat",
+                "up_to": 1,
+                "condition": {"type": "amount", "aspect": "HoT", "amount": 1, "target": "self"},
+                "effects": [{
+                    "type": "extend",
+                    "aspect": "HoT",
+                    "amount": 2,
+                    "target": "self"
+                }]
+                
+            }
+            
         ],
         "image": "static/w101/spells/storm/(Spell)_Revolutionary_Strike.png",
         "id": "revolutionary_strike",
-        "accuracy": 65
+        "accuracy": 65,
+        "pvp_level": 40
     },
     {
         "name": "Reap the Whirlwind",

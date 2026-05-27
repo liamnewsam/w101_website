@@ -6,13 +6,15 @@ from Card import *
 from Deck import *
 from utils import *
 
-def createBotPlayer(name, bot_id, image_path, school="random", deck=None, difficulty="easy"):
-    
+def createBotPlayer(name, bot_id, image_path, school="random", deck=None, difficulty="easy", level=1):
+    from stats import compute_stats, compute_school_chart
     if school == "random":
         school = random.choice(list(DECK_MASTER[difficulty].keys()))
     if deck is None:
         deck = DECK_MASTER[difficulty][school]()
-    return Player(name, bot_id, school, deck, isBot=True, img_path=image_path)
+    base_stats   = compute_stats(level, school)
+    school_chart = compute_school_chart(level, school)
+    return Player(name, bot_id, school, deck, isBot=True, img_path=image_path, base_stats=base_stats, school_chart=school_chart)
     
     #return Player(name, bot_id, school, contrived_enemy_deck(), isBot=True, img_path=image_path)
 
@@ -389,7 +391,10 @@ class Game():
                 
 
             player.deck.play_hand.pop(card_index)
-            player.deck.play_discard.append(card)
+            if card.card_def.reshuffle:
+                player.deck.play_discard.append(card)
+            else:
+                print("Card is removed from play")
         
         #for message in log:
         #    print(message)
@@ -521,6 +526,8 @@ class Game():
                 for dot in target.dots:
                     if dot.rounds > 1:
                         return True
+            if condition["aspect"] == "HoT" and len(target.hots) >= condition["amount"]:
+                return True
 
         return False
     

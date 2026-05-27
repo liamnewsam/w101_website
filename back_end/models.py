@@ -3,6 +3,9 @@ from sqlalchemy.sql import func
 #----------------
 from database import Base
 
+SCHOOLS_LIST = ["fire", "ice", "storm", "life", "death", "myth", "balance"]
+_WINS_PER_LEVEL = 5
+
 class User(Base):
     __tablename__ = "users"
 
@@ -31,15 +34,22 @@ class PlayerState(Base):
     wins = Column(Integer, default=0)
     losses = Column(Integer, default=0)
 
-    # Elo rating — level is derived from this
+    # Per-school win counts — drives per-school leveling
+    school_wins = Column(JSON, default=dict)
+
+    # Elo rating — used for matchmaking
     elo = Column(Integer, default=100)
 
     image_path = Column(String)
 
+    def _compute_school_level(self, school: str) -> int:
+        """Return the level for a specific school based on wins with that school."""
+        sw = (self.school_wins or {}).get(school.lower(), 0)
+        return min(100, sw // _WINS_PER_LEVEL + 1)
+
     def _compute_level(self):
-        elo = self.elo or 100
-        # Level 1 at 100 Elo, +1 level per 50 Elo, capped at 100
-        return max(1, min(100, (elo - 100) // 50 + 1))
+        """Return the level for the player's currently active school."""
+        return self._compute_school_level(self.school or "balance")
 
     def _selected_deck(self):
         """Return the currently selected deck dict (falls back to legacy deck field)."""
@@ -53,6 +63,7 @@ class PlayerState(Base):
         wins = self.wins or 0
         losses = self.losses or 0
         decks = self.decks or []
+        school_levels = {s: self._compute_school_level(s) for s in SCHOOLS_LIST}
         return {
             "name": self.name,
             "school": self.school,
@@ -64,7 +75,8 @@ class PlayerState(Base):
             "wins": wins,
             "losses": losses,
             "elo": self.elo or 100,
-            "level": self._compute_level(),
+            "level": self._compute_level(),          # active school's level
+            "school_levels": school_levels,           # all seven school levels
         }
 
 

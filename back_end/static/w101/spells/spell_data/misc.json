@@ -164,5 +164,140 @@
         "id": "iron_sultan",
         "accuracy": 70,
         "pvp_level": 118
+    },
+    {
+        "name": "Brave Sir Badger",
+        "school": "balance",
+        "type": "damage",
+        "pips": {
+            "regular": 3,
+            "balance": 1
+        },
+        "description": "Deals 390 Balance Damage to target and applies a +25% outgoing Damage Aura on caster for 4 Rounds",
+        "effects": [
+            {
+                "type": "damage",
+                "school": "balance",
+                "amount": 390,
+                "target": "enemy"
+            },
+            {
+                "type": "aura",
+                "amount": 25,
+                "rounds": 4,
+                "target": "self"
+            }
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Brave_Sir_Badger.png",
+        "id": "brave_sir_badger",
+        "accuracy": 80,
+        "pvp_level": 50
+    },
+    {
+        "name": "Courageous Charge",
+        "school": "balance",
+        "type": "damage",
+        "pips": 2,
+        "description": "Deals 130 Balance Damage to target and applies a +20% outgoing Armor Piercing Aura on caster for 4 Rounds if target has a helpful Aura",
+        "effects": [
+            {
+                "type": "gambit",
+                "condition": {
+                    "type": "amount",
+                    "aspect": "aura_positive",
+                    "amount": 1,
+                    "target": "enemy"
+                },
+                "true": [
+                    {
+                        "type": "damage",
+                        "school": "balance",
+                        "amount": 130,
+                        "target": "enemy"
+                    },
+                    {
+                        "type": "aura",
+                        "aspect": "armor_piercing",
+                        "amount": 20,
+                        "rounds": 4,
+                        "target": "self"
+                    }
+                ],
+                "false": [
+                    {
+                        "type": "damage",
+                        "school": "balance",
+                        "amount": 130,
+                        "target": "enemy"
+                    }
+                ]
+            }
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Courageous_Charge.png",
+        "id": "courageous_charge",
+        "accuracy": 85,
+        "pvp_level": 75
+    },
+    {
+        "name": "Pluto's Peril",
+        "school": "death",
+        "type": "damage",
+        "pips": 7,
+        "description": "Deals 500 Death Damage to and applies a -25% outgoing Damage Aura for 4 Rounds on target",
+        "effects": [
+            {"type": "damage", "school": "death", "amount": 500, "target": "enemy_same"},
+            {"type": "aura", "school": "death", "amount": -25, "rounds": 4, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/death/(Spell)_Pluto's_Peril.png",
+        "id": "pluto's_peril",
+        "accuracy": 85,
+        "pvp_level": 90
+    },
+    {
+        "name": "The World",
+        "school": "life",
+        "type": "damage",
+        "pips": 10,
+        "description": "Deals 680 Life Damage and 210 Life Damage after 3 Rounds to target and applies a -25% incoming Damage Aura for 4 Rounds on caster",
+        "effects": [
+            {"type": "damage", "school": "life", "amount": 680, "target": "enemy_same"},
+            {"type": "DoT", "school": "life", "amount": 210, "rounds": 3, "wait": true, "target": "enemy_same"},
+            {"type": "aura", "aspect": "damage_incoming", "amount": -25, "rounds": 4, "target": "self"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_The_World.png",
+        "id": "the_world",
+        "accuracy": 90,
+        "pvp_level": 170
+    },
+    {
+        "name": "Stormwing",
+        "school": "storm",
+        "type": "damage",
+        "pips": 5,
+        "description": "Deals 515 Storm Damage to target and applies a +30% outgoing Storm Damage Aura for 4 Rounds on self",
+        "effects": [
+            {"type": "damage", "school": "storm", "amount": 515, "target": "enemy"},
+            {"type": "aura", "school": "storm", "amount": 30, "rounds": 4, "target": "self"}
+        ],
+        "image": "static/w101/spells/storm/(Spell)_Stormwing.png",
+        "id": "stormwing",
+        "accuracy": 70,
+        "pvp_level": 60
+    },
+    {
+        "name": "Jupiter's Might",
+        "school": "storm",
+        "type": "damage",
+        "pips": 7,
+        "description": "Deals 730 Storm Damage to and applies a +35% incoming Damage Aura of caster's School for 4 Rounds on target",
+        "effects": [
+            {"type": "damage", "school": "storm", "amount": 730, "target": "enemy_same"},
+            {"type": "aura", "aspect": "damage_incoming", "school": "caster", "amount": 35, "rounds": 4, "target": "enemy_same"}
+        ],
+        "image": "static/w101/spells/storm/(Spell)_Jupiter's_Might.png",
+        "id": "jupiter's_might",
+        "accuracy": 70,
+        "pvp_level": 90
     }
+
 ]

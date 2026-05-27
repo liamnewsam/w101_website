@@ -109,22 +109,7 @@
         "id": "life_trap",
         "accuracy": 100
     },
-    {
-        "name": "The World",
-        "school": "life",
-        "type": "damage",
-        "pips": 10,
-        "description": "Deals 680 Life Damage and 210 Life Damage after 3 Rounds to target and applies a -25% incoming Damage Aura for 4 Rounds on caster",
-        "effects": [
-            {"type": "damage", "school": "life", "amount": 680, "target": "enemy_same"},
-            {"type": "DoT", "school": "life", "amount": 210, "rounds": 3, "wait": true, "target": "enemy_same"},
-            {"type": "aura", "aspect": "damage_incoming", "amount": -25, "rounds": 4, "target": "self"}
-        ],
-        "image": "static/w101/spells/life/(Spell)_The_World.png",
-        "id": "the_world",
-        "accuracy": 90,
-        "pvp_level": 170
-    },
+    
     {
         "name": "Life Weakness",
         "school": "life",
@@ -179,7 +164,8 @@
         ],
         "image": "static/w101/spells/life/(Spell)_Mass_Triage.png",
         "id": "mass_triage",
-        "accuracy": 100
+        "accuracy": 100,
+        "pvp_level": 72
     },
     {
         "name": "Tranquility",
@@ -311,7 +297,8 @@
         ],
         "image": "static/w101/spells/life/(Spell)_Spirit_Armor.png",
         "id": "spirit_armor",
-        "accuracy": 100
+        "accuracy": 100,
+        "pvp_level": 38
     },
     {
         "name": "Phoebus' Will",
@@ -520,7 +507,8 @@
         ],
         "image": "static/w101/spells/life/(Spell)_Burrowing_Bane.png",
         "id": "burrowing_bane",
-        "accuracy": 90
+        "accuracy": 90,
+        "pvp_level": 40
     },
     {
         "name": "Seraph",
@@ -590,7 +578,8 @@
         ],
         "image": "static/w101/spells/life/(Spell)_Goat_Monk.png",
         "id": "goat_monk",
-        "accuracy": 85
+        "accuracy": 85,
+        "pvp_level": 42
     },
     {
         "name": "Sanctuary",

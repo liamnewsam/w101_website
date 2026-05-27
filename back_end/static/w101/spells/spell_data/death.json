@@ -11,7 +11,8 @@
         ],
         "image": "static/w101/spells/death/(Spell)_Kiiii-Yaaaa!.png",
         "id": "kiiii-yaaaa!",
-        "accuracy": 80
+        "accuracy": 80,
+        "pvp_level": 35
     },
     {
         "name": "Oni's Morbidity",
@@ -114,7 +115,8 @@
         ],
         "image": "static/w101/spells/death/(Spell)_Monk_of_Mourning.png",
         "id": "monk_of_mourning",
-        "accuracy": 80
+        "accuracy": 80,
+        "pvp_level": 42
     },
     {
         "name": "Curse",
@@ -195,21 +197,7 @@
         "accuracy": 85,
         "pvp_level": 42
     },
-    {
-        "name": "Pluto's Peril",
-        "school": "death",
-        "type": "damage",
-        "pips": 7,
-        "description": "Deals 500 Death Damage to and applies a -25% outgoing Damage Aura for 4 Rounds on target",
-        "effects": [
-            {"type": "damage", "school": "death", "amount": 500, "target": "enemy_same"},
-            {"type": "aura", "school": "death", "amount": -25, "rounds": 4, "target": "enemy_same"}
-        ],
-        "image": "static/w101/spells/death/(Spell)_Pluto's_Peril.png",
-        "id": "pluto's_peril",
-        "accuracy": 85,
-        "pvp_level": 90
-    },
+    
     {
         "name": "Death Shield",
         "school": "death",
@@ -260,7 +248,8 @@
         ],
         "image": "static/w101/spells/death/(Spell)_Vampire.png",
         "id": "vampire",
-        "accuracy": 85
+        "accuracy": 85,
+        "pvp_level": 26
     },
     {
         "name": "Strangle",
@@ -380,7 +369,8 @@
         ],
         "image": "static/w101/spells/death/(Spell)_Threefold_Fever.png",
         "id": "threefold_fever",
-        "accuracy": 100
+        "accuracy": 100,
+        "pvp_level": 40
     },
     {
         "name": "Age of Reckoning",
@@ -409,7 +399,8 @@
         ],
         "image": "static/w101/spells/death/(Spell)_Lord_of_Night.png",
         "id": "lord_of_night",
-        "accuracy": 85
+        "accuracy": 85,
+        "pvp_level": 42
     },
     {
         "name": "Death Prism",
@@ -546,7 +537,8 @@
         ],
         "image": "static/w101/spells/death/(Spell)_Headless_Horseman.png",
         "id": "headless_horseman",
-        "accuracy": 80
+        "accuracy": 80,
+        "pvp_level": 42
     },
     {
         "name": "Jinn's Larceny",

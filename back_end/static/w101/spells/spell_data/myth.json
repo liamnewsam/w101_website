@@ -218,7 +218,8 @@
         ],
         "image": "static/w101/spells/myth/(Spell)_Wreckin'_Ettin.png",
         "id": "wreckin'_ettin",
-        "accuracy": 75
+        "accuracy": 75,
+        "pvp_level": 38
     },
     {
         "name": "Blood Bat",
@@ -280,7 +281,8 @@
         ],
         "image": "static/w101/spells/myth/(Spell)_Ninja_Pigs.png",
         "id": "ninja_pigs",
-        "accuracy": 75
+        "accuracy": 75,
+        "pvp_level": 50
     },
     {
         "name": "Saturn's Reaping",
@@ -359,7 +361,8 @@
         ],
         "image": "static/w101/spells/myth/(Spell)_Vermin_Virtuoso.png",
         "id": "vermin_virtuoso",
-        "accuracy": 80
+        "accuracy": 80,
+        "pvp_level": 42
     },
     {
         "name": "Hero of Khrysalis",
@@ -373,7 +376,8 @@
         ],
         "image": "static/w101/spells/myth/(Spell)_Hero_of_Khrysalis.png",
         "id": "hero_of_khrysalis",
-        "accuracy": 75
+        "accuracy": 75,
+        "pvp_level": 38
     },
     {
         "name": "Keeper of the Flame",
@@ -387,7 +391,8 @@
         ],
         "image": "static/w101/spells/myth/(Spell)_Keeper_of_the_Flame.png",
         "id": "keeper_of_the_flame",
-        "accuracy": 75
+        "accuracy": 75,
+        "pvp_level": 40
     },
     {
         "name": "Phantastic Jinn",
@@ -425,7 +430,8 @@
         ],
         "image": "static/w101/spells/myth/(Spell)_Athena_Battle_Sight.png",
         "id": "athena_battle_sight",
-        "accuracy": 75
+        "accuracy": 75,
+        "pvp_level": 42
     },
     {
         "name": "Stone Colossus",
@@ -593,7 +599,8 @@
         ],
         "image": "static/w101/spells/myth/(Spell)_Splashsquatch.png",
         "id": "splashsquatch",
-        "accuracy": 75
+        "accuracy": 75,
+        "pvp_level": 40
     },
     {
         "name": "Trickster Oni",
