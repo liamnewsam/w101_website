@@ -80,13 +80,18 @@ def simple_storm():
 
 def simple_fire():
     cards = []
+    '''
     cards.extend([Card(CARD_BY_ID["fire_cat"]) for _ in range(2)])
     cards.extend([Card(CARD_BY_ID["fire_elf"]) for _ in range(3)])
     cards.extend([Card(CARD_BY_ID["glacial_shield"]) for _ in range(2)])
     cards.extend([Card(CARD_BY_ID["sunbird"]) for _ in range(3)])
     cards.extend([Card(CARD_BY_ID["fire_trap"]) for _ in range(3)])
     cards.extend([Card(CARD_BY_ID["fire_weakness"]) for _ in range(3)])
-    return Deck("SimpleStormDeck", cards)
+    '''
+    cards.extend([Card(CARD_BY_ID["fire_elf"]) for _ in range(1)])
+    cards.extend([Card(CARD_BY_ID["fireblade"]) for _ in range(2)])
+    
+    return Deck("SimpleFireDeck", cards)
 
 def simple_ice():
     cards = []
@@ -96,7 +101,7 @@ def simple_ice():
     cards.extend([Card(CARD_BY_ID["evil_snowman"]) for _ in range(2)])
     cards.extend([Card(CARD_BY_ID["tower_shield"]) for _ in range(2)])
     cards.extend([Card(CARD_BY_ID["ice_trap"]) for _ in range(2)])
-    return Deck("SimpleStormDeck", cards)
+    return Deck("SimpleIceDeck", cards)
 
 def simple_death():
     cards = []
@@ -106,7 +111,7 @@ def simple_death():
     cards.extend([Card(CARD_BY_ID["banshee"]) for _ in range(3)])
     cards.extend([Card(CARD_BY_ID["vampire"]) for _ in range(3)])
     cards.extend([Card(CARD_BY_ID["infection"]) for _ in range(3)])
-    return Deck("SimpleStormDeck", cards)
+    return Deck("SimpleDeathDeck", cards)
 
 def simple_myth():
     cards = []
@@ -115,7 +120,7 @@ def simple_myth():
     cards.extend([Card(CARD_BY_ID["myth_trap"]) for _ in range(2)])
     cards.extend([Card(CARD_BY_ID["cyclops"]) for _ in range(3)])
     cards.extend([Card(CARD_BY_ID["ether_shield"]) for _ in range(3)])
-    return Deck("SimpleStormDeck", cards)
+    return Deck("SimpleMythDeck", cards)
 
 def simple_balance():
     cards = []
@@ -125,7 +130,7 @@ def simple_balance():
     cards.extend([Card(CARD_BY_ID["locust_swarm"]) for _ in range(2)])
     cards.extend([Card(CARD_BY_ID["elemental_trap"]) for _ in range(2)])
     cards.extend([Card(CARD_BY_ID["elemental_shield"]) for _ in range(2)])
-    return Deck("SimpleStormDeck", cards)
+    return Deck("SimpleBalanceDeck", cards)
 
 
 DECK_MASTER = {

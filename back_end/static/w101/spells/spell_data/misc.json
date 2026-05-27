@@ -1,0 +1,168 @@
+[
+    {
+        "name": "Take Power",
+        "school": "fire",
+        "type": "manipulation",
+        "pips": 1,
+        "description": "Sacrifices a friendly Minion to give 3 Pips to self",
+        "effects": [],
+        "image": "static/w101/spells/fire/(Spell)_Take_Power.png",
+        "id": "take_power",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Drain Health",
+        "school": "life",
+        "type": "damage",
+        "pips": 1,
+        "description": "Sacrifices a friendly Minion to restore 450 Health to caster",
+        "effects": [
+            {"type": "gambit"}
+        ],
+        "image": "static/w101/spells/life/(Spell)_Drain_Health.png",
+        "id": "drain_health",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Sap Power",
+        "school": "storm",
+        "type": "damage",
+        "pips": 1,
+        "description": "Sacrifices Minion to give 4 Pips to self",
+        "effects": [
+            {"type": "destroy", "target": "minion"},
+            {"type": "pip", "amount": 4, "target": "self"}
+        ],
+        "image": "static/w101/spells/storm/(Spell)_Sap_Power.png",
+        "id": "sap_power",
+        "accuracy": 100,
+        "level": 25,
+        "pvp_level": 25
+    },
+    {
+        "name": "Draw Power",
+        "school": "myth",
+        "type": "damage",
+        "pips": 1,
+        "description": "Sacrifices a friendly Minion to give 2 Pips to caster",
+        "effects": [],
+        "image": "static/w101/spells/myth/(Spell)_Draw_Power.png",
+        "id": "draw_power",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Steal Health",
+        "school": "death",
+        "type": "drain",
+        "pips": 1,
+        "description": "Deals 300 Death Drain Damage to friendly Minion and heals the caster for the Damage dealt",
+        "effects": [],
+        "image": "static/w101/spells/death/(Spell)_Steal_Health.png",
+        "id": "steal_health",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Sap Health",
+        "school": "balance",
+        "type": "damage",
+        "pips": 1,
+        "description": "Sacrifices a friendly Minion to restore 500 Health to caster",
+        "effects": [],
+        "image": "static/w101/spells/balance/(Spell)_Sap_Health.png",
+        "id": "sap_health",
+        "accuracy": 100,
+        "pvp_level": 25
+    },
+    {
+        "name": "Climaclysm",
+        "school": "ice",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 200 Ice Damage and applies a +60% Ice Damage Ward split among selected enemies",
+        "effects": [
+            {"type": "damage", "school": "ice", "amount": 200, "target": "enemy_selected"},
+            {"type": "trap", "school": "ice", "amount": 60, "target": "enemy_selected"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Climaclysm.png",
+        "id": "climaclysm",
+        "accuracy": 80,
+        "pvp_level": 118
+    },
+    {
+        "name": "Sand Wurm",
+        "school": "balance",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 250 Balance Damage and applies a +35% Damage Ward split among selected enemies",
+        "effects": [
+            {"type": "damage", "school": "balance", "amount": 250, "target": "enemy_selected"},
+            {"type": "trap", "amount": 35, "target": "enemy_selected"}
+        ],
+        "image": "static/w101/spells/balance/(Spell)_Sand_Wurm.png",
+        "id": "sand_wurm",
+        "accuracy": 85,
+        "pvp_level": 118
+    },
+    {
+        "name": "Qismah's Curse",
+        "school": "death",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 340 Death Damage split among selected enemies",
+        "effects": [
+            {"type": "damage", "school": "death", "amount": 340, "target": "enemy_select"}
+        ],
+        "image": "static/w101/spells/death/(Spell)_Qismah's_Curse.png",
+        "id": "qismah's_curse",
+        "accuracy": 85,
+        "pvp_level": 118
+    },
+    {
+        "name": "Scorching Scimitars",
+        "school": "fire",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 220 Fire Damage split among selected enemies and restores 420 Health over 3 Rounds to caster",
+        "effects": [
+            {"type": "damage", "school": "fire", "amount": 220, "target": "enemy_select"},
+            {"type": "HoT", "amount": 420, "rounds": 3, "target": "self"}
+        ],
+        "image": "static/w101/spells/fire/(Spell)_Scorching_Scimitars.png",
+        "id": "scorching_scimitars",
+        "accuracy": 75,
+        "pvp_level": 118
+    },
+    {
+        "name": "Snake Charmer",
+        "school": "myth",
+        "type": "damage",
+        "pips": 4,
+        "description": "Applies two Damage over Time effects that each deal 225 Myth Damage over 3 Rounds split among selected enemies",
+        "effects": [
+            {"type": "DoT", "school": "myth", "amount": 225, "rounds": 3, "target": "enemy_selected"},
+            {"type": "DoT", "school": "myth", "amount": 225, "rounds": 3, "target": "enemy_selected"}
+        ],
+        "image": "static/w101/spells/myth/(Spell)_Snake_Charmer.png",
+        "id": "snake_charmer",
+        "accuracy": 80,
+        "pvp_level": 118
+    },
+    {
+        "name": "Iron Sultan",
+        "school": "storm",
+        "type": "damage",
+        "pips": 4,
+        "description": "Deals 495 Storm Damage split among selected enemies",
+        "effects": [
+            {"type": "damage", "school": "storm", "amount": 495, "target": "enemy_select"}
+        ],
+        "image": "static/w101/spells/storm/(Spell)_Iron_Sultan.png",
+        "id": "iron_sultan",
+        "accuracy": 70,
+        "pvp_level": 118
+    }
+]

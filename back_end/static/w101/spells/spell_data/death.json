@@ -6,7 +6,7 @@
         "pips": {"regular": 2, "death": 1},
         "description": "Deals 300 Death Damage to target and applies a +35% Damage Blade on caster",
         "effects": [
-            {"type": "damage", "school": "death", "amount": 300},
+            {"type": "damage", "school": "death", "amount": 300, "target": "enemy"},
             {"type": "charm", "aspect": "damage", "school": "death", "amount": 35, "target": "self"}
         ],
         "image": "static/w101/spells/death/(Spell)_Kiiii-Yaaaa!.png",
@@ -66,8 +66,8 @@
         "description": "Deals 405 Death Damage to and applies two -25% Damage Charms on target",
         "effects": [
             {"type": "damage", "school": "death", "amount": 405, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy_same"},
-            {"type": "charm", "aspect": "damage", "amount": -25, "target": "enemy_same"}
+            {"type": "curse", "aspect": "damage", "amount": -25, "target": "enemy_same"},
+            {"type": "curse", "aspect": "damage", "amount": -25, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/death/(Spell)_Grim_Reader.png",
         "id": "grim_reader",
@@ -109,7 +109,7 @@
         "pips": {"regular": 3, "death": 1},
         "description": "Deals 470 Death Damage to target and applies a -50% Damage Ward on caster",
         "effects": [
-            {"type": "damage", "school": "death", "amount": 470},
+            {"type": "damage", "school": "death", "amount": 470, "target": "enemy"},
             {"type": "shield", "aspect": "damage", "amount": -50, "target": "self"}
         ],
         "image": "static/w101/spells/death/(Spell)_Monk_of_Mourning.png",
@@ -132,11 +132,11 @@
     {
         "name": "Death Weakness",
         "school": "death",
-        "type": "charm",
+        "type": "curse",
         "pips": 0,
         "description": "Applies a -35% Death Damage Charm",
         "effects": [
-            {"type": "charm", "aspect": "damage", "school": "death", "amount": -35, "target": "enemy"}
+            {"type": "curse", "aspect": "damage", "school": "death", "amount": -35, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Death_Weakness.png",
         "id": "death_weakness",
@@ -152,13 +152,13 @@
         "effects": [
             {
                 "type": "gambit", 
-                "condition": {"type": "amount", "aspect": "ward_positive", "amount": 4, "target": "self"}, 
+                "condition": {"type": "amount", "aspect": "ward", "amount": 4, "target": "self"}, 
                 "true": [
-                    {"type": "repeat", "up_to": 4, "effects": [{"type": "destroy", "aspect": "ward_positive", "target": "self"}]},
-                    {"type": "damage", "school": "death", "amount": 1640}
+                    {"type": "repeat", "up_to": 4, "effects": [{"type": "destroy", "aspect": "ward", "target": "self"}]},
+                    {"type": "damage", "school": "death", "amount": 1640, "target": "enemy"}
                 ], 
                 "false": [
-                    {"type": "damage", "school": "death", "amount": 1055}
+                    {"type": "damage", "school": "death", "amount": 1055, "target": "enemy"}
                 ]
             }
         ],
@@ -170,11 +170,11 @@
     {
         "name": "Virulent Plague",
         "school": "death",
-        "type": "charm",
+        "type": "curse",
         "pips": 2,
         "description": "Applies a -40% Damage Charm on all enemies",
         "effects": [
-            {"type": "charm", "aspect": "damage", "amount": -40, "target": "enemy_all"}
+            {"type": "curse", "aspect": "damage", "amount": -40, "target": "enemy_all"}
         ],
         "image": "static/w101/spells/death/(Spell)_Virulent_Plague.png",
         "id": "virulent_plague",
@@ -207,7 +207,8 @@
         ],
         "image": "static/w101/spells/death/(Spell)_Pluto's_Peril.png",
         "id": "pluto's_peril",
-        "accuracy": 0
+        "accuracy": 85,
+        "pvp_level": 90
     },
     {
         "name": "Death Shield",
@@ -223,18 +224,7 @@
         "accuracy": 100,
         "pvp_level": 10
     },
-    {
-        "name": "Steal Health",
-        "school": "death",
-        "type": "drain",
-        "pips": 1,
-        "description": "Deals 300 Death Drain Damage to friendly Minion and heals the caster for the Damage dealt",
-        "effects": [],
-        "image": "static/w101/spells/death/(Spell)_Steal_Health.png",
-        "id": "steal_health",
-        "accuracy": 100,
-        "pvp_level": 25
-    },
+    
     {
         "name": "Macabre Jinn",
         "school": "death",
@@ -244,13 +234,13 @@
         "effects": [
             {
                 "type": "gambit", 
-                "condition": {"type": "amount", "aspect": "charm_positive", "amount": 4, "target": "self"}, 
+                "condition": {"type": "amount", "aspect": "charm", "amount": 4, "target": "self"}, 
                 "true": [
-                    {"type": "repeat", "up_to": 4, "effects": [{"type": "destroy", "aspect": "charm_positive", "target": "self"}]},
-                    {"type": "damage", "school": "death", "amount": 1320}
+                    {"type": "repeat", "up_to": 4, "effects": [{"type": "destroy", "aspect": "charm", "target": "self"}]},
+                    {"type": "damage", "school": "death", "amount": 1320, "target": "enemy"}
                 ], 
                 "false": [
-                    {"type": "damage", "school": "death", "amount": 855}
+                    {"type": "damage", "school": "death", "amount": 855, "target": "enemy"}
                 ]
             }
         ],
@@ -279,7 +269,7 @@
         "pips": 2,
         "description": "Applies a Death Dispel Charm",
         "effects": [
-            {"type": "dispel", "school": "death", "target": "enemy"}
+            {"type": "curse", "aspect": "dispel", "school": "death", "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Strangle.png",
         "id": "strangle",
@@ -322,7 +312,10 @@
         "pips": 0,
         "description": "Deals 5% max Health Damage to caster to give 3 Pips to caster",
         "effects": [
-            {"type": "empower"}
+            {"type": "damage", "school": "death", "amountType": "player_max", "amount": 5, "target": "self"},
+            {"type": "pip", "target": "self"},
+            {"type": "pip", "target": "self"},
+            {"type": "pip", "target": "self"}
         ],
         "image": "static/w101/spells/death/(Spell)_Empower.png",
         "id": "empower",
@@ -336,7 +329,7 @@
         "pips": 5,
         "description": "Deals 430-510 Death Damage",
         "effects": [
-            {"type": "damage", "school": "death", "min": 430, "max": 510}
+            {"type": "damage", "school": "death", "min": 430, "max": 510, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Skeletal_Pirate.png",
         "id": "skeletal_pirate",
@@ -416,7 +409,7 @@
         ],
         "image": "static/w101/spells/death/(Spell)_Lord_of_Night.png",
         "id": "lord_of_night",
-        "accuracy": 0
+        "accuracy": 85
     },
     {
         "name": "Death Prism",
@@ -438,7 +431,7 @@
         "pips": 3,
         "description": "Deals 245-305 Death Damage",
         "effects": [
-            {"type": "damage", "school": "death", "min": 245, "max": 305}
+            {"type": "damage", "school": "death", "min": 245, "max": 305, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Banshee.png",
         "id": "banshee",
@@ -464,7 +457,7 @@
         "pips": 1,
         "description": "Deals 65-105 Death Damage",
         "effects": [
-            {"type": "damage", "school": "death", "min": 65, "max": 105}
+            {"type": "damage", "school": "death", "min": 65, "max": 105, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Dark_Sprite.png",
         "id": "dark_sprite",
@@ -477,7 +470,7 @@
         "pips": 10,
         "description": "Deals 780 Death Damage to target and applies a +35% Death Damage Charm and -50% Damage Ward on caster",
         "effects": [
-            {"type": "damage", "school": "death", "amount": 780},
+            {"type": "damage", "school": "death", "amount": 780, "target": "enemy"},
             {"type": "charm", "aspect": "damage", "school": "death", "amount": 35, "target": "self"},
             {"type": "shield", "aspect": "damage", "amount": -50, "target": "self"}
         ],
@@ -493,7 +486,7 @@
         "pips": 6,
         "description": "Deals 405 Death Damage to target and applies a -20% Damage Charm on all enemies",
         "effects": [
-            {"type": "damage", "school": "death", "amount": 405},
+            {"type": "damage", "school": "death", "amount": 405, "target": "enemy"},
             {"type": "curse", "aspect": "damage", "amount": -20, "target": "enemy_all"}
         ],
         "image": "static/w101/spells/death/(Spell)_Winged_Sorrow.png",
@@ -549,7 +542,7 @@
         "pips": {"regular": 3, "death": 1},
         "description": "Deals 530-590 Death Damage",
         "effects": [
-            {"type": "damage", "school": "death", "min": 530, "max": 590}
+            {"type": "damage", "school": "death", "min": 530, "max": 590, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Headless_Horseman.png",
         "id": "headless_horseman",
@@ -584,7 +577,7 @@
         "pips": 4,
         "description": "Deals 140 Death Damage and applies a +25% Death Damage Global",
         "effects": [
-            {"type": "damage", "school": "death", "amount": 140},
+            {"type": "damage", "school": "death", "amount": 140, "target": "enemy"},
             {"type": "global", "aspect": "damage", "school": "death", "amount": 25}
         ],
         "image": "static/w101/spells/death/(Spell)_Crimson_Phantom.png",
@@ -628,7 +621,16 @@
         "pips": 6,
         "description": "Deals 535 Death Damage to target, and removes up to three harmful Charms from target to deal an additional 130 Death Damage per harmful Charm removed",
         "effects": [
-            {"type": "damage", "school": "death", "amount": 535}
+            {"type": "damage", "school": "death", "amount": 535, "target": "enemy_same"},
+            {
+                "type": "repeat", 
+                "up_to": 3, 
+                "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "enemy_same"}, 
+                "effects": [
+                    {"type": "destroy", "aspect": "curse", "target": "enemy_same"},
+                    {"type": "damage", "school": "death", "amount": 130, "target": "enemy_same"}
+                ]
+            }
         ],
         "image": "static/w101/spells/death/(Spell)_Monster_Mash.png",
         "id": "monster_mash",
@@ -641,10 +643,11 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes a Heal over Time effect from target to apply two -65% Healing Charms on target",
+        "condition": {"type": "amount", "aspect": "HoT", "amount": 1, "target": "enemy"},
         "effects": [
             {"type": "destroy", "aspect": "HoT", "target": "enemy_same"},
-            {"type": "curse", "aspect": "heal", "amount": 10, "target": "enemy_same"},
-            {"type": "curse", "aspect": "heal", "amount": 10, "target": "enemy_same"}
+            {"type": "curse", "aspect": "heal", "amount": -65, "target": "enemy_same"},
+            {"type": "curse", "aspect": "heal", "amount": -65, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/death/(Spell)_Contagion.png",
         "id": "contagion",
@@ -681,7 +684,7 @@
         "pips": 7,
         "description": "Deals 665 Death Damage",
         "effects": [
-            {"type": "damage", "school": "death", "amount": 665}
+            {"type": "damage", "school": "death", "amount": 665, "target": "enemy"}
         ],
         "image": "static/w101/spells/death/(Spell)_Anubis.png",
         "id": "anubis",

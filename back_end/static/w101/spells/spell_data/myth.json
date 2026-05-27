@@ -5,9 +5,9 @@
         "type": "manipulation",
         "pips": 0,
         "description": "Removes a helpful Ward",
-        "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"},
+        "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"},
         "effects": [
-            {"type": "destroy", "aspect": "ward_positive", "target": "enemy"}
+            {"type": "destroy", "aspect": "ward", "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Pierce.png",
         "id": "pierce",
@@ -42,7 +42,7 @@
                 "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "self"}, 
                 "effects": [
                     {"type": "destroy", "aspect": "curse", "target": "self"},
-                    {"type": "DoT", "school": "myth", "amount": 60, "rounds": 3, "wait": true}
+                    {"type": "DoT", "school": "myth", "amount": 60, "rounds": 3, "wait": true, "target": "enemy"}
                 ]
             }
         ],
@@ -154,7 +154,7 @@
         "school": "myth",
         "type": "ward",
         "pips": 0,
-        "description": "-70% next Inc.",
+        "description": "Applies -70% Life and Death Damage Wards.",
         "effects": [
             {"type": "shield", "aspect": "damage", "school": "life", "amount": -70, "target": "ally_same"},
             {"type": "shield", "aspect": "damage", "school": "death", "amount": -70, "target": "ally_same"}
@@ -177,7 +177,7 @@
                 "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "self"}, 
                 "effects": [
                     {"type": "destroy", "aspect": "curse", "target": "self"},
-                    {"type": "trap", "school": "myth", "amount": 15}
+                    {"type": "trap", "school": "myth", "amount": 15, "target": "enemy"}
                 ]
             }
         ],
@@ -193,7 +193,7 @@
         "pips": 3,
         "description": "Deals 265-325 Myth Damage",
         "effects": [
-            {"type": "damage", "school": "myth", "min": 265, "max": 325}
+            {"type": "damage", "school": "myth", "min": 265, "max": 325, "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Cyclops.png",
         "id": "cyclops",
@@ -209,9 +209,9 @@
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "ward_positive", "target": "enemy_same"}
+                    {"type": "destroy", "aspect": "ward", "target": "enemy_same"}
                 ]
             },
             {"type": "damage", "school": "myth", "amount": 395, "target": "enemy_same"}
@@ -227,11 +227,11 @@
         "pips": 1,
         "description": "Deals 70-110 Myth Damage",
         "effects": [
-            {"type": "damage", "school": "myth", "min": 70, "max": 110}
+            {"type": "damage", "school": "myth", "min": 70, "max": 110, "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Blood_Bat.png",
         "id": "blood_bat",
-        "accuracy": 0
+        "accuracy": 80
     },
     {
         "name": "Myth Shield",
@@ -257,9 +257,9 @@
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "ward_positive", "target": "enemy"},
+                    {"type": "destroy", "aspect": "ward", "target": "enemy"},
                     {"type": "shield", "aspect": "damage", "amount": -20, "target": "self"}
                 ]
             }
@@ -276,7 +276,7 @@
         "pips": {"regular": 4, "myth": 1},
         "description": "Deals 685 Myth Damage",
         "effects": [
-            {"type": "damage", "school": "myth", "amount": 685}
+            {"type": "damage", "school": "myth", "amount": 685, "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Ninja_Pigs.png",
         "id": "ninja_pigs",
@@ -304,7 +304,7 @@
         "pips": 2,
         "description": "Deals 170-210 Myth Damage",
         "effects": [
-            {"type": "damage", "school": "myth", "min": 170, "max": 210}
+            {"type": "damage", "school": "myth", "min": 170, "max": 210, "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Troll.png",
         "id": "troll",
@@ -316,9 +316,9 @@
         "type": "manipulation",
         "pips": 0,
         "description": "Removes a harmful Ward",
-        "condition": {"type": "amount", "aspect": "ward_negative", "amount": 1, "target": "ally"},
+        "condition": {"type": "amount", "aspect": "jinx", "amount": 1, "target": "ally"},
         "effects": [
-            {"type": "destroy", "aspect": "ward_negative", "target": "ally"}
+            {"type": "destroy", "aspect": "jinx", "target": "ally"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Cleanse_Ward.png",
         "id": "cleanse_ward",
@@ -330,14 +330,14 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes up to three helpful Wards from target to apply up to three +15% Myth Damage Traps on target",
-        "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}, 
+        "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"}, 
         "effects": [
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "ward_positive", "target": "enemy_same"},
+                    {"type": "destroy", "aspect": "ward", "target": "enemy_same"},
                     {"type": "trap", "school": "myth", "amount": 15, "target": "enemy_same"}
                 ]
             }
@@ -354,12 +354,12 @@
         "pips": 4,
         "description": "Deals 145 Myth Damage to target and applies a +25% Myth Damage Global",
         "effects": [
-            {"type": "damage", "school": "myth", "amount": 145},
+            {"type": "damage", "school": "myth", "amount": 145, "target": "enemy"},
             {"type": "global", "aspect": "damage", "school": "myth", "amount": 25}
         ],
         "image": "static/w101/spells/myth/(Spell)_Vermin_Virtuoso.png",
         "id": "vermin_virtuoso",
-        "accuracy": 0
+        "accuracy": 80
     },
     {
         "name": "Hero of Khrysalis",
@@ -383,7 +383,7 @@
         "description": "Deals 400 Myth Damage to and applies a +35% Damage Trap of caster's School on target",
         "effects": [
             {"type": "damage", "school": "myth", "amount": 400, "target": "enemy_same"},
-            {"type": "trap", "school": "self", "amount": 35, "target": "enemy_same"}
+            {"type": "trap", "school": "player", "amount": 35, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Keeper_of_the_Flame.png",
         "id": "keeper_of_the_flame",
@@ -398,13 +398,13 @@
         "effects": [
             {
                 "type": "gambit", 
-                "condition": {"type": "amount", "aspect": "ward_positive", "amount": 4, "target": "self"}, 
+                "condition": {"type": "amount", "aspect": "ward", "amount": 4, "target": "self"}, 
                 "true": [
-                    {"type": "destroy", "aspect": "ward_positive", "target": "self", "times": 4},
-                    {"type": "damage", "school": "myth", "amount": 1730}
+                    {"type": "destroy", "aspect": "ward", "target": "self", "times": 4},
+                    {"type": "damage", "school": "myth", "amount": 1730, "target": "enemy"}
                 ], 
                 "false": [
-                    {"type": "damage", "school": "myth", "amount": 1120}
+                    {"type": "damage", "school": "myth", "amount": 1120, "target": "enemy"}
                 ]
             }
         ],
@@ -420,7 +420,7 @@
         "pips": {"regular": 3, "myth": 1},
         "description": "Deals 520 Myth Damage to target and applies a -35% Damage Ward on caster",
         "effects": [
-            {"type": "damage", "school": "myth", "amount": 520},
+            {"type": "damage", "school": "myth", "amount": 520, "target": "enemy"},
             {"type": "shield", "aspect": "damage", "amount": -35, "target": "self"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Athena_Battle_Sight.png",
@@ -434,7 +434,7 @@
         "pips": 6,
         "description": "Deals 560-640 Myth Damage",
         "effects": [
-            {"type": "damage", "school": "myth", "min": 560, "max": 640}
+            {"type": "damage", "school": "myth", "min": 560, "max": 640, "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Stone_Colossus.png",
         "id": "stone_colossus",
@@ -476,7 +476,7 @@
         "description": "Deals 945 Myth Damage after 3 Rounds, removes 1 positive Ward from target, and applies a +10% Myth Armor Piercing Charm on self",
         "effects": [
             {"type": "DoT", "school": "myth", "amount": 945, "rounds": 3, "wait": true, "target": "enemy_same"},
-            {"type": "destroy", "aspect": "ward_positive", "target": "enemy_same"},
+            {"type": "destroy", "aspect": "ward", "target": "enemy_same"},
             {"type": "charm", "aspect": "armor_piercing", "school": "myth", "amount": 10, "target": "self"}
         ],
         "image": "static/w101/spells/myth/(Spell)_King_Artorius_(Myth).png",
@@ -497,29 +497,6 @@
         "id": "mass_myth_prism",
         "accuracy": 100,
         "pvp_level": 70
-    },
-    {
-        "name": "Siphon Health",
-        "school": "myth",
-        "type": "damage",
-        "pips": 1,
-        "description": "Sacrifices Minion to restore 400 Health to self",
-        "effects": [],
-        "image": "static/w101/spells/myth/(Spell)_Siphon_Health.png",
-        "id": "siphon_health",
-        "accuracy": 100
-    },
-    {
-        "name": "Draw Power",
-        "school": "myth",
-        "type": "damage",
-        "pips": 1,
-        "description": "Sacrifices a friendly Minion to give 2 Pips to caster",
-        "effects": [],
-        "image": "static/w101/spells/myth/(Spell)_Draw_Power.png",
-        "id": "draw_power",
-        "accuracy": 100,
-        "pvp_level": 25
     },
     {
         "name": "Mythblade",
@@ -582,28 +559,14 @@
         "pips": 2,
         "description": "Applies a Myth Dispel Charm",
         "effects": [
-            {"type": "dispel", "school": "myth", "target": "enemy"}
+            {"type": "curse", "aspect": "dispel", "school": "myth", "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Vaporize.png",
         "id": "vaporize",
         "accuracy": 100,
         "pvp_level": 22
     },
-    {
-        "name": "Snake Charmer",
-        "school": "myth",
-        "type": "damage",
-        "pips": 4,
-        "description": "Applies two Damage over Time effects that each deal 225 Myth Damage over 3 Rounds split among selected enemies",
-        "effects": [
-            {"type": "DoT", "school": "myth", "amount": 225, "rounds": 3, "target": "enemy_selected"},
-            {"type": "DoT", "school": "myth", "amount": 225, "rounds": 3, "target": "enemy_selected"}
-        ],
-        "image": "static/w101/spells/myth/(Spell)_Snake_Charmer.png",
-        "id": "snake_charmer",
-        "accuracy": 80,
-        "pvp_level": 118
-    },
+    
     {
         "name": "Barbarian's Saga",
         "school": "myth",
@@ -612,7 +575,7 @@
         "description": "Deals 425 Myth Damage and 220 Myth Damage after three Rounds",
         "effects": [
             {"type": "damage", "school": "myth", "amount": 425, "target": "enemy_same"},
-            {"type": "DoT", "school": "myth", "amount": 220, "rounds": 3, "wait": true}
+            {"type": "DoT", "school": "myth", "amount": 220, "rounds": 3, "wait": true, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Barbarians_Saga.png",
         "id": "barbarians_saga",
@@ -626,7 +589,7 @@
         "pips": {"regular": 2, "myth": 1},
         "description": "Deals 425-525 Myth Damage",
         "effects": [
-            {"type": "damage", "school": "myth", "min": 425, "max": 525}
+            {"type": "damage", "school": "myth", "min": 425, "max": 525, "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Splashsquatch.png",
         "id": "splashsquatch",
@@ -647,7 +610,8 @@
                     {"type": "damage", "school": "myth", "amount": 1665, "target": "enemy_same"}
                 ], 
                 "false": [
-                    {"type": "DoT", "school": "myth", "amount": 430, "rounds": 5, "times": 2, "wait": true}
+                    {"type": "DoT", "school": "myth", "amount": 430, "rounds": 5, "wait": true, "target": "enemy_same"},
+                    {"type": "DoT", "school": "myth", "amount": 430, "rounds": 5, "wait": true, "target": "enemy_same"}
                 ]
             }
         ],
@@ -663,7 +627,7 @@
         "pips": 3,
         "description": "Deals 310 Myth Damage",
         "effects": [
-            {"type": "damage", "school": "myth", "amount": 310}
+            {"type": "damage", "school": "myth", "amount": 310, "target": "enemy"}
         ],
         "image": "static/w101/spells/myth/(Spell)_Gobbler.png",
         "id": "gobbler",
@@ -677,7 +641,7 @@
         "pips": 2,
         "description": "Removes three harmful Charms from target",
         "effects": [
-            {"type": "repeat", "up_to": 3, "effects": [{"type": "destroy", "aspect": "curse", "target": "ally_same"}]}
+            {"type": "repeat", "up_to": 3, "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "enemy"}, "effects": [{"type": "destroy", "aspect": "curse", "target": "enemy_same"}]}
         ],
         "image": "static/w101/spells/myth/(Spell)_Purge.png",
         "id": "purge",

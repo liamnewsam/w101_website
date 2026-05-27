@@ -6,7 +6,7 @@
         "pips": 7,
         "description": "Deals 975 Storm Damage",
         "effects": [
-            {"type": "damage", "school": "storm", "amount": 975}
+            {"type": "damage", "school": "storm", "amount": 975, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Heqet.png",
         "id": "heqet",
@@ -22,7 +22,6 @@
         "effects": [
             {"type": "heal", "amount": 385, "target": "ally_same"},
             {"type": "HoT", "amount": 75, "rounds": {"min": 3, "max": 5}, "target": "ally_same"}
-
         ],
         "image": "static/w101/spells/storm/(Spell)_Healing_Current.png",
         "id": "healing_current",
@@ -36,7 +35,7 @@
         "pips": 6,
         "description": "Deals 675 Storm Damage to target and applies a +15%, +45%, or +60% Storm Damage Charm on caster",
         "effects": [
-            {"type": "damage", "school": "storm", "amount": 675},
+            {"type": "damage", "school": "storm", "amount": 675, "target": "enemy"},
             {"type": "charm", "aspect": "damage", "school": "storm", "amount": [15, 45, 60], "target": "self"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Rusalka's_Wrath.png",
@@ -51,12 +50,11 @@
         "pips": 2,
         "description": "Applies a Storm Dispel Charm",
         "effects": [
-            {"type": "dispel", "school": "storm", "target": "enemy"}
+            {"type": "curse", "aspect": "dispel", "school": "storm", "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Dissipate.png",
         "id": "dissipate",
         "accuracy": 100,
-        "level": 22,
         "pvp_level": 22
     },
     {
@@ -66,12 +64,11 @@
         "pips": 3,
         "description": "Deals 375-435 Storm Damage",
         "effects": [
-            {"type": "damage", "min": 375, "max": 435}
+            {"type": "damage", "school": "storm", "min": 375, "max": 435, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Storm_Shark.png",
         "id": "storm_shark",
-        "accuracy": 70,
-        "level": 10
+        "accuracy": 70
     },
     {
         "name": "Storm Prism",
@@ -97,8 +94,7 @@
         ],
         "image": "static/w101/spells/storm/(Spell)_Storm_Shield.png",
         "id": "storm_shield",
-        "accuracy": 100,
-        "level": 10
+        "accuracy": 100
     },
     {
         "name": "Wild Bolt",
@@ -107,7 +103,7 @@
         "pips": 2,
         "description": "Deals 10 Storm Damage, 100 Storm Damage, or 1,000 Storm Damage",
         "effects": [
-            {"type": "damage", "school": "storm", "amount": [10, 100, 1000]}
+            {"type": "damage", "school": "storm", "amount": [10, 100, 1000], "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Wild_Bolt.png",
         "id": "wild_bolt",
@@ -127,7 +123,6 @@
         "image": "static/w101/spells/storm/(Spell)_Astraphobia.png",
         "id": "astraphobia",
         "accuracy": 100,
-        "level": 97,
         "pvp_level": 97
     },
     {
@@ -137,7 +132,7 @@
         "pips": 6,
         "description": "Deals 600 Storm Damage to target and restores 450 Health over 3 Rounds to caster",
         "effects": [
-            {"type": "damage", "school": "storm", "amount": 600},
+            {"type": "damage", "school": "storm", "amount": 600, "target": "enemy"},
             {"type": "HoT", "amount": 450, "rounds": 3, "target": "self"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Dark_&_Stormy.png",
@@ -152,9 +147,9 @@
         "pips": 2,
         "description": "Deals 145 Storm Damage to target three times, with each hit having a 20% chance to hit caster instead of target",
         "effects": [
-            {"type": "chance", "options": [
+            {"type": "chance", "times": 3, "options": [
                 {
-                    "chance": 80, 
+                    "chance": 80,
                     "effect": {"type": "damage", "school": "storm", "amount": 145, "target": "enemy_same"}
                 },
                 {
@@ -179,8 +174,7 @@
         ],
         "image": "static/w101/spells/storm/(Spell)_Storm_Trap.png",
         "id": "storm_trap",
-        "accuracy": 100,
-        "level": 16
+        "accuracy": 100
     },
     {
         "name": "Turmoil Oni",
@@ -189,7 +183,17 @@
         "pips": 9,
         "description": "Deals 1,255 Storm Damage to target; or removes four harmful Charms from target to deal 2,145 Storm Damage",
         "effects": [
-            {"type": "gambit"}
+            {
+                "type": "gambit",
+                "condition": {"type": "amount", "aspect": "curse", "amount": 4, "target": "enemy"},
+                "true": [
+                    {"type": "destroy", "aspect": "curse", "target": "enemy", "times": 4},
+                    {"type": "damage", "school": "storm", "amount": 2145, "target": "enemy"}
+                ],
+                "false": [
+                    {"type": "damage", "school": "storm", "amount": 1255, "target": "enemy"}
+                ]
+            }
         ],
         "image": "static/w101/spells/storm/(Spell)_Turmoil_Oni.png",
         "id": "turmoil_oni",
@@ -203,15 +207,13 @@
         "pips": 5,
         "description": "Deals 515 Storm Damage to target and applies a +30% outgoing Storm Damage Aura for 4 Rounds on self",
         "effects": [
-            {"type": "damage", "school": "storm", "amount": 515},
+            {"type": "damage", "school": "storm", "amount": 515, "target": "enemy"},
             {"type": "aura", "school": "storm", "amount": 30, "rounds": 4, "target": "self"}
-
         ],
         "image": "static/w101/spells/storm/(Spell)_Stormwing.png",
         "id": "stormwing",
         "accuracy": 70,
-        "level": 42,
-        "pvp_level": true
+        "pvp_level": 60
     },
     {
         "name": "Storm Owl",
@@ -220,12 +222,11 @@
         "pips": 10,
         "description": "Deals 1,330-1,470 Storm Damage",
         "effects": [
-            {"type": "damage", "school": "storm", "min": 1330, "max": 1470}
+            {"type": "damage", "school": "storm", "min": 1330, "max": 1470, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Storm_Owl.png",
         "id": "storm_owl",
         "accuracy": 70,
-        "level": 80,
         "pvp_level": 80
     },
     {
@@ -249,14 +250,13 @@
         "description": "Removes a Heal over Time effect from target to apply two +35% Healing Charms on caster",
         "condition": {"type": "amount", "aspect": "HoT", "amount": 1, "target": "enemy"},
         "effects": [
-            {"type": "destory", "aspect": "HoT", "target": "enemy"},
+            {"type": "destroy", "aspect": "HoT", "target": "enemy"},
             {"type": "charm", "aspect": "heal", "amount": 35, "target": "self"},
             {"type": "charm", "aspect": "heal", "amount": 35, "target": "self"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Energy_Transfer.png",
         "id": "energy_transfer",
-        "accuracy": 0,
-        "level": 50,
+        "accuracy": 100,
         "pvp_level": 40
     },
     {
@@ -266,12 +266,11 @@
         "pips": 2,
         "description": "Applies a +25% Storm Damage Global",
         "effects": [
-            {"type": "global", "school": "storm", "amount": 25}
+            {"type": "global", "aspect": "damage", "school": "storm", "amount": 25}
         ],
         "image": "static/w101/spells/storm/(Spell)_Darkwind.png",
         "id": "darkwind",
         "accuracy": 100,
-        "level": 30,
         "pvp_level": 30
     },
     {
@@ -281,7 +280,7 @@
         "pips": {"regular": 3, "life": 1},
         "description": "Deals 805 Storm Damage",
         "effects": [
-            {"type": "damage", "school": "storm", "amount": 805}
+            {"type": "damage", "school": "storm", "amount": 805, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Tree_of_Strife.png",
         "id": "tree_of_strife",
@@ -302,7 +301,7 @@
         "image": "static/w101/spells/storm/(Spell)_The_Tower.png",
         "id": "the_tower",
         "accuracy": 70,
-        "level": 170
+        "pvp_level": 170
     },
     {
         "name": "Kraken",
@@ -311,12 +310,11 @@
         "pips": 4,
         "description": "Deals 520-580 Storm Damage",
         "effects": [
-            {"type": "damage", "school": "storm", "min": 520, "max": 580}
+            {"type": "damage", "school": "storm", "min": 520, "max": 580, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Kraken.png",
         "id": "kraken",
         "accuracy": 70,
-        "level": 22,
         "pvp_level": 22
     },
     {
@@ -339,57 +337,38 @@
         "pips": 1,
         "description": "Deals 105-145 Storm Damage",
         "effects": [
-            {"type": "damage", "school": "storm", "min": 105, "max": 145}
+            {"type": "damage", "school": "storm", "min": 105, "max": 145, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Thunder_Snake.png",
         "id": "thunder_snake",
-        "accuracy": 70,
-        "level": 1
+        "accuracy": 70
     },
     {
         "name": "Storm Weakness",
         "school": "storm",
         "type": "curse",
         "pips": 0,
-        "description": "Deals 105-145 Storm Damage",
+        "description": "Applies a -35% Storm Damage Charm.",
         "effects": [
             {"type": "curse", "aspect": "damage", "school": "storm", "amount": -35, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Storm_Weakness.png",
         "id": "storm_weakness",
         "accuracy": 100,
-        "level": 10,
         "pvp_level": 10
-    },
-    {
-        "name": "Sap Power",
-        "school": "storm",
-        "type": "damage",
-        "pips": 1,
-        "description": "Sacrifices Minion to give 4 Pips to self",
-        "effects": [
-            {"type": "destroy", "target": "minion"},
-            {"type": "pip", "amount": 4, "target": "self"}
-        ],
-        "image": "static/w101/spells/storm/(Spell)_Sap_Power.png",
-        "id": "sap_power",
-        "accuracy": 100,
-        "level": 25,
-        "pvp_level": 25
     },
     {
         "name": "Windstorm",
         "school": "storm",
-        "type": ["ward", "all enemies"],
+        "type": "jinx",
         "pips": 1,
         "description": "Applies a +25% Storm Damage Ward on all enemies",
         "effects": [
-            {"type": "trap", "school": "storm", "amount": "25", "target": "enemy_all"}
+            {"type": "trap", "school": "storm", "amount": 25, "target": "enemy_all"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Windstorm.png",
         "id": "windstorm",
         "accuracy": 100,
-        "level": 26,
         "pvp_level": 26
     },
     {
@@ -399,12 +378,11 @@
         "pips": 2,
         "description": "Deals 245-285 Storm Damage",
         "effects": [
-            {"type": "damage", "school": "storm", "min": 245, "max": 285}
+            {"type": "damage", "school": "storm", "min": 245, "max": 285, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Lightning_Bats.png",
         "id": "lightning_bats",
-        "accuracy": 70,
-        "level": 0
+        "accuracy": 70
     },
     {
         "name": "Thunderman",
@@ -413,13 +391,12 @@
         "pips": 4,
         "description": "Deals 205 Storm Damage to target and applies a +25% Storm Damage Global",
         "effects": [
-            {"type": "damage", "school": "storm", "amount": 205},
+            {"type": "damage", "school": "storm", "amount": 205, "target": "enemy"},
             {"type": "global", "school": "storm", "amount": 25, "aspect": "damage"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Thunderman.png",
         "id": "thunderman",
         "accuracy": 70,
-        "level": 45,
         "pvp_level": 45
     },
     {
@@ -442,12 +419,23 @@
         "pips": 7,
         "description": "Deals 830 Storm Damage or removes three Heal over Time effects from caster to deal 2,320 Storm Damage",
         "effects": [
-            {"type": "gambit"}
+            {
+                "type": "gambit",
+                "condition": {"type": "amount", "aspect": "HoT", "amount": 3, "target": "self"},
+                "true": [
+                    {"type": "destroy", "aspect": "HoT", "target": "self"},
+                    {"type": "destroy", "aspect": "HoT", "target": "self"},
+                    {"type": "destroy", "aspect": "HoT", "target": "self"},
+                    {"type": "damage", "school": "storm", "amount": 2320, "target": "enemy"}
+                ],
+                "false": [
+                    {"type": "damage", "school": "storm", "amount": 830, "target": "enemy"}
+                ]
+            }
         ],
         "image": "static/w101/spells/storm/(Spell)_Thundering_Jinn.png",
         "id": "thundering_jinn",
         "accuracy": 65,
-        "level": 70,
         "pvp_level": 70
     },
     {
@@ -462,10 +450,8 @@
         "image": "static/w101/spells/storm/(Spell)_Mass_Storm_Prism.png",
         "id": "mass_storm_prism",
         "accuracy": 100,
-        "level": 70,
         "pvp_level": 70
     },
-
     {
         "name": "Triton",
         "school": "storm",
@@ -473,12 +459,11 @@
         "pips": 6,
         "description": "Deals 795-875 Storm Damage",
         "effects": [
-            {"type": "damage", "school": "storm", "min": 795, "max": 875}
+            {"type": "damage", "school": "storm", "min": 795, "max": 875, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Triton.png",
         "id": "triton",
         "accuracy": 70,
-        "level": 42,
         "pvp_level": 38
     },
     {
@@ -494,21 +479,7 @@
         "image": "static/w101/spells/storm/(Spell)_Catalan.png",
         "id": "catalan",
         "accuracy": 65
-    },
-    {
-        "name": "Iron Sultan",
-        "school": "storm",
-        "type": "damage",
-        "pips": 4,
-        "description": "",
-        "effects": [
-            {"type": "damage", "school": "storm", "amount": 495, "target": "enemies_selected"}
-        ],
-        "image": "static/w101/spells/storm/(Spell)_Iron_Sultan.png",
-        "id": "iron_sultan",
-        "accuracy": 70,
-        "pvp_level": 118
-    },
+    }, 
     {
         "name": "Thermic Shield",
         "school": "storm",
@@ -518,13 +489,10 @@
         "effects": [
             {"type": "shield", "aspect": "damage", "school": "ice", "amount": -70, "target": "ally_same"},
             {"type": "shield", "aspect": "damage", "school": "fire", "amount": -70, "target": "ally_same"}
-
-
         ],
         "image": "static/w101/spells/storm/(Spell)_Thermic_Shield.png",
         "id": "thermic_shield",
-        "accuracy": 100,
-        "level": 8
+        "accuracy": 100
     },
     {
         "name": "Jupiter's Might",
@@ -555,7 +523,6 @@
         "image": "static/w101/spells/storm/(Spell)_Jinn's_Restoration.png",
         "id": "jinn's_restoration",
         "accuracy": 100,
-        "level": 70,
         "pvp_level": 70
     },
     {
@@ -570,7 +537,6 @@
         "image": "static/w101/spells/storm/(Spell)_Stormspear.png",
         "id": "stormspear",
         "accuracy": 100,
-        "level": 80,
         "pvp_level": 80
     },
     {
@@ -593,13 +559,12 @@
         "pips": 8,
         "description": "Deals 1,115 Storm Damage to target and applies a +10% Storm Armor Piercing Charm on self",
         "effects": [
-            {"type": "damage", "school": "storm", "amount": 1115},
+            {"type": "damage", "school": "storm", "amount": 1115, "target": "enemy"},
             {"type": "charm", "aspect": "armor_piercing", "school": "storm", "amount": 10, "target": "self"}
         ],
         "image": "static/w101/spells/storm/(Spell)_King_Artorius_(Storm).png",
         "id": "king_artorius_(storm)",
         "accuracy": 70,
-        "level": 90,
         "pvp_level": 80
     },
     {
@@ -609,7 +574,7 @@
         "pips": {"regular": 1, "storm": 1},
         "description": "Deals 375 Storm Damage to target and extends the duration of a Heal over Time effect by 2 Rounds on caster",
         "effects": [
-            {"type": "damage", "school": "storm", "amount": 375},
+            {"type": "damage", "school": "storm", "amount": 375, "target": "enemy"},
             {"type": "extend", "aspect": "HoT", "rounds": 2, "target": "self"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Revolutionary_Strike.png",
@@ -627,12 +592,10 @@
             {"type": "destroy", "aspect": "DoT", "target": "ally_same"},
             {"type": "charm", "aspect": "damage", "school": "storm", "amount": 55, "target": "ally_same"},
             {"type": "charm", "aspect": "damage", "school": "storm", "amount": 55, "target": "ally_same"}
-
         ],
         "image": "static/w101/spells/storm/(Spell)_Reap_the_Whirlwind.png",
         "id": "reap_the_whirlwind",
         "accuracy": 100,
-        "level": 50,
         "pvp_level": 40
     },
     {
@@ -642,13 +605,12 @@
         "pips": 5,
         "description": "Deals 650-730 Storm Damage",
         "effects": [
-            {"type": "damage", "school": "storm", "min": 650, "max": 730}
+            {"type": "damage", "school": "storm", "min": 650, "max": 730, "target": "enemy"}
         ],
         "image": "static/w101/spells/storm/(Spell)_Stormzilla.png",
         "id": "stormzilla",
         "accuracy": 70,
-        "level": 33,
-        "pvp_level": true
+        "pvp_level": 40
     },
     {
         "name": "Oni's Attrition",
@@ -665,7 +627,6 @@
         "image": "static/w101/spells/storm/(Spell)_Oni's_Attrition.png",
         "id": "oni's_attrition",
         "accuracy": 100,
-        "level": 100,
         "pvp_level": 100
     }
 ]

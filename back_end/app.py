@@ -737,6 +737,7 @@ def get_player_state(data):
 
 
 VALID_SCHOOLS = {"Fire", "Ice", "Storm", "Life", "Death", "Myth", "Balance"}
+VALID_SCHOOLS_LOWER = {"fire", "ice", "storm", "life", "death", "myth", "balance"}
 
 
 def build_match_result(lobby, winner_team, elo_changes):
@@ -1010,6 +1011,27 @@ def prepareLog(log):
         if entry["type"] == "result" and entry["result"] == "success":
             entry["card"] = CARD_BY_ID[entry["card"]].img_path
 
+
+
+@socketio.on("set_school_pip")
+def set_school_pip(data):
+    gameId = data.get("gameId")
+    school = (data.get("school") or "").strip().lower()
+
+    if school not in VALID_SCHOOLS_LOWER:
+        return {"ok": False, "error": "Invalid school"}
+
+    lobby = lobbies.get(gameId)
+    if not lobby or not lobby.game:
+        return {"ok": False, "error": "Game not found"}
+
+    user_id = get_user_identity(request.sid)
+    player = lobby.game.get_player(user_id)
+    if not player:
+        return {"ok": False, "error": "Player not found"}
+
+    player.school_pip_select = school
+    return {"ok": True}
 
 
 @socketio.on("player_action")

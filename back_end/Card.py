@@ -79,8 +79,9 @@ for card in ALL_CARD_DEFS:
     effect_types.update([effect["type"] for effect in card.effects])
     for effect in card.effects:
         all_types.update(effect.keys())
-        if effect["type"] == "clear":
-            print(f"[{card.school.upper()}] {card.name}: {card.description}\n")
+        #if effect["type"] in ["empower", "extend", "pip", "repeat", "take", "reshuffle"]:
+        #    print(effect)
+
 
 print(f"Types of effects: {sorted(effect_types)}")
 #print(f"All effect types: {all_types}")

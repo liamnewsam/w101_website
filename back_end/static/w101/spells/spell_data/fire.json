@@ -22,7 +22,7 @@
         "pips": {"regular": 3, "fire": 1},
         "description": "Deals 370 Fire Damage to target and restores 645 Health over 4 Rounds to caster",
         "effects": [
-            {"type": "damage", "school": "fire", "amount": 370},
+            {"type": "damage", "school": "fire", "amount": 370, "target": "enemy"},
             {"type": "HoT", "amount": 645, "rounds": 4, "target": "self"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Whitehart_Fire.png",
@@ -35,14 +35,14 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes up to three helpful Wards from target to restore 190 Health per helpful Ward over 4 Rounds to caster",
-        "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"},
+        "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"},
         "effects": [
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "ward_positive", "target": "enemy"},
+                    {"type": "destroy", "aspect": "ward", "target": "enemy"},
                     {"type": "HoT", "amount": 190, "rounds": 4, "target": "self"}
                 ]
             }
@@ -102,15 +102,15 @@
         "type": "manipulation",
         "pips": 3,
         "description": "Removes up to three helpful Wards from target to deal 100 Fire Damage per helpful Ward over 3 Rounds to target",
-        "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"},
+        "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"},
         "effects": [
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "ward_positive", "amount": 1, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "ward_positive", "target": "enemy"},
-                    {"type": "DoT", "school": "fire", "amount": 100, "rounds": 3}
+                    {"type": "destroy", "aspect": "ward", "target": "enemy"},
+                    {"type": "DoT", "school": "fire", "amount": 100, "rounds": 3, "target": "enemy"}
                 ]
             }
         ],
@@ -153,7 +153,7 @@
         "pips": 7,
         "description": "Deals 780 Fire Damage",
         "effects": [
-            {"type": "damage", "school": "fire", "amount": 780}
+            {"type": "damage", "school": "fire", "amount": 780, "target": "enemy"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Ammut.png",
         "id": "ammut",
@@ -169,12 +169,12 @@
         "effects": [
             {
                 "type": "gambit", 
-                "condition": {"type": "amount", "aspect": "ward_negative", "amount": 4, "target": "enemy"}, 
+                "condition": {"type": "amount", "aspect": "jinx", "amount": 4, "target": "enemy"}, 
                 "true": [
-                    {"type": "damage", "school": "fire", "amount": 1550}
+                    {"type": "damage", "school": "fire", "amount": 1550, "target": "enemy"}
                 ], 
                 "false": [
-                    {"type": "DoT", "school": "fire", "amount": 480, "rounds": 6, "times": 3}
+                    {"type": "DoT", "school": "fire", "amount": 480, "rounds": 6, "times": 3, "target": "enemy"}
                 ]
             }
         ],
@@ -237,10 +237,10 @@
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "ward_negative", "amount": 1, "target": "self"}, 
+                "condition": {"type": "amount", "aspect": "jinx", "amount": 1, "target": "self"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "ward_negative", "target": "self"},
-                    {"type": "trap", "aspect": "DoT", "amount": 35}
+                    {"type": "destroy", "aspect": "jinx", "target": "self"},
+                    {"type": "trap", "aspect": "DoT", "amount": 35, "target": "enemy"}
                 ]
             }
         ],
@@ -280,35 +280,21 @@
         "id": "brimstone_revenant",
         "accuracy": 70
     },
-    {
-        "name": "Scorching Scimitars",
-        "school": "fire",
-        "type": "damage",
-        "pips": 4,
-        "description": "Deals 220 Fire Damage split among selected enemies and restores 420 Health over 3 Rounds to caster",
-        "effects": [
-            {"type": "damage", "school": "fire", "amount": 220, "target": "enemy_select"},
-            {"type": "HoT", "amount": 420, "rounds": 3, "target": "self"}
-        ],
-        "image": "static/w101/spells/fire/(Spell)_Scorching_Scimitars.png",
-        "id": "scorching_scimitars",
-        "accuracy": 75,
-        "pvp_level": 118
-    },
+    
     {
         "name": "A-baahh-calypse",
         "school": "fire",
         "type": "damage",
-        "pips": {"regular": 2, "fire": 1},
-        "description": "Deals 350 Fire Damage to and Detonates two Damage over Time effects on target",
+        "pips": {"regular": 3, "fire": 1},
+        "description": "Deals 410 Fire Damage to and Detonates two Damage over Time effects on target to deal 145% of the remaining Damage",
         "effects": [
-            {"type": "damage", "school": "fire", "amount": 350, "target": "enemy_same"},
+            {"type": "damage", "school": "fire", "amount": 410, "target": "enemy_same"},
             {
                 "type": "repeat", 
-                "up_to": 3, 
+                "up_to": 2, 
                 "condition": {"type": "amount", "aspect": "DoT", "amount": 1, "target": "enemy_same"}, 
                 "effects": [
-                    {"type": "detonate", "target": "enemy_same"}
+                    {"type": "detonate", "target": "enemy_same", "amount": 1.45}
                 ]
             }
         ],
@@ -338,7 +324,7 @@
         "pips": 6,
         "description": "Deals 625-705 Fire Damage",
         "effects": [
-            {"type": "damage", "school": "fire", "min": 625, "max": 705}
+            {"type": "damage", "school": "fire", "min": 625, "max": 705, "target": "enemy"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Helephant.png",
         "id": "helephant",
@@ -367,7 +353,7 @@
         "pips": 3,
         "description": "Deals 295-355 Fire Damage",
         "effects": [
-            {"type": "damage", "school": "fire", "min": 295, "max": 355}
+            {"type": "damage", "school": "fire", "min": 295, "max": 355, "target": "enemy"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Sunbird.png",
         "id": "sunbird",
@@ -393,6 +379,7 @@
         "type": "manipulation",
         "pips": 1,
         "description": "Steals a helpful Charm",
+        "condition": {"type": "amount", "aspect": "charm", "amount": 1, "target": "enemy"},
         "effects": [
             {"type": "take", "aspect": "charm", "target": "enemy"}
 
@@ -471,7 +458,7 @@
         "pips": 1,
         "description": "Deals 80-120 Fire Damage",
         "effects": [
-            {"type": "damage", "school": "fire", "min": 80, "max": 120}
+            {"type": "damage", "school": "fire", "min": 80, "max": 120, "target": "enemy"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Fire_Cat.png",
         "id": "fire_cat",
@@ -484,7 +471,7 @@
         "pips": 2,
         "description": "Applies a Fire Dispel Charm",
         "effects": [
-            {"type": "dispel", "school": "fire", "target": "enemy"}
+            {"type": "curse", "aspect": "dispel", "school": "fire", "target": "enemy"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Quench.png",
         "id": "quench",
@@ -516,11 +503,14 @@
                 "type": "gambit", 
                 "condition": {"type": "amount", "aspect": "HoT", "amount": 3, "target": "self"}, 
                 "true": [
-                    {"type": "destroy", "aspect": "HoT", "target": "self", "repeat": 3},
-                    {"type": "damage", "school": "fire", "amount": 1855}
+                    {"type": "destroy", "aspect": "HoT", "target": "self"},
+                    {"type": "destroy", "aspect": "HoT", "target": "self"},
+                    {"type": "destroy", "aspect": "HoT", "target": "self"},
+                    {"type": "damage", "school": "fire", "amount": 1855, "target": "enemy_same"}
                 ], 
                 "false": [
-                    {"type": "DoT", "school": "fire", "amount": 475, "rounds": 3, "repeat": 2}
+                    {"type": "DoT", "school": "fire", "amount": 475, "rounds": 5, "target": "enemy_same"},
+                    {"type": "DoT", "school": "fire", "amount": 475, "rounds": 5, "target": "enemy_same"}
                 ]
             }
         ],
@@ -536,7 +526,7 @@
         "pips": {"regular": 3, "fire": 1},
         "description": "Deals 340-420 Fire Damage to target and applies a +25% Fire Damage Global",
         "effects": [
-            {"type": "damage", "school": "fire", "min": 340, "max": 420},
+            {"type": "damage", "school": "fire", "min": 340, "max": 420, "target": "enemy"},
             {"type": "global", "aspect": "damage", "school": "fire", "amount": 25}
         ],
         "image": "static/w101/spells/fire/(Spell)_Hephaestus.png",
@@ -551,7 +541,7 @@
         "description": "Deals 200 Fire Damage to caster to deal 600 Fire Damage to target",
         "effects": [
             {"type": "damage", "school": "fire", "amount": 200, "target": "self"},
-            {"type": "damage", "school": "fire", "amount": 600}
+            {"type": "damage", "school": "fire", "amount": 600, "target": "enemy"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Immolate.png",
         "id": "immolate",
@@ -578,7 +568,7 @@
         "pips": {"regular": 3, "fire": 1},
         "description": "Deals 70 Fire Damage to target, and applies two Damage over Time effects on target that each deal 420 Damage of the caster's School after five Rounds",
         "effects": [
-            {"type": "damage", "school": "balance", "amount": 70, "target": "enemy_same"},
+            {"type": "damage", "school": "fire", "amount": 70, "target": "enemy_same"},
             {"type": "DoT", "school": "player", "amount": 420, "rounds": 5, "wait": true,"target": "enemy_same"},
             {"type": "DoT", "school": "player", "amount": 420, "rounds": 5, "wait": true, "target": "enemy_same"}
         ],
@@ -596,10 +586,10 @@
             {
                 "type": "repeat", 
                 "up_to": 3, 
-                "condition": {"type": "amount", "aspect": "ward_negative", "amount": 1, "target": "self"}, 
+                "condition": {"type": "amount", "aspect": "jinx", "amount": 1, "target": "self"}, 
                 "effects": [
-                    {"type": "destroy", "aspect": "ward_negative", "target": "self"},
-                    {"type": "DoT", "school": "fire", "amount": 70, "rounds": 3}
+                    {"type": "destroy", "aspect": "jinx", "target": "self"},
+                    {"type": "DoT", "school": "fire", "amount": 70, "rounds": 3, "target": "enemy"}
                 ]
             }
         ],
@@ -652,25 +642,13 @@
         "pvp_level": 72
     },
     {
-        "name": "Take Power",
-        "school": "fire",
-        "type": "damage",
-        "pips": 1,
-        "description": "Sacrifices a friendly Minion to give 3 Pips to self",
-        "effects": [],
-        "image": "static/w101/spells/fire/(Spell)_Take_Power.png",
-        "id": "take_power",
-        "accuracy": 100,
-        "pvp_level": 25
-    },
-    {
         "name": "Phoenix",
         "school": "fire",
         "type": "damage",
         "pips": 5,
         "description": "Deals 515-595 Fire Damage",
         "effects": [
-            {"type": "damage", "school": "fire", "min": 515, "max": 595}
+            {"type": "damage", "school": "fire", "min": 515, "max": 595, "target": "enemy"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Phoenix.png",
         "id": "phoenix",
@@ -680,7 +658,7 @@
     {
         "name": "Fire Trap",
         "school": "fire",
-        "type": "ward",
+        "type": "jinx",
         "pips": 0,
         "description": "Applies a +40% Fire Damage Ward",
         "effects": [

@@ -19,3 +19,6 @@ ESCAPE = "q"
 HIDDEN_KEYS = [ESCAPE]
 
 CHARACTER_IMAGE_PATH = "static/w101/icons/characters/"
+
+
+MAX_PIP_COUNT = 7
