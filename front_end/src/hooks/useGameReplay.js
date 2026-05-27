@@ -12,6 +12,8 @@ const EVENT_DELAY_MS = 300;
 const FLOATING_PRESENT_OFFSET_X = 20;
 const FLOATING_PRESENT_OFFSET_Y = -20;
 
+const fieldMap = { charm: "charms", curse: "curses", ward: "wards", jinx: "jinxes", dot: "dots", hot: "hots" };
+
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
 function shallowMatch(obj, pattern) {
@@ -26,6 +28,17 @@ function removeFirstMatching(arr, target) {
       return false;
     }
     return true;
+  });
+}
+
+function replaceFirstMatching(arr, target, replacement) {
+  let replaced = false;
+  return arr.map(obj => {
+    if (!replaced && shallowMatch(obj, target)) {
+      replaced = true;
+      return replacement;
+    }
+    return obj;
   });
 }
 
@@ -236,6 +249,140 @@ async function processEvent(
       }
 
       switch (event.aspect) {
+        case "update": {
+          const field = fieldMap[event.aspectType];
+          if (field) {
+            const target = getPlayer(gs, event.player);
+            target[field] = replaceFirstMatching(target[field], event.from, event.to);
+          }
+          break;
+        }
+        case "destroy": {
+          const field = fieldMap[event.aspectType];
+          if (field) {
+            setVisualEffects(effects => [...effects, {
+              type: "FLOATING_PRESENT",
+              items: [{ type: "text", value: `${event.aspectType} destroyed`, color: badColor}],
+              id: crypto.randomUUID(),
+              pos: {
+                  x: playerPositions[event.target].x + FLOATING_PRESENT_OFFSET_X,
+                  y: playerPositions[event.target].y + FLOATING_PRESENT_OFFSET_Y
+              }
+            }]);
+            const target = getPlayer(gs, event.target);
+            target[field] = removeFirstMatching(target[field], event.value);
+          }
+          break;
+        }
+
+        case "take": {
+          switch (event.aspectType) {
+            case "ward": {
+              setVisualEffects(effects => [...effects, {
+                type: "FLOATING_PRESENT",
+                items: [{ type: "text", value: `ward taken`, color: badColor}],
+                id: crypto.randomUUID(),
+                pos: playerPositions[event.target],
+              }]);
+              const target = getPlayer(gs, event.target);
+              target["wards"] = removeFirstMatching(target["wards"], event.value);
+              break;
+            }
+            case "charm": {
+              setVisualEffects(effects => [...effects, {
+                type: "FLOATING_PRESENT",
+                items: [{ type: "text", value: `ward taken`, color: badColor}],
+                id: crypto.randomUUID(),
+                pos: playerPositions[event.target],
+              }]);
+              const target = getPlayer(gs, event.target);
+              target["charms"] = removeFirstMatching(target["charms"], event.value);
+              break;
+            }
+            case "pip": {
+              setVisualEffects(effects => [...effects, {
+                type: "FLOATING_PRESENT",
+                items: [{ type: "text", value: `pip taken`, color: badColor}],
+                id: crypto.randomUUID(),
+                pos: playerPositions[event.target],
+              }]);
+              const target = getPlayer(gs, event.target);
+              target.pips[event.value] -= 1;
+              break;
+            }
+          }
+          
+          let effect = {
+            type: "SIMPLE_ARROW",
+            startPos: playerPositions[event.target],
+            endPos: playerPositions[event.player],
+            duration: 0.6,
+            id: crypto.randomUUID(),
+          };
+          setVisualEffects(effects => [...effects, effect]);
+          await wait(EFFECT_ARROW_MS);
+
+          switch (event.aspectType) {
+            case "ward": {
+              setVisualEffects(effects => [...effects, {
+                type: "FLOATING_PRESENT",
+                items: [{ type: "text", value: `ward taken`, color: goodColor}],
+                id: crypto.randomUUID(),
+                pos: playerPositions[event.player],
+              }]);
+              const player = getPlayer(gs, event.player);
+              player['wards'] = [...player['wards'], event.value];
+              break;
+            }
+            case "charm": {
+              setVisualEffects(effects => [...effects, {
+                type: "FLOATING_PRESENT",
+                items: [{ type: "text", value: `ward taken`, color: goodColor}],
+                id: crypto.randomUUID(),
+                pos: playerPositions[event.player],
+              }]);
+              const player = getPlayer(gs, event.player);
+              player['charms'] = [...player['charms'], event.value];
+              break;
+            }
+            case "pip": {
+              setVisualEffects(effects => [...effects, {
+                type: "FLOATING_PRESENT",
+                items: [{ type: "text", value: `pip received`, color: goodColor}],
+                id: crypto.randomUUID(),
+                pos: playerPositions[event.player],
+              }]);
+              const player = getPlayer(gs, event.player);
+              player.pips["regular"] += 1;
+              break;
+            }
+          }
+
+          break;
+        }
+        case "global": {
+          let effect = {
+            type: "SIMPLE_ARROW",
+            startPos: playerPositions[event.player],
+            endPos: {x:0, y:0},
+            duration: 0.6,
+            id: crypto.randomUUID(),
+          };
+          setVisualEffects(effects => [...effects, effect]);
+          await wait(EFFECT_ARROW_MS);
+
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: `global effect added`}],
+            id: crypto.randomUUID(),
+            pos: { x: 0, y: 0 },
+          }]);
+
+          if (!gs.global_effects) gs.global_effects = [];
+          gs.global_effects.push(event.value);
+
+          break;
+        }
         case "damage": {
           setVisualEffects(effects => [...effects, {
             type: "FLOATING_PRESENT",
@@ -284,20 +431,37 @@ async function processEvent(
           break;
         }
         case "pip_lose": {
-          const player = getPlayer(gs, event.player);
+          const player = getPlayer(gs, event.target ?? event.player);
           for (const pip_type in event.amount) {
-            if (pip_type === "converted") continue;
-            player.pips[pip_type] -= event.amount[pip_type];
+            if (pip_type === "converted") {
+              if (event.amount["converted"]) player.pips["regular"] += 1;
+            } else {
+              player.pips[pip_type] -= event.amount[pip_type];
+            }
           }
           break;
         }
         case "pip_gain": {
-          const player = getPlayer(gs, event.player);
+          const player = getPlayer(gs, event.target ?? event.player);
           for (const pip_type in event.amount) {
             player.pips[pip_type] += event.amount[pip_type];
           }
           break;
         }
+        case "pip_choke": {
+          const player = getPlayer(gs, event.player);
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: `Too Many Pips!`, color: badColor}],
+            id: crypto.randomUUID(),
+            pos: {
+              x: playerPositions[event.target].x + FLOATING_PRESENT_OFFSET_X,
+              y: playerPositions[event.target].y + FLOATING_PRESENT_OFFSET_Y
+            },
+          }]);
+          break;
+        }
+
         case "charm": {
           setVisualEffects(effects => [...effects, {
             type: "FLOATING_PRESENT",
@@ -382,12 +546,25 @@ async function processEvent(
           target.health += event.amount;
           break;
         }
+        case "hot": {
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: `HoT gained`, color: goodColor}],
+            id: crypto.randomUUID(),
+            pos: {
+              x: playerPositions[event.target].x + FLOATING_PRESENT_OFFSET_X,
+              y: playerPositions[event.target].y + FLOATING_PRESENT_OFFSET_Y
+            },
+          }]);
+          const target = getPlayer(gs, event.target);
+          target['hots'] = [...target['hots'], event.value];
+          break;
+        }
       }
       break;
     }
 
     case "effect_trigger": {
-      const fieldMap = { charm: "charms", curse: "curses", ward: "wards", jinx: "jinxes" };
       const field = fieldMap[event.aspect];
       if (field) {
         setVisualEffects(effects => [...effects, {
@@ -438,6 +615,18 @@ async function processEvent(
           align: "center"
         }]);
         await wait(2000);
+      } else if (event.result === "dispel") {
+        setVisualEffects(effects => [...effects, {
+          type: "FLOATING_PRESENT",
+          items: [{ type: "text", value: `Dispelled` }],
+          id: crypto.randomUUID(),
+          pos: {
+              x: 0,
+              y: 0
+          },
+          align: "center"
+        }]);
+        await wait(1000);
       }
       break;
     }

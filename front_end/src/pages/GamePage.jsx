@@ -100,6 +100,14 @@ export default function GamePage() {
     setSelectedCardIndex(-1);
   }
 
+  const [localSchoolPipSelect, setLocalSchoolPipSelect] = useState(null);
+  const currentSchoolPip = localSchoolPipSelect ?? visual.player?.school_pip_select ?? visual.player?.school;
+
+  function handleSchoolPipChange(school) {
+    setLocalSchoolPipSelect(school);
+    socket.emit("set_school_pip", { gameId, school });
+  }
+
   function discardCard(cardId) {
     if (replaying) return;
     socket.emit(
@@ -138,6 +146,8 @@ export default function GamePage() {
           selectedCardIndex={selectedCardIndex}
           onSelectTarget={onTargetSelected}
           deadPlayerIds={deadPlayerIds}
+          currentPlayerSchoolPip={currentSchoolPip}
+          onSchoolPipChange={handleSchoolPipChange}
         />
 
         <motion.img

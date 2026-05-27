@@ -1,23 +1,18 @@
-import { useState } from "react";
-import { BACKEND_URL, BATTLE_PATH} from "../config";
+import { pipSrc } from "../config";
 import "./PipGrid.css";
 
-const pip_map = {
-    "regular": "pips/Pip.png",
-    "powerpip": "pips/Power_Pip.png"
-}
 
 export default function PipGrid({pips, pipIconSize}) {
     const pip_icons = Object.entries(pips).flatMap(
-        ([key, count]) => Array(count).fill(pip_map[key])
+        ([key, count]) => Array(count).fill({ src: pipSrc(key), key })
     );
 
     return (
         <div className="pip-grid">
-            {pip_icons.map((icon, index) => (
-                <img 
-                    src={BACKEND_URL+BATTLE_PATH+icon}
-                    alt={icon}
+            {pip_icons.map(({ src, key }, index) => (
+                <img
+                    src={src}
+                    alt={key}
                     className="pip-icon"
                     style={{ height: pipIconSize, width: pipIconSize }}
                     key={index}

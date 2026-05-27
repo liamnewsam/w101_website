@@ -3,6 +3,7 @@ import "./PlayerInfoWithIcons.css";
 import {BACKEND_URL, BATTLE_PATH, goodColor, badColor} from "../config";
 import StatusGrid from "./StatusGrid";
 import PipGrid from "./PipGrid";
+import SchoolPipSelector from "./SchoolPipSelector";
 
 
 
@@ -37,6 +38,19 @@ function statusToPopup(status) {
           {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Outgoing.png`}
         ];
       }
+      if (status["aspect"] == "armor_piercing") {
+        return [
+          {"type": "text", "value": `+${status.amount}%`, "color": goodColor},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + "Armor_Piercing.png"}
+        ];
+      }
+      if (status["aspect"] == "accuracy") {
+        return [
+          {"type": "text", "value": `+${status.amount}%`, "color": goodColor},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + "Accuracy.png"}
+        ];
+      }
     case "curse":
       if (status["aspect"] == "damage") {
         return [
@@ -51,6 +65,18 @@ function statusToPopup(status) {
           {"type": "text", "value": `${status.amount}%`, "color": badColor},
           {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Heal.png`},
           {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Outgoing.png`}
+        ];
+      }
+      if (status["aspect"] == "dispel") {
+        return [
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
+          {"type": "text", "value": "Dispel", "color": badColor}
+        ]
+      }
+      if (status["aspect"] == "accuracy") {
+        return [
+          {"type": "text", "value": `${status.amount}%`, "color": badColor},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + "Accuracy.png"}
         ];
       }
     case "ward":
@@ -70,6 +96,12 @@ function statusToPopup(status) {
           {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`},
           {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Incoming.png`},
         ];
+      } else if (status["aspect"] == "prism") {
+        return [
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['from']}.png`},
+          {"type": "text", "value": "to", "color": badColor},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['to']}.png`}
+        ]
       }
 
     case "dot":
@@ -77,9 +109,15 @@ function statusToPopup(status) {
         {"type": "text", "value": `${status.amount}`, "color": badColor},
         {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `school_type/${status['school']}.png`},
         {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Damage.png`},
-        {"type": "text", "value": `over ${status.rounds}`, "color": badColor},
+        {"type": "text", "value": `${status.wait ? "after" : "over"} ${status.rounds}`, "color": badColor},
         {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Round.png`}
-
+      ]
+    case "hot":
+      return [
+        {"type": "text", "value": `+${status.amount}`, "color": goodColor},
+        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Heal.png`},
+        {"type": "text", "value": `over ${status.rounds}`, "color": goodColor},
+        {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Round.png`}
       ]
     default:
       return [{"type": "text", "value": status.type ?? "unknown"}];
@@ -91,13 +129,15 @@ function statusToPopup(status) {
 export default function PlayerInfoWithIcons({
   player,
   leftIcon,
-  style
+  style,
+  schoolPipSelect,
+  onSchoolPipChange,
 }) {
   const activeIcons = STATUS_CATEGORIES
   .filter(category => player[category.key]?.length > 0)
   .map(category => ({
-    key: category.key,        // name your property
-    icon: category.icon,      // name your property
+    key: category.key,
+    icon: category.icon,
     popupItems: player[category.key].map(status => statusToPopup(status)),
   }));
 
@@ -133,6 +173,17 @@ export default function PlayerInfoWithIcons({
       <div className="pip-grid-container">
         <PipGrid pips={player.pips} pipIconSize={statusIconSize}/>
       </div>
+
+      {/* School pip selector — only shown for the current player */}
+      {schoolPipSelect && onSchoolPipChange && (
+        <div className="school-pip-selector-container">
+          <SchoolPipSelector
+            currentSchool={schoolPipSelect}
+            size={statusIconSize}
+            onChange={onSchoolPipChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -29,5 +29,10 @@
     position: absolute;
     bottom: 100%;
     left: 0%;
+}
 
+.school-pip-selector-container {
+    position: absolute;
+    bottom: 100%;
+    right: 0%;
 }

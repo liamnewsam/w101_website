@@ -1,0 +1,48 @@
+.school-pip-selector {
+  position: relative;
+}
+
+.school-pip-current {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.school-pip-current:hover {
+  border-color: white;
+}
+
+.school-pip-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(0, 0, 0, 0.88);
+  border: 1px solid #888;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  padding: 4px;
+  z-index: 200;
+}
+
+.school-pip-option {
+  cursor: pointer;
+  opacity: 0.65;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  display: block;
+}
+
+.school-pip-option:hover {
+  opacity: 1;
+}
+
+.school-pip-option.selected {
+  border-color: gold;
+  opacity: 1;
+}

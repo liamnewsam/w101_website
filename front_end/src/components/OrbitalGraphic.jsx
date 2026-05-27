@@ -1,7 +1,57 @@
+import { useState } from "react";
 import "./OrbitalGraphic.css";
-import {BACKEND_URL, TARGET_PATH} from "../config";
+import {BACKEND_URL, TARGET_PATH, BATTLE_PATH, goodColor} from "../config";
 import PlayerInfoWithIcons from "./PlayerInfoWithIcons";
 import FloatingPresent from "./FloatingPresent";
+
+const GLOBAL_ASPECT_ICON = {
+  damage: "Damage.png",
+  armor_piercing: "Accuracy.png",
+  critical: "Critical.png",
+  heal: "Heal.png",
+};
+
+function GlobalEffectIcon({ effects, size = 32 }) {
+  const [popup, setPopup] = useState({ visible: false, x: 0, y: 0 });
+
+  return (
+    <div
+      style={{ position: "relative", display: "inline-block" }}
+      onMouseMove={e => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setPopup({ visible: true, x: e.clientX - rect.left + 10, y: e.clientY - rect.top + 10 });
+      }}
+      onMouseLeave={() => setPopup(p => ({ ...p, visible: false }))}
+    >
+      <img
+        src={BACKEND_URL + BATTLE_PATH + "Global.png"}
+        alt="global effects"
+        style={{ width: size, height: size, display: "block" }}
+      />
+      {popup.visible && (
+        <div className="status-popup" style={{ position: "absolute", left: popup.x, top: popup.y, zIndex: 10 }}>
+          {effects.map((effect, i) => (
+            <div key={i} className="popup-line">
+              <span style={{ color: goodColor, marginRight: 4 }}>+{effect.amount}%</span>
+              {effect.school && (
+                <img
+                  src={BACKEND_URL + BATTLE_PATH + `school_type/${effect.school}.png`}
+                  alt={effect.school}
+                  style={{ width: 16, height: 16, marginRight: 4 }}
+                />
+              )}
+              <img
+                src={BACKEND_URL + BATTLE_PATH + (GLOBAL_ASPECT_ICON[effect.aspect] || "Damage.png")}
+                alt={effect.aspect}
+                style={{ width: 16, height: 16 }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 
 const bottomTargetIcons = [
@@ -26,6 +76,8 @@ export default function OrbitalGraphic({
   selectedCardIndex,
   onSelectTarget,
   deadPlayerIds = new Set(),
+  currentPlayerSchoolPip,
+  onSchoolPipChange,
 }) {
   const center = size / 2;
 
@@ -88,6 +140,22 @@ export default function OrbitalGraphic({
           top: center,
         }}
       />
+
+      {/* Global effects icon */}
+      {gameState.global_effects?.length > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            left: center,
+            top: center,
+            transform: "translate(-50%, -50%)",
+            zIndex: 5,
+          }}
+        >
+          <GlobalEffectIcon effects={gameState.global_effects} size={32} />
+        </div>
+      )}
+
       {/*
       <img
         src={BACKEND_URL + "static/w101/battle_triangle.png"}
@@ -117,6 +185,7 @@ export default function OrbitalGraphic({
 
         const targetXRelative = targetDistance * Math.cos(angle+Math.PI/2);
         const targetYRelative = targetDistance * Math.sin(angle+Math.PI/2);
+        const isCurrentPlayer = player.user_id === playerState.user_id;
         //
         return (
           <div
@@ -141,6 +210,8 @@ export default function OrbitalGraphic({
                     width: `${infoWidth}px`,
                     height: `${infoHeight}px`
                 }}
+                schoolPipSelect={isCurrentPlayer ? currentPlayerSchoolPip : undefined}
+                onSchoolPipChange={isCurrentPlayer ? onSchoolPipChange : undefined}
             />
 
             
@@ -192,6 +263,7 @@ export default function OrbitalGraphic({
 
         const targetXRelative = targetDistance * Math.cos(angle+Math.PI/2);
         const targetYRelative = targetDistance * Math.sin(angle+Math.PI/2);
+        const isCurrentPlayer = player.user_id === playerState.user_id;
         //
         return (
           <div
@@ -216,6 +288,8 @@ export default function OrbitalGraphic({
                     width: `${infoWidth}px`,
                     height: `${infoHeight}px`
                 }}
+                schoolPipSelect={isCurrentPlayer ? currentPlayerSchoolPip : undefined}
+                onSchoolPipChange={isCurrentPlayer ? onSchoolPipChange : undefined}
             />
 
             
