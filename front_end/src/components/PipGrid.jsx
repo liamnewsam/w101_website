@@ -4,7 +4,7 @@ import "./PipGrid.css";
 
 export default function PipGrid({pips, pipIconSize}) {
     const pip_icons = Object.entries(pips).flatMap(
-        ([key, count]) => Array(count).fill({ src: pipSrc(key), key })
+        ([key, count]) => Array(Math.max(0, Math.floor(count || 0))).fill({ src: pipSrc(key), key })
     );
 
     return (

@@ -5,6 +5,7 @@ import { logout } from "../api/auth";
 import { usePlayer } from "../PlayerContext";
 import Loading from "../components/Loading";
 import { BACKEND_URL } from "../config";
+import { computeLevel, computeLevelProgress, ELO_FLOOR } from "../utils/levelUtils";
 import "./MenuPage.css";
 
 export default function MenuPage() {
@@ -75,17 +76,31 @@ export default function MenuPage() {
         <div className="menu-player-details">
           <p className="menu-player-name">{player.name}</p>
           <div className="menu-player-meta">
-            <span className="menu-level">Lv. {player.level ?? 1}</span>
+            <span className="menu-level">Lv. {computeLevel((player.school_elos ?? {})[(player.school || "balance").toLowerCase()] ?? ELO_FLOOR)}</span>
             <span className="menu-sep">·</span>
             <span className="menu-school">{player.school}</span>
           </div>
-          <div className="menu-record">
-            <span className="menu-rating">{player.elo ?? 100} Rating</span>
-          </div>
+          {(() => {
+            const school = (player.school || "balance").toLowerCase();
+            const elo = (player.school_elos ?? {})[school] ?? ELO_FLOOR;
+            const progress = computeLevelProgress(elo);
+            return (
+              <div className="menu-level-bar-row">
+                <div className="menu-level-bar-track">
+                  <div className="menu-level-bar-fill" style={{ width: `${progress * 100}%` }} />
+                </div>
+              </div>
+            );
+          })()}
         </div>
-        <button className="menu-profile-btn" onClick={() => navigate("/profile")}>
-          Profile
-        </button>
+        <div className="menu-banner-actions">
+          <button className="menu-profile-btn" onClick={() => navigate("/profile")}>
+            Profile
+          </button>
+          <button className="menu-profile-btn" onClick={() => navigate("/history")}>
+            History
+          </button>
+        </div>
       </div>
 
       {/* Play section */}

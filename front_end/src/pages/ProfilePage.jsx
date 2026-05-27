@@ -4,6 +4,7 @@ import { useSocket } from "../socket/socketContext";
 import { usePlayer } from "../PlayerContext";
 import { BACKEND_URL } from "../config";
 import AvatarPicker from "../components/AvatarPicker";
+import { computeLevel, computeLevelProgress, ELO_FLOOR } from "../utils/levelUtils";
 import "./ProfilePage.css";
 
 const SCHOOLS = [
@@ -50,8 +51,19 @@ export default function ProfilePage() {
   const selectedDeckIndex = player.selected_deck_index ?? 0;
   const schoolLevels = player.school_levels ?? {};
   const activeLevel = player.level ?? 0;
-  const wins = player.wins ?? 0;
-  const losses = player.losses ?? 0;
+
+  // Per-school W/L for display
+  const schoolKey = activeSchool.toLowerCase();
+  const schoolWins   = player.school_wins   ?? {};
+  const schoolLosses = player.school_losses ?? {};
+  const activeSchoolWins   = schoolWins[schoolKey]   ?? 0;
+  const activeSchoolLosses = schoolLosses[schoolKey] ?? 0;
+
+  // Level and progress driven by per-school ELO
+  const schoolElos   = player.school_elos ?? {};
+  const activeSchoolElo = schoolElos[schoolKey] ?? ELO_FLOOR;
+  const profileLevel    = computeLevel(activeSchoolElo);
+  const profileProgress = computeLevelProgress(activeSchoolElo);
 
   function isDeckAllowed(deck) {
     if (!cardCatalogue) return true; // optimistic while loading
@@ -182,9 +194,15 @@ export default function ProfilePage() {
               </div>
             )}
             <div className="profile-stats">
-              <span className="stat win">{wins}W</span>
+              <span className="stat win">{activeSchoolWins}W</span>
               <span className="stat sep">/</span>
-              <span className="stat loss">{losses}L</span>
+              <span className="stat loss">{activeSchoolLosses}L</span>
+            </div>
+            <div className="profile-level-row">
+              <span className="profile-level-badge">Lv. {profileLevel}</span>
+              <div className="profile-level-bar-track">
+                <div className="profile-level-bar-fill" style={{ width: `${profileProgress * 100}%` }} />
+              </div>
             </div>
           </div>
         </div>

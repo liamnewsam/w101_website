@@ -136,23 +136,28 @@
   margin-top: 0.25rem;
 }
 
-/* ── Elo change ── */
-.elo-change-wrap {
+/* ── Level progress ── */
+.level-progress-wrap {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.3rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
 }
 
-.elo-rating {
-  font-size: 0.8rem;
-  color: #aaa;
-  font-weight: 600;
+.level-progress-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.level-badge {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #e8e8f0;
 }
 
 .elo-delta {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -172,6 +177,30 @@
 .level-down {
   background: rgba(224, 92, 92, 0.15);
   color: #e05c5c;
+}
+
+.level-bar-track {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.level-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf82, #6dd6a0);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* ── Bottom actions ── */
+.results-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 /* ── Home button ── */

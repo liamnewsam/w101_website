@@ -8,6 +8,8 @@ import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import DeckEditorPage from "./pages/DeckEditorPage";
 import StatsPage from "./pages/StatsPage";
+import MatchHistoryPage from "./pages/MatchHistoryPage";
+import ReplayPage from "./pages/ReplayPage";
 import {useSocket} from "./socket/socketContext"
 
 function ProtectedRoute({ element }) {
@@ -67,6 +69,16 @@ export default function App() {
       <Route
         path="/stats"
         element={<ProtectedRoute element={<StatsPage />} />}
+      />
+
+      <Route
+        path="/history"
+        element={<ProtectedRoute element={<MatchHistoryPage />} />}
+      />
+
+      <Route
+        path="/replay/:gameId"
+        element={<ProtectedRoute element={<ReplayPage />} />}
       />
 
       <Route path="*" element={<Navigate to="/menu" replace />} />

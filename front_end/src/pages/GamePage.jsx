@@ -9,6 +9,7 @@ import FloatingPresent from "../components/FloatingPresent";
 import CardReveal from "../components/CardReveal";
 import SlideFadeReveal from "../components/SlideFadeReveal";
 import SimpleArrow from "../components/SimpleArrow";
+import Loading from "../components/Loading";
 import { BACKEND_URL } from "../config";
 import "./GamePage.css";
 import CircularArrow from "../components/CircularArrow";
@@ -124,16 +125,14 @@ export default function GamePage() {
      ============================ */
 
   if (!visual.game || !visual.player) {
-    return <div>Loading game…</div>;
+    return <Loading />;
   }
 
   return (
-    <div className="page game">
-      <h1>Game {gameId}</h1>
-
-      <div className="hud">
-        {!replaying && <div>Round: {visual.game.turns}</div>}
-        {replaying && <div className="replay-indicator">Resolving turn…</div>}
+    <div className="game-page">
+      <div className="game-hud">
+        <span className="game-hud-round">Round {visual.game.turns}</span>
+        {replaying && <span className="game-hud-status">Resolving turn…</span>}
       </div>
 
       <div className="orbital-layout">
@@ -239,7 +238,7 @@ export default function GamePage() {
         </div>
       </div>
 
-      <div className="controls">
+      <div className="game-controls">
         <CardHand
           cards={visual.player.hand}
           selectedIndex={selectedCardIndex}
@@ -247,23 +246,17 @@ export default function GamePage() {
           onDiscardCard={discardCard}
         />
 
-        <div className="pass_leave">
+        <div className="game-action-row">
           {isOurTurn() && (
-            <button onClick={() => sendAction({ type: "pass" })}>
+            <button className="game-btn primary" onClick={() => sendAction({ type: "pass" })}>
               Pass
             </button>
           )}
-          <button onClick={() => navigate("/menu")}>Leave Game</button>
+          <button className="game-btn secondary" onClick={() => {
+              sendAction({ type: "leave" });
+              navigate("/menu");
+            }}>Leave Game</button>
         </div>
-      </div>
-
-      <div className="board"> {/* Replace with your duel view and animation canvas */}
-        <pre style={{ whiteSpace: "pre-wrap" }}>
-          {JSON.stringify(authoritative.game, null, 2)}
-        </pre>
-        <pre style={{ whiteSpace: "pre-wrap" }}>
-          {JSON.stringify(authoritative.player, null, 2)}
-        </pre>
       </div>
     </div>
   );

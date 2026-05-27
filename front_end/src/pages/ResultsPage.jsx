@@ -1,7 +1,8 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { usePlayer } from "../PlayerContext";
 import { BACKEND_URL } from "../config";
+import { computeLevel, computeLevelProgress, ELO_FLOOR } from "../utils/levelUtils";
 import "./ResultsPage.css";
 
 const SCHOOL_COLORS = {
@@ -18,28 +19,30 @@ function schoolColor(school) {
   return SCHOOL_COLORS[school?.toLowerCase()] ?? "#aaa";
 }
 
-function computeLevel(elo) {
-  return Math.max(1, Math.min(100, Math.floor((elo - 100) / 50) + 1));
-}
-
 function EloChange({ elo, eloChange }) {
-  const newElo = Math.max(100, elo + eloChange);
+  const newElo = Math.max(ELO_FLOOR, elo + eloChange);
   const newLevel = computeLevel(newElo);
   const oldLevel = computeLevel(elo);
   const levelDelta = newLevel - oldLevel;
+  const progress = computeLevelProgress(newElo);
   const sign = eloChange >= 0 ? "+" : "";
 
   return (
-    <div className="elo-change-wrap">
-      <span className="elo-rating">{newElo} Rating</span>
-      <span className={`elo-delta ${eloChange >= 0 ? "elo-gain" : "elo-loss"}`}>
-        {sign}{eloChange}
-      </span>
-      {levelDelta !== 0 && (
-        <span className={`level-delta ${levelDelta > 0 ? "level-up" : "level-down"}`}>
-          {levelDelta > 0 ? `▲ Lv.${newLevel}` : `▼ Lv.${newLevel}`}
+    <div className="level-progress-wrap">
+      <div className="level-progress-header">
+        <span className="level-badge">Lv. {newLevel}</span>
+        {levelDelta !== 0 && (
+          <span className={`level-delta ${levelDelta > 0 ? "level-up" : "level-down"}`}>
+            {levelDelta > 0 ? `▲ +${levelDelta}` : `▼ ${levelDelta}`}
+          </span>
+        )}
+        <span className={`elo-delta ${eloChange >= 0 ? "elo-gain" : "elo-loss"}`}>
+          {sign}{eloChange}
         </span>
-      )}
+      </div>
+      <div className="level-bar-track">
+        <div className="level-bar-fill" style={{ width: `${progress * 100}%` }} />
+      </div>
     </div>
   );
 }
@@ -72,6 +75,7 @@ function PlayerCard({ p, isWinner }) {
 export default function ResultsPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { gameId } = useParams();
   const { player: currentPlayer } = usePlayer();
 
   const result = state?.result;
@@ -118,9 +122,14 @@ export default function ResultsPage() {
         </div>
       </div>
 
-      <button className="home-btn" onClick={() => navigate("/menu")}>
-        Return to Home
-      </button>
+      <div className="results-actions">
+        <button className="home-btn" onClick={() => navigate(`/replay/${gameId}`)}>
+          Watch Replay
+        </button>
+        <button className="home-btn" onClick={() => navigate("/menu")}>
+          Return to Home
+        </button>
+      </div>
     </div>
   );
 }

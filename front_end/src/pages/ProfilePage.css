@@ -234,6 +234,37 @@
 .stat.loss  { color: #e05c5c; font-weight: 600; }
 .stat.sep   { color: #555; }
 
+.profile-level-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.profile-level-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #e8e8f0;
+  white-space: nowrap;
+  min-width: 48px;
+}
+
+.profile-level-bar-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 160px;
+}
+
+.profile-level-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf82, #6dd6a0);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
 /* ── School grid ──────────────────────────────────────── */
 
 .school-grid {

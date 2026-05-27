@@ -1,7 +1,48 @@
+.game-page {
+  min-height: 100vh;
+  background: #0a0a14;
+  color: #e8e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 16px 24px;
+  box-sizing: border-box;
+  gap: 12px;
+  font-family: inherit;
+}
+
+/* ── HUD bar ── */
+.game-hud {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2a2a3a;
+  border-radius: 10px;
+}
+
+.game-hud-round {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 0.04em;
+}
+
+.game-hud-status {
+  font-size: 0.82rem;
+  color: #ffd700;
+  font-style: italic;
+  letter-spacing: 0.03em;
+}
+
+/* ── Orbital area ── */
 .orbital-layout {
   position: relative;
   width: 100%;
-  height: min(75vh, 600px); /* big enough for all effects */
+  height: min(70vh, 560px);
 }
 
 .effects-layer {
@@ -16,4 +57,54 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+}
+
+/* ── Bottom controls ── */
+.game-controls {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.game-action-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.game-btn {
+  padding: 9px 24px;
+  border-radius: 9px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin: 0;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.game-btn.primary {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+}
+
+.game-btn.primary:hover {
+  background: rgba(255, 215, 0, 0.18);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.game-btn.secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: #2a2a3a;
+  color: #888;
+}
+
+.game-btn.secondary:hover {
+  background: rgba(224, 92, 92, 0.08);
+  border-color: rgba(224, 92, 92, 0.3);
+  color: #e05c5c;
 }

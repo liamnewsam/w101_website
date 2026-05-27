@@ -66,7 +66,7 @@ export function computePlayerAngle(playerState, gameState, user_id) {
   return angle;
 }
 
-function computePlayerPos(playerState, gameState, user_id) {
+export function computePlayerPos(playerState, gameState, user_id) {
   const angle = computePlayerAngle(playerState, gameState, user_id);
   return {
     x: (ORBITAL_DIAMETER / 2.0) * Math.cos(angle),
@@ -93,7 +93,7 @@ export const ACTIONS = {
   ACTION_RESULT: "ACTION_RESULT",
 };
 
-const initialReplayState = {
+export const initialReplayState = {
   authoritative: { game: null, player: null },
   visual: { game: null, player: null },
   turnQueue: [],
@@ -102,7 +102,7 @@ const initialReplayState = {
   confirmedDiscardIds: [],
 };
 
-function replayReducer(state, action) {
+export function replayReducer(state, action) {
   switch (action.type) {
     case ACTIONS.SNAPSHOT: {
       const { game, player } = action.payload;
@@ -181,7 +181,7 @@ function replayReducer(state, action) {
   }
 }
 
-async function processEvent(
+export async function processEvent(
   event, gs, ps, playerAngles, playerPositions, setVisualEffects, setActivatedPlayerID, onPlayerDead
 ) {
   switch (event.type) {
@@ -690,6 +690,11 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
       setHasPendingResult(true);
     });
 
+    socket.on("player_left", ({ userId, gameState }) => {
+      dispatch({ type: ACTIONS.SNAPSHOT, payload: { game: gameState, player: null } });
+      addDeadPlayer(userId);
+    });
+
     socket.emit("get_game_state", { gameId }, gs => {
       if (gs) {
         dispatch({ type: ACTIONS.SNAPSHOT, payload: { game: gs, player: null } });
@@ -706,6 +711,7 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
     return () => {
       socket.off("turn_resolved");
       socket.off("match_finished");
+      socket.off("player_left");
       socket.emit("unwatch_game", { gameId });
     };
   }, [socket, gameId, navigate]);
