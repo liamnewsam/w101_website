@@ -8,8 +8,18 @@
   gap: 24px;
 }
 
+/* ── Top bar (back btn + tabs) ──────────────────────────── */
+
+.profile-topbar {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .back-btn {
-  align-self: flex-start;
   background: none;
   border: 1px solid #333;
   color: #aaa;
@@ -18,10 +28,43 @@
   cursor: pointer;
   font-size: 0.9rem;
   transition: background 0.15s;
+  flex-shrink: 0;
 }
 
 .back-btn:hover {
   background: #1e1e1e;
+}
+
+.profile-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.profile-tab {
+  background: none;
+  border: none;
+  color: #777;
+  padding: 5px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.profile-tab:hover {
+  color: #ccc;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.profile-tab.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e8e8f0;
 }
 
 /* ── Section wrapper ──────────────────────────────────── */
@@ -181,13 +224,6 @@
   border-color: #e05c5c;
 }
 
-.profile-level {
-  font-size: 0.95rem;
-  color: #c8a824;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
 .profile-stats {
   display: flex;
   gap: 6px;
@@ -234,10 +270,22 @@
   color: #fff;
 }
 
-.school-dot {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+.school-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.school-tile-level {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #888;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.school-tile.active .school-tile-level {
+  color: var(--school-color);
 }
 
 /* ── Deck list ────────────────────────────────────────── */
@@ -298,6 +346,23 @@
 .deck-row.active {
   border-color: #3fb55c;
   background: rgba(63, 181, 92, 0.08);
+}
+
+.deck-row.restricted {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: rgba(224, 92, 92, 0.35);
+}
+
+.deck-row.restricted:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.deck-restricted-label {
+  font-size: 0.72rem;
+  color: #e05c5c;
+  font-weight: 600;
+  margin-top: 2px;
 }
 
 .deck-name {

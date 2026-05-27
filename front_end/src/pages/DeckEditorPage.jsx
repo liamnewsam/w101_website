@@ -38,7 +38,7 @@ export default function DeckEditorPage() {
   const [error, setError] = useState("");
   const nameRef = useRef(null);
 
-  const playerLevel = player?.level ?? 1;
+  const activeSchoolLevel = player?.level ?? 0;
 
   // Fetch card catalogue once
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function DeckEditorPage() {
   function addCard(card) {
     if (cardIds.length >= MAX_CARDS) return;
     if ((counts[card.id] ?? 0) >= MAX_COPIES) return;
-    if (card.pvp_level > playerLevel) return;
+    if (card.pvp_level > activeSchoolLevel) return;
     setCardIds((prev) => {
       const lastIdx = prev.lastIndexOf(card.id);
       if (lastIdx === -1) return [...prev, card.id];
@@ -161,7 +161,11 @@ export default function DeckEditorPage() {
               style={{ "--school-color": SCHOOL_COLORS[s] }}
               onClick={() => setActiveSchool(s)}
             >
-              <span className="de-school-dot" style={{ background: SCHOOL_COLORS[s] }} />
+              <img
+                className="de-school-icon"
+                src={`${BACKEND_URL}/static/w101/icons/schools/${s}.png`}
+                alt={s}
+              />
               {s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
@@ -173,7 +177,7 @@ export default function DeckEditorPage() {
         ) : (
           <div className="de-browser-grid">
             {schoolCards.map((card) => {
-              const locked = card.pvp_level > playerLevel;
+              const locked = card.pvp_level > activeSchoolLevel;
               const count = counts[card.id] ?? 0;
               const maxed = count >= MAX_COPIES;
               const full  = cardIds.length >= MAX_CARDS;

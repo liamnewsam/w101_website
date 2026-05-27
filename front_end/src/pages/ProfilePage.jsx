@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSocket } from "../socket/socketContext";
 import { usePlayer } from "../PlayerContext";
@@ -25,15 +25,40 @@ export default function ProfilePage() {
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [cardCatalogue, setCardCatalogue] = useState(null);
+
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/cards`)
+      .then((r) => r.json())
+      .then(setCardCatalogue)
+      .catch(() => {});
+  }, []);
+
+  // Flat map of card id → pvp_level for quick lookup
+  const pvpLevelById = useMemo(() => {
+    if (!cardCatalogue) return {};
+    const map = {};
+    for (const cards of Object.values(cardCatalogue))
+      for (const c of cards) map[c.id] = c.pvp_level ?? 0;
+    return map;
+  }, [cardCatalogue]);
 
   if (!player) return <div className="page profile-page"><p>Loading…</p></div>;
 
   const activeSchool = player.school || "Balance";
   const decks = player.decks || [];
   const selectedDeckIndex = player.selected_deck_index ?? 0;
-  const level = player.level ?? 1;
+  const schoolLevels = player.school_levels ?? {};
+  const activeLevel = player.level ?? 0;
   const wins = player.wins ?? 0;
   const losses = player.losses ?? 0;
+
+  function isDeckAllowed(deck) {
+    if (!cardCatalogue) return true; // optimistic while loading
+    return (deck.card_ids || []).every(
+      (id) => (pvpLevelById[id] ?? 0) <= activeLevel
+    );
+  }
 
   function startEditingName() {
     setNameInput(player.name || "");
@@ -81,6 +106,11 @@ export default function ProfilePage() {
   }
 
   function selectDeck(index) {
+    if (!isDeckAllowed(decks[index])) {
+      setFeedback(`Deck contains cards above your current level (Lv.${activeLevel}).`);
+      setTimeout(() => setFeedback(""), 2500);
+      return;
+    }
     socket.emit("update_player_deck", { deckIndex: index }, (resp) => {
       if (resp?.ok) setFeedback("Active deck changed.");
       else setFeedback(resp?.error || "Failed to update deck.");
@@ -99,7 +129,13 @@ export default function ProfilePage() {
 
   return (
     <div className="page profile-page">
-      <button className="back-btn" onClick={() => navigate("/menu")}>← Back</button>
+      <div className="profile-topbar">
+        <button className="back-btn" onClick={() => navigate("/menu")}>← Back</button>
+        <div className="profile-tabs">
+          <button className="profile-tab active">Profile</button>
+          <button className="profile-tab" onClick={() => navigate("/stats")}>Stats</button>
+        </div>
+      </div>
 
       {showAvatarPicker && (
         <AvatarPicker
@@ -145,7 +181,6 @@ export default function ProfilePage() {
                 <button className="profile-name-edit-btn" onClick={startEditingName} title="Edit name">✏️</button>
               </div>
             )}
-            <div className="profile-level">Level {level}</div>
             <div className="profile-stats">
               <span className="stat win">{wins}W</span>
               <span className="stat sep">/</span>
@@ -171,8 +206,15 @@ export default function ProfilePage() {
                 }}
                 onClick={() => selectSchool(s.name)}
               >
-                <div className="school-dot" style={{ background: s.color }} />
+                <img
+                  className="school-icon"
+                  src={`${BACKEND_URL}/static/w101/icons/schools/${s.name.toLowerCase()}.png`}
+                  alt={s.name}
+                />
                 {s.name}
+                <span className="school-tile-level">
+                  Lv.{schoolLevels[s.name.toLowerCase()] ?? 1}
+                </span>
               </button>
             );
           })}
@@ -193,15 +235,18 @@ export default function ProfilePage() {
           <div className="deck-list">
             {decks.map((deck, i) => {
               const isActive = i === selectedDeckIndex;
+              const allowed = isDeckAllowed(deck);
               return (
                 <div
                   key={i}
-                  className={`deck-row${isActive ? " active" : ""}`}
+                  className={`deck-row${isActive ? " active" : ""}${!allowed ? " restricted" : ""}`}
                   onClick={() => selectDeck(i)}
+                  title={!allowed ? `Contains cards above Lv.${activeLevel}` : undefined}
                 >
                   <div className="deck-info">
                     <div className="deck-name">{deck.name || `Deck ${i + 1}`}</div>
                     <div className="deck-count">{deck.card_ids?.length ?? 0} cards</div>
+                    {!allowed && <div className="deck-restricted-label">Above level</div>}
                   </div>
                   <div className="deck-row-actions">
                     {isActive && <span className="deck-active-mark">✓ Active</span>}

@@ -1,0 +1,267 @@
+.sp-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding-bottom: 48px;
+  box-sizing: border-box;
+  background: #0a0a14;
+  color: #e8e8f0;
+  font-family: inherit;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+
+.sp-header {
+  width: 100%;
+  max-width: 640px;
+  padding: 24px 24px 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sp-back-btn {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid #333;
+  color: #aaa;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: background 0.15s;
+}
+.sp-back-btn:hover { background: #1e1e1e; }
+
+.sp-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2a2a3a;
+  border-top: 3px solid var(--school-color, #c8a85c);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.sp-school-icon {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.sp-identity-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-player-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-school-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.sp-level-badge {
+  flex-shrink: 0;
+  border: 2px solid var(--school-color, #c8a85c);
+  color: var(--school-color, #c8a85c);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* ── Content ──────────────────────────────────────────── */
+
+.sp-content {
+  width: 100%;
+  max-width: 640px;
+  padding: 20px 24px 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Sections ──────────────────────────────────────────── */
+
+.sp-section {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2a2a3a;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.sp-section-title {
+  padding: 10px 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--school-color, #c8a85c);
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid #2a2a3a;
+}
+
+.sp-section-body {
+  padding: 6px 0;
+}
+
+/* ── Stat rows ──────────────────────────────────────────── */
+
+.sp-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+}
+
+.sp-stat-row + .sp-stat-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.sp-stat-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 170px;
+  flex-shrink: 0;
+}
+
+.sp-stat-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.sp-stat-icon-placeholder {
+  width: 18px;
+  height: 18px;
+}
+
+/* Colored pips for Health / Mana (no icon files available) */
+.sp-health-pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e05c5c;
+  flex-shrink: 0;
+}
+
+.sp-mana-pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4a90d9;
+  flex-shrink: 0;
+}
+
+.sp-stat-label {
+  font-size: 0.88rem;
+  color: #ccc;
+  white-space: nowrap;
+}
+
+.sp-stat-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-bar-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sp-bar-fill {
+  height: 100%;
+  background: var(--school-color, #c8a85c);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.sp-bar-health { background: #e05c5c; }
+.sp-bar-mana   { background: #4a90d9; }
+
+.sp-stat-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #e8e8f0;
+  width: 52px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── School Affinities Table ──────────────────────────────── */
+
+.sp-school-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.sp-school-table thead tr {
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid #2a2a3a;
+}
+
+.sp-school-table th {
+  padding: 8px 14px;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.sp-school-table td {
+  padding: 9px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  color: #ccc;
+}
+
+.sp-school-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sp-school-table-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.sp-positive { color: #6ddd8a; font-weight: 600; }
+.sp-negative { color: #e06060; font-weight: 600; }
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .sp-stat-left { width: 148px; }
+  .sp-stat-value { width: 44px; font-size: 0.82rem; }
+}

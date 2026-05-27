@@ -249,10 +249,22 @@ async function processEvent(
       }
 
       switch (event.aspect) {
+        case "reshuffle": {
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: "Reshuffled", color: goodColor}],
+            id: crypto.randomUUID(),
+            pos: {
+                x: playerPositions[event.target].x + FLOATING_PRESENT_OFFSET_X,
+                y: playerPositions[event.target].y + FLOATING_PRESENT_OFFSET_Y
+            }
+          }]);
+          break;
+        }
         case "update": {
           const field = fieldMap[event.aspectType];
           if (field) {
-            const target = getPlayer(gs, event.player);
+            const target = getPlayer(gs, event.target ?? event.player);
             target[field] = replaceFirstMatching(target[field], event.from, event.to);
           }
           break;

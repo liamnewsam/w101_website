@@ -7,6 +7,7 @@ import ResultsPage from "./pages/ResultsPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import DeckEditorPage from "./pages/DeckEditorPage";
+import StatsPage from "./pages/StatsPage";
 import {useSocket} from "./socket/socketContext"
 
 function ProtectedRoute({ element }) {
@@ -61,6 +62,11 @@ export default function App() {
       <Route
         path="/deck-editor"
         element={<ProtectedRoute element={<DeckEditorPage />} />}
+      />
+
+      <Route
+        path="/stats"
+        element={<ProtectedRoute element={<StatsPage />} />}
       />
 
       <Route path="*" element={<Navigate to="/menu" replace />} />
