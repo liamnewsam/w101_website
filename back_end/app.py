@@ -40,7 +40,7 @@ CORS(app, supports_credentials=True, resources={r"/*": {"origins": ALLOWED_ORIGI
 
 app.register_blueprint(auth, url_prefix="/auth")
 
-socketio = SocketIO(app, cors_allowed_origins=ALLOWED_ORIGINS, logger=False, engineio_logger=False)
+socketio = SocketIO(app, cors_allowed_origins=ALLOWED_ORIGINS, logger=False, engineio_logger=False, async_mode="threading")
 
 from flask import make_response
 

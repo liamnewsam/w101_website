@@ -1,1 +1,1 @@
-web: gunicorn -k eventlet -b :$PORT app:app
+gunicorn --bind :$PORT app:app
