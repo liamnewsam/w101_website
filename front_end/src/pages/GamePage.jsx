@@ -11,6 +11,7 @@ import SlideFadeReveal from "../components/SlideFadeReveal";
 import SimpleArrow from "../components/SimpleArrow";
 import Loading from "../components/Loading";
 import { BACKEND_URL } from "../config";
+import { logout } from "../api/auth";
 import "./GamePage.css";
 import CircularArrow from "../components/CircularArrow";
 import { useGameReplay, ACTIONS, ORBITAL_DIAMETER } from "../hooks/useGameReplay";
@@ -21,7 +22,7 @@ import { useGameReplay, ACTIONS, ORBITAL_DIAMETER } from "../hooks/useGameReplay
 
 export default function GamePage() {
   const { gameId } = useParams();
-  const { socket } = useSocket();
+  const { socket, disconnectSocket } = useSocket();
   const navigate = useNavigate();
   const { state: locationState } = useLocation();
 
@@ -260,7 +261,12 @@ export default function GamePage() {
           )}
           <button className="game-btn secondary" onClick={() => {
               sendAction({ type: "leave" });
-              navigate(isDemo ? "/" : "/menu");
+              if (isDemo) {
+                logout(disconnectSocket);
+                navigate("/");
+              } else {
+                navigate("/menu");
+              }
             }}>Leave Game</button>
         </div>
       </div>
