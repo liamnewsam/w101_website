@@ -25,7 +25,8 @@ export default function LoginPage() {
   useEffect(() => {
     if (!connected) return;
     const token = localStorage.getItem("token");
-    const payload = jwtPayload(token || "");
+    if (!token) return;
+    const payload = jwtPayload(token);
     navigate(payload.type === "demo" ? "/rl-demo" : "/menu");
   }, [connected]);
 
