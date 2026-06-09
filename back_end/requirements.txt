@@ -8,5 +8,5 @@ SQLAlchemy
 psycopg2-binary
 bcrypt
 PyJWT
-psycopg2-binary
+python-dotenv
 gunicorn
