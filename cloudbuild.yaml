@@ -3,7 +3,7 @@ steps:
   - name: gcr.io/k8s-skaffold/pack
     args:
       - build
-      - gcr.io/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - gcr.io/$_AR_PROJECT_ID/$_AR_REPOSITORY/$_REPO_NAME/$_SERVICE_NAME:$_TAG
       - '--builder=gcr.io/buildpacks/builder:latest'
       - '--path=back_end'
       - '--clear-cache'
@@ -13,7 +13,7 @@ steps:
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - gcr.io/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - gcr.io/$_AR_PROJECT_ID/$_AR_REPOSITORY/$_REPO_NAME/$_SERVICE_NAME:$_TAG
     id: Push
 
   # 3️⃣ Deploy to Cloud Run
@@ -31,7 +31,7 @@ steps:
     id: Deploy
 
 images:
-  - gcr.io/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+  - gcr.io/$_AR_PROJECT_ID/$_AR_REPOSITORY/$_REPO_NAME/$_SERVICE_NAME:$_TAG
 
 options:
   logging: CLOUD_LOGGING_ONLY
@@ -39,5 +39,7 @@ options:
 substitutions:
   _AR_PROJECT_ID: fresh-circle-478122-b7
   _AR_REPOSITORY: cloud-run-source-deploy
+  _REPO_NAME: w101-website
   _SERVICE_NAME: w101
   _DEPLOY_REGION: us-west1
+  _TAG: latest
