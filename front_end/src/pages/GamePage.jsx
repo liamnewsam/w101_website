@@ -39,6 +39,16 @@ export default function GamePage() {
   const isDemo = locationState?.isDemo === true;
   const demoResultPath = isDemo ? `/demo-results/${gameId}` : undefined;
 
+  // Detect demo token even when location.state is lost (e.g. tab restore)
+  const tokenType = (() => {
+    try {
+      const t = localStorage.getItem("token");
+      if (!t) return null;
+      return JSON.parse(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).type;
+    } catch { return null; }
+  })();
+  const missingGamePath = (isDemo || tokenType === "demo") ? "/" : "/menu";
+
   const { visual, replaying, dispatch, playerAngles, authoritative, deadPlayerIds } = useGameReplay({
     socket,
     gameId,
@@ -46,6 +56,7 @@ export default function GamePage() {
     setVisualEffects,
     setActivatedPlayerID,
     resultPath: demoResultPath,
+    missingGamePath,
   });
 
   // Compute clockwise-only cumulative rotation during render.

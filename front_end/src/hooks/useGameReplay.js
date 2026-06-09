@@ -659,7 +659,7 @@ export async function processEvent(
   return { gs, ps };
 }
 
-export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setActivatedPlayerID, resultPath }) {
+export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setActivatedPlayerID, resultPath, missingGamePath }) {
   const [replayState, dispatch] = useReducer(replayReducer, initialReplayState);
   const { visual, replaying, eventQueue, turnQueue } = replayState;
   const [deadPlayerIds, setDeadPlayerIds] = useState(new Set());
@@ -707,11 +707,14 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
     });
 
     socket.emit("get_game_state", { gameId }, gs => {
-      if (gs) {
+      if (gs?.teams) {
         dispatch({ type: ACTIONS.SNAPSHOT, payload: { game: gs, player: null } });
         setActivatedPlayerID(gs.teams?.[gs.playing_team]?.[0]?.user_id);
       } else {
-        navigate("/menu");
+        if (missingGamePath === "/") {
+          localStorage.removeItem("token");
+        }
+        navigate(missingGamePath ?? "/menu");
       }
     });
 
