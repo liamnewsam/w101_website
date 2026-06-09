@@ -1,23 +1,19 @@
-"""Inference utilities using ONNX Runtime (no PyTorch dependency).
+"""Original PyTorch-based inference. Preserved for local training/evaluation use.
 
-Run rl/export_onnx.py once locally to generate .onnx + .json files from .pt checkpoints.
-
-Key public API:
-    list_checkpoints()             → list of checkpoint metadata dicts
-    load_model(path, device)       → (session, config_dict)
-    take_model_action(session, game, player, device, max_retries)
+To use .pt checkpoints directly, import from this module instead of inference.py:
+    from rl.inference_torch import load_model, take_model_action
 """
 
 from __future__ import annotations
 
-import glob
-import json
 import os
+import glob
 from pathlib import Path
 
 import numpy as np
-import onnxruntime as ort
+import torch
 
+from rl.model import TransformerActorCritic
 from rl.env import (
     CARD_DIM, PLAYER_DIM, GAME_DIM,
     EFFECT_TOKEN_DIM, MAX_EFFECT_TOKENS,
@@ -34,46 +30,52 @@ from rl.env import (
 _CHECKPOINT_DIR = Path(__file__).parent / "checkpoints"
 
 
-def _onnx_path(path: str) -> str:
-    return str(path).replace(".pt", ".onnx")
-
-def _json_path(path: str) -> str:
-    return str(path).replace(".pt", ".json")
-
-def _read_json(path: str) -> dict:
-    with open(path) as f:
-        return json.load(f)
-
-
 # ──────────────────────────────────────────────────────────────────────────────
 # Checkpoint discovery
 # ──────────────────────────────────────────────────────────────────────────────
 
 def get_school_best_deck(school: str) -> list[str]:
-    path = _CHECKPOINT_DIR / school / "best.json"
-    return _read_json(str(path)).get("deck_card_ids", [])
+    """Return the deck_card_ids from rl/checkpoints/<School>/best.pt."""
+    path = _CHECKPOINT_DIR / school / "best.pt"
+    ckpt = torch.load(str(path), map_location="cpu", weights_only=False)
+    return ckpt.get("deck_card_ids", [])
 
 
 def pick_demo_ai_deck(school: str) -> tuple[list[str], str]:
-    best_path = str(_CHECKPOINT_DIR / school / "best.json")
-    alt_paths = sorted(glob.glob(str(_CHECKPOINT_DIR / school / "best_decks" / "deck_*.json")))
+    """Randomly choose the AI deck for a demo game."""
+    best_path = _CHECKPOINT_DIR / school / "best.pt"
+    best_decks_dir = _CHECKPOINT_DIR / school / "best_decks"
+    best_deck_paths = sorted(glob.glob(str(best_decks_dir / "deck_*.pt")))
 
-    options = [best_path] + alt_paths
-    chosen  = options[os.urandom(1)[0] % len(options)] if options else best_path
+    options = [str(best_path)] + best_deck_paths
+    chosen = options[os.urandom(1)[0] % len(options)] if options else str(best_path)
 
-    data = _read_json(chosen)
-    return data.get("deck_card_ids", []), chosen.replace(".json", ".pt")
+    ckpt = torch.load(chosen, map_location="cpu", weights_only=False)
+    card_ids = ckpt.get("deck_card_ids", [])
+    return card_ids, chosen
 
 
 def list_checkpoints() -> list[dict]:
-    paths = sorted(glob.glob(str(_CHECKPOINT_DIR / "model_*.json")), reverse=True)
+    """Return metadata for every checkpoint in rl/checkpoints/, newest first."""
+    paths = sorted(glob.glob(str(_CHECKPOINT_DIR / "model_*.pt")), reverse=True)
     results = []
     for path in paths:
         try:
-            results.append(_read_json(path))
+            ckpt = torch.load(path, map_location="cpu", weights_only=False)
+            cfg = ckpt.get("config", {})
+            results.append({
+                "path": path,
+                "filename": os.path.basename(path),
+                "iteration": ckpt.get("iteration", 0),
+                "agent_school": cfg.get("agent_school", "Unknown"),
+                "agent_level": cfg.get("agent_level", 1),
+                "agent_deck_name": cfg.get("agent_deck_name"),
+                "embed_dim": cfg.get("embed_dim", 64),
+                "n_heads": cfg.get("n_heads", 4),
+                "n_layers": cfg.get("n_layers", 2),
+            })
         except Exception as e:
-            pt = path.replace(".json", ".pt")
-            results.append({"path": pt, "filename": os.path.basename(pt), "error": str(e)})
+            results.append({"path": path, "filename": os.path.basename(path), "error": str(e)})
     return results
 
 
@@ -82,19 +84,30 @@ def list_checkpoints() -> list[dict]:
 # ──────────────────────────────────────────────────────────────────────────────
 
 def load_model(checkpoint_path: str, device: str = "cpu") -> tuple:
-    """Load an ONNX inference session from a checkpoint path (.pt or .onnx).
+    """Load a TransformerActorCritic from a checkpoint. Returns (model, config_dict)."""
+    ckpt = torch.load(checkpoint_path, map_location=device, weights_only=False)
+    cfg = ckpt.get("config", {})
 
-    Returns:
-        (session, config_dict)
-    """
-    onnx = _onnx_path(checkpoint_path)
-    meta = {}
-    jp   = _json_path(checkpoint_path)
-    if os.path.exists(jp):
-        meta = _read_json(jp)
-    meta.setdefault("deck_card_ids", None)
-    session = ort.InferenceSession(onnx, providers=["CPUExecutionProvider"])
-    return session, meta
+    model = TransformerActorCritic(
+        card_dim             = CARD_DIM,
+        player_dim           = PLAYER_DIM,
+        game_dim             = GAME_DIM,
+        effect_token_dim     = EFFECT_TOKEN_DIM,
+        hand_size            = HAND_SIZE,
+        max_players          = MAX_PLAYERS,
+        max_total_cards      = MAX_TOTAL_CARDS,
+        max_effect_tokens    = MAX_EFFECT_TOKENS,
+        n_target_slots       = N_TARGET_SLOTS,
+        n_pip_school_actions = N_PIP_SCHOOL_ACTIONS,
+        embed_dim            = cfg.get("embed_dim", 64),
+        n_heads              = cfg.get("n_heads", 4),
+        n_layers             = cfg.get("n_layers", 2),
+    ).to(device)
+
+    model.load_state_dict(ckpt["model"])
+    model.eval()
+    cfg["deck_card_ids"] = ckpt.get("deck_card_ids", None)
+    return model, cfg
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -138,11 +151,12 @@ def _action_mask(game, player, my_team, enemy_team) -> np.ndarray:
     for card_i, info in enumerate(play[:HAND_SIZE]):
         if not info["playable"]:
             continue
+        targets = info["targets"]
         base = CAST_BASE + card_i * N_TARGET_SLOTS
-        if not info["targets"]:
+        if not targets:
             mask[base + MAX_PLAYERS] = 1.0
         else:
-            for t in info["targets"]:
+            for t in targets:
                 j = _global_idx_for_player(t, my_team, enemy_team)
                 if j >= 0:
                     mask[base + j] = 1.0
@@ -233,7 +247,7 @@ def _apply_action(action_int: int, game, player, my_team, enemy_team) -> bool:
 # ──────────────────────────────────────────────────────────────────────────────
 
 def take_model_action(
-    model: ort.InferenceSession,
+    model: TransformerActorCritic,
     game,
     player,
     device: str = "cpu",
@@ -248,24 +262,16 @@ def take_model_action(
     for _ in range(max_retries):
         obs = obs_for_player(game, player, max_turns)
 
-        (logits_np, _) = model.run(None, {
-            "cards":       obs["cards"][None],
-            "players":     obs["players"][None],
-            "effects":     obs["effects"][None],
-            "game":        obs["game"][None],
-            "action_mask": obs["action_mask"][None],
-        })
+        cards_t   = torch.as_tensor(obs["cards"][None],       device=device)
+        players_t = torch.as_tensor(obs["players"][None],     device=device)
+        effects_t = torch.as_tensor(obs["effects"][None],     device=device)
+        game_t    = torch.as_tensor(obs["game"][None],        device=device)
+        mask_t    = torch.as_tensor(obs["action_mask"][None], device=device)
 
-        logits = logits_np[0]
-        finite = np.isfinite(logits)
-        if not finite.any():
-            break
-        shifted = np.where(finite, logits - logits[finite].max(), -1e9)
-        probs   = np.exp(shifted)
-        probs   = np.where(finite, probs, 0.0)
-        probs  /= probs.sum()
+        with torch.no_grad():
+            action, _, _ = model.act(cards_t, players_t, effects_t, game_t, mask_t)
 
-        action_int = int(np.random.choice(len(probs), p=probs))
+        action_int = int(action.item())
         if _apply_action(action_int, game, player, my_team, enemy_team):
             return
 

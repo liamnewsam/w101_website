@@ -6,6 +6,9 @@ python-engineio
 
 SQLAlchemy
 psycopg2-binary
+pg8000
+numpy
+onnxruntime
 bcrypt
 PyJWT
 python-dotenv
