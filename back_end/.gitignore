@@ -1,1 +1,14 @@
 .env
+.claude
+rl/checkpoints/misc
+rl/checkpoints/Balance/phase1_final.pt
+rl/checkpoints/Death/phase1_final.pt
+rl/checkpoints/Fire/phase1_final.pt
+rl/checkpoints/Ice/phase1_final.pt
+rl/checkpoints/Life/phase1_final.pt
+rl/checkpoints/Myth/phase1_final.pt
+rl/checkpoints/Storm/phase1_final.pt
+rl/crashes
+rl/logs
+rl/eval
+rl/benchmark_results

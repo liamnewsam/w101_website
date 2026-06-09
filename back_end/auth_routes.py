@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 import bcrypt, uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 #-------------------
 from database import SessionLocal
 from models import User, GuestSession, PlayerState
@@ -37,7 +37,9 @@ def login():
 @auth.route("/guest", methods=["POST"])
 def guest_login():
     guest_id = uuid.uuid4().hex
-    expires = datetime.utcnow() + timedelta(seconds=GUEST_SESSION_LIFETIME)
+    expires = datetime.now(timezone.utc) + timedelta(seconds=GUEST_SESSION_LIFETIME)
+
+    decks, school, selected_deck_index = new_player_state()
 
     db = SessionLocal()
     try:
@@ -46,9 +48,9 @@ def guest_login():
             player_id=guest_id,
             is_guest=True,
             name=f"Guest {guest_id[:6]}",
-            school="Balance",
-            decks=[contrived_player_deck().to_dict()],
-            selected_deck_index=0,
+            school=school,
+            decks=decks,
+            selected_deck_index=selected_deck_index,
             wins=0,
             losses=0,
             elo=100,
@@ -82,6 +84,7 @@ def register():
     try:
         if db.query(User).filter_by(username=username).first():
             return jsonify({"error": "Username already taken"}), 409
+        decks, school, selected_deck_index = new_player_state()
         user = User(username=username, password_hash=password_hash)
         db.add(user)
         db.flush()  # populate user.id
@@ -89,9 +92,9 @@ def register():
             player_id=str(user.id),
             is_guest=False,
             name=username,
-            school="Balance",
-            decks=[simple_balance().to_dict()],
-            selected_deck_index=0,
+            school=school,
+            decks=decks,
+            selected_deck_index=selected_deck_index,
             wins=0,
             losses=0,
             elo=100,
@@ -105,6 +108,14 @@ def register():
         raise e
     finally:
         db.close()
+
+
+@auth.route("/demo", methods=["POST"])
+def demo_login():
+    """Create a temporary demo session with no database record."""
+    demo_id = "demo_" + uuid.uuid4().hex
+    token = create_jwt({"user_id": demo_id, "type": "demo"})
+    return jsonify({"token": token, "demo_id": demo_id})
 
 
 @auth.route("/logout", methods=["POST"])

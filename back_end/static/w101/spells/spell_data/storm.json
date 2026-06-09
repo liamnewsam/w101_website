@@ -142,29 +142,6 @@
         "pvp_level": 140
     },
     {
-        "name": "Insane Bolt",
-        "school": "storm",
-        "type": "damage",
-        "pips": 2,
-        "description": "Deals 145 Storm Damage to target three times, with each hit having a 20% chance to hit caster instead of target",
-        "effects": [
-            {"type": "chance", "times": 3, "options": [
-                {
-                    "chance": 80,
-                    "effect": {"type": "damage", "school": "storm", "amount": 145, "target": "enemy_same"}
-                },
-                {
-                    "chance": 20,
-                    "effect": {"type": "damage", "school": "storm", "amount": 145, "target": "self"}
-                }
-            ]}
-        ],
-        "image": "static/w101/spells/storm/(Spell)_Insane_Bolt.png",
-        "id": "insane_bolt",
-        "accuracy": 70,
-        "pvp_level": 55
-    },
-    {
         "name": "Storm Trap",
         "school": "storm",
         "type": "jinx",
@@ -222,6 +199,7 @@
         "type": "manipulation",
         "pips": 0,
         "description": "Removes 1 negative Charm",
+        "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "self"},
         "effects": [
             {"type": "destroy", "aspect": "curse", "target": "self"}
         ],
@@ -310,6 +288,7 @@
         "type": "manipulation",
         "pips": 0,
         "description": "Removes a positive Charm",
+        "condition": {"type": "amount", "aspect": "charm", "amount": 1, "target": "enemy"},
         "effects": [
             {"type": "destroy", "aspect": "charm", "target": "enemy"}
         ],

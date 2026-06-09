@@ -6,7 +6,7 @@ from Card import *
 from Deck import *
 from utils import *
 
-def createBotPlayer(name, bot_id, image_path, school="random", deck=None, difficulty="easy", level=1):
+def createBotPlayer(name, bot_id, image_path, school="random", deck=None, difficulty="moderate", level=100):
     from stats import compute_stats, compute_school_chart
     if school == "random":
         school = random.choice(list(DECK_MASTER[difficulty].keys()))
@@ -67,7 +67,6 @@ def neededTargetType(card_def):
 
 def getEffectTargetType(effect):
     if "target" in effect.keys():
-        print(effect["target"])
         return effect["target"]
     
     #Defaulting
@@ -87,6 +86,14 @@ class Game():
         self.winner = None
 
         self.log = []
+
+        # Maps user_id → (model, device) for bots driven by a trained RL model.
+        # Set externally after construction (e.g. in start_game or simulate_game).
+        self.model_agents: dict = {}
+
+        # Bot user_ids listed here will always pass instead of acting randomly.
+        # Used for curriculum phase 2 (pass-bot training).
+        self.pass_bot_ids: set = set()
     
     def getPlayers(self, includeBots=True):
         players = self.teams[0] + self.teams[1]
@@ -115,24 +122,29 @@ class Game():
 
         self.player_actions = {player.user_id: None for player in self.getPlayers()}
 
+        pre_log_len = len(self.log)
         for player in self.current_team(aliveOnly=True):
-            if player.isBot: #Immediately do a random action
+            if player.isBot:
                 self.takeRandomAction(player)
+        log.extend(self.log[pre_log_len:])
 
         return log
     
     def takeRandomAction(self, player):
-        self.player_pass(player)
-        return
+        if player.user_id in self.pass_bot_ids:
+            self.player_pass(player)
+            return
+
+        if player.user_id in self.model_agents:
+            self.model_agents[player.user_id](player)
+            return
 
         if len(player.deck.play_hand) == 0:
-            print(f"{player.name} is out of cards, passing")
             self.player_pass(player)
             return
 
         playable_indices = [i for i, option in enumerate(self.playability[player.user_id]) if option["playable"]]
         if len(playable_indices) == 0:
-            print(f"{player.name} cannot play anything! Will discard one card and then pass")
             discard_card = player.deck.play_hand[random.randint(0, len(player.deck.play_hand)-1)]
             self.player_discard(player, discard_card.instance_id)
             self.player_pass(player)
@@ -184,7 +196,7 @@ class Game():
         for i, card in enumerate(player.deck.play_hand):
             if card.instance_id == card_id:
                 player.deck.play_hand.pop(i)
-                self.log.append({"type": "action", "player": player.user_id, "action": "discard", "cardIndex": i})
+                self.log.append({"type": "action", "player": player.user_id, "action": "discard", "card": card.card_def.id, "cardIndex": i})
                 player.deck.play_discard.append(card)
                 self.playability[player.user_id].pop(i)
                 return True
@@ -234,7 +246,23 @@ class Game():
                 condition = effect.get("condition")
                 if condition:
                     condition_target = self._resolve_condition_target(condition, player, action)
-                    for _ in range(effect["up_to"]):
+                    # For amount conditions, cap iterations at the current count of the
+                    # aspect so over-expansion doesn't queue more destroy/consume effects
+                    # than actually exist (expansion runs before resolution).
+                    max_iters = effect["up_to"]
+                    if condition.get("type") == "amount":
+                        _aspect_lists = {
+                            "charm": condition_target.charms,
+                            "curse": condition_target.curses,
+                            "ward":  condition_target.wards,
+                            "jinx":  condition_target.jinxes,
+                            "DoT":   condition_target.dots,
+                            "HoT":   condition_target.hots,
+                        }
+                        aspect_list = _aspect_lists.get(condition.get("aspect", ""))
+                        if aspect_list is not None:
+                            max_iters = min(max_iters, len(aspect_list))
+                    for _ in range(max_iters):
                         if not self.conditionMet(player, condition, condition_target):
                             break
                         yield from self._expand_effects(effect["effects"], player, action)
@@ -268,7 +296,6 @@ class Game():
             
 
             log.append({"type": "action", "player": player.user_id, "action": "activate"})
-            print(log[-1])
 
             log.extend(self.process_ongoing_effects(player))
             if player.health == 0: #They died
@@ -276,17 +303,14 @@ class Game():
 
 
             action = self.player_actions[player.user_id]
-            print(action)
             if action["type"] == "pass":
                 log.append({"type": "action", "player": player.user_id, "action": "pass"})
-                print(log[-1])
                 continue
             
             #Otherwise, the player is casting a card
             card_index = action["index"]
             card = player.deck.play_hand[card_index]
             log.append({"type": "action", "player": player.user_id, "action": "attempt_cast", "school": card.card_def.school})
-            print(log[-1])
 
             consumed_dispel = player.consume_dispel(card)
             if consumed_dispel:
@@ -304,23 +328,18 @@ class Game():
             for hangingEffect in consumed_accuracies:
                 value = hangingEffect.to_json()
                 log.append({"type": "effect_trigger", "player": player.user_id, "aspect": value["type"], "value": value})
-                print(log[-1])
 
-            
             if random.randint(1, 100) > accuracy:
-                #print(card.card_def.accuracy)
-                #print(extra_accuracy)
                 log.append({"type": "result", "player": player.user_id, "result": "fizzle"})
-                print(log[-1])
                 player.deck.play_hand.pop(card_index)
                 player.deck.play_cards.insert(random.randint(0, len(player.deck.play_cards)), card)
                 continue
-            
-            log.append({"type": "effect_resolve", "target": player.user_id, "aspect": "pip_lose", "amount": player.deduct_pips(card)})
-            print(log[-1])
+
+            deducted = player.deduct_pips(card)
+            x_pips = deducted.pop("x_pips", 1)
+            log.append({"type": "effect_resolve", "target": player.user_id, "aspect": "pip_lose", "amount": deducted})
             log.append({"type": "result", "player": player.user_id, "result": "success", "card": card.card_def.id})
-            print(log[-1])
-            
+
 
             # Expand effects first so gambit conditions see charms/curses intact.
             # caster_accumulation is shared across the whole cast so blades apply
@@ -337,12 +356,9 @@ class Game():
             overwritten_global = False
             for effect in expanded_effects:
 
-                print(f"Effect: {effect}")
-
                 for hangingEffect in player.consume_charms_curses_for_effect(effect, caster_accumulation):
                     value = hangingEffect.to_json()
                     log.append({"type": "effect_trigger", "player": player.user_id, "aspect": value["type"], "value": value})
-                    print(log[-1])
 
                 target_pool = None
                 if "target" not in effect.keys():
@@ -356,6 +372,14 @@ class Game():
                 elif effect["target"] == "ally_all":
                     target_pool = self.current_team(aliveOnly=True)
 
+                target_accumulation = {
+                    "damage": {"any": 0, "myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0},
+                    "armor_piercing": {"any": 0, "myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0},
+                    "heal": 0,
+                    "prism_school": False
+                }
+                critical_multiplier = 1
+
                 if target_pool:
                     for target in target_pool:
                         target_accumulation = {
@@ -368,24 +392,21 @@ class Game():
                         for hangingEffect in target.consume_wards_jinxes(effect, target_accumulation):
                             value = hangingEffect.to_json()
                             log.append({"type": "effect_trigger", "player": target.user_id, "aspect": value["type"], "value": value})
-                            print(log[-1])
 
                         critical_multiplier = 1
 
                         if effect["type"] in ["damage", "DoT", "heal", "HoT", "drain", "detonate"]:
                             if random.randint(0, 99) < player.critical[card.card_def.school]:
                                 log.append({"type": "effect_resolve", "player": player.user_id, "aspect": "critical"})
-                                print(log[-1])
                                 critical_multiplier = 2
 
-                        log.extend(self.resolve_action(card, player, target, effect, caster_accumulation, target_accumulation, critical_multiplier))
-                        print(log[-1])
+                        log.extend(self.resolve_action(card, player, target, effect, caster_accumulation, target_accumulation, critical_multiplier, x_pips))
 
                 else:
                     if effect["type"] == "global" and not overwritten_global:
                         overwritten_global = True
                         self.global_effects = []
-                        log.extend(self.resolve_action(card, player, None, effect, caster_accumulation, target_accumulation, critical_multiplier))
+                        log.extend(self.resolve_action(card, player, None, effect, caster_accumulation, target_accumulation, critical_multiplier, x_pips))
                 
                 
                 
@@ -393,8 +414,6 @@ class Game():
             player.deck.play_hand.pop(card_index)
             if card.card_def.reshuffle:
                 player.deck.play_discard.append(card)
-            else:
-                print("Card is removed from play")
         
         #for message in log:
         #    print(message)
@@ -405,11 +424,11 @@ class Game():
 
         return log
 
-    def resolve_action(self, card: Card, caster: Player, target: Player, effect: dict, caster_accumulation, target_accumulation, critical_multiplier):
+    def resolve_action(self, card: Card, caster: Player, target: Player, effect: dict, caster_accumulation, target_accumulation, critical_multiplier, x_pips=1):
 
-        effect = EFFECT_TYPE_TO_CLASS[effect["type"]](effect, caster, target, card)
+        effect = EFFECT_TYPE_TO_CLASS[effect["type"]](effect, caster, target, card, x_pips=x_pips)
         if type(effect) in [DamageEffect, HealEffect, DoTEffect, HoTEffect, DrainEffect, DetonateEffect]:
-            result = effect.resolve(self, caster_accumulation, target_accumulation, critical_multiplier)            
+            result = effect.resolve(self, caster_accumulation, target_accumulation, critical_multiplier)
         else:
             result = effect.resolve(self)
 
@@ -418,9 +437,13 @@ class Game():
         return result
 
     def struggle_punish(self, player):
-        if len(player.deck.play_cards) == 0 and len(self.playable_cards(player)) == 0:
-            player.health -= 10 * player.struggle_counter
+        """Apply escalating damage when both hand and deck are empty."""
+        if len(player.deck.play_cards) == 0 and len(player.deck.play_hand) == 0:
+            damage = 10 * player.struggle_counter
+            player.health = max(0, player.health - damage)
             player.struggle_counter += 1
+            return [{"type": "effect_resolve", "target": player.user_id, "aspect": "struggle", "amount": damage}]
+        return []
 
     def is_playable(self, player, card):
         
@@ -432,8 +455,10 @@ class Game():
         if type(required_pips) == dict:
             for school in [x for x in required_pips.keys() if x != "regular"]:
                 test[school] -= required_pips[school]
+        elif required_pips == "X":
+            # X-pip spells consume all pips; need at least 1 pip to cast
+            return player.pip_count() >= 1
         elif type(required_pips) == str:
-            '''TODO: X'''
             return False
         else:
             required_pips = {"regular": card.card_def.pips}    
@@ -560,9 +585,12 @@ class Game():
         
 
     def process_ongoing_effects(self, player):
-
-        #Process DoTs
         log = []
+
+        log.extend(self.struggle_punish(player))
+        if player.health == 0:
+            return log
+
         for dot in player.dots[:]:
 
             
@@ -579,7 +607,6 @@ class Game():
                 for hangingEffect in dot.target.consume_wards_jinxes(dummyEffect, target_accumulation):
                     value = hangingEffect.to_json()
                     log.append({"type": "effect_trigger", "player": dot.target.user_id, "aspect": value["type"], "value": value})
-                    print(log[-1])
         
 
 

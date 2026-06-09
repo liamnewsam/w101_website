@@ -298,6 +298,59 @@
         "id": "jupiter's_might",
         "accuracy": 70,
         "pvp_level": 90
+    },
+    {
+        "name": "Dark Pact",
+        "school": "death",
+        "type": "charm",
+        "pips": 1,
+        "description": "Deals 250 Moon Damage to caster and applies two +25% Damage Blades on target",
+        "effects": [
+            {"type": "damage", "school": "moon", "amount": 250, "target": "self"},
+            {"type": "charm", "aspect": "damage", "amount": 25, "target": "ally_same"},
+            {"type": "charm", "aspect": "damage", "amount": 25, "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/death/(Spell)_Dark_Pact.png",
+        "id": "dark_pact",
+        "accuracy": 100,
+        "pvp_level": 35
+    },
+    {
+        "name": "Stun Block",
+        "school": "ice",
+        "type": "ward",
+        "pips": 0,
+        "description": "Applies two Stun Resist Wards on target",
+        "effects": [
+            {"type": "shield", "aspect": "stun", "target": "ally_same"},
+            {"type": "shield", "aspect": "stun", "target": "ally_same"}
+        ],
+        "image": "static/w101/spells/ice/(Spell)_Stun_Block.png",
+        "id": "stun_block",
+        "accuracy": 100
+    },
+    {
+        "name": "Insane Bolt",
+        "school": "storm",
+        "type": "damage",
+        "pips": 2,
+        "description": "Deals 145 Storm Damage to target three times, with each hit having a 20% chance to hit caster instead of target",
+        "effects": [
+            {"type": "chance", "times": 3, "options": [
+                {
+                    "chance": 80,
+                    "effect": {"type": "damage", "school": "storm", "amount": 145, "target": "enemy_same"}
+                },
+                {
+                    "chance": 20,
+                    "effect": {"type": "damage", "school": "storm", "amount": 145, "target": "self"}
+                }
+            ]}
+        ],
+        "image": "static/w101/spells/storm/(Spell)_Insane_Bolt.png",
+        "id": "insane_bolt",
+        "accuracy": 70,
+        "pvp_level": 55
     }
 
 ]

@@ -1136,7 +1136,7 @@
     {
         "name": "Elemental Trap",
         "school": "balance",
-        "type": "ward",
+        "type": "jinx",
         "pips": 1,
         "description": "Applies +30% Fire, Ice, and Storm Damage Wards",
         "effects": [
@@ -1407,7 +1407,7 @@
         "name": "Tribunal Oni",
         "school": "balance",
         "type": "damage",
-        "pips": 1,
+        "pips": 9,
         "description": "Deals 285 Myth, Death, and Life Damage to target; removes two helpful Charms from caster and two harmful Charms from target to deal 500 Myth, Death, and Life Damage",
         "effects": [
             {
@@ -1524,7 +1524,7 @@
             {
                 "type": "damage",
                 "school": "balance",
-                "amount": 500,
+                "amount": 100,
                 "target": "enemy"
             }
         ],

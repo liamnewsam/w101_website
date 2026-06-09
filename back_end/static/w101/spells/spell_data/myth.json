@@ -482,7 +482,14 @@
         "description": "Deals 945 Myth Damage after 3 Rounds, removes 1 positive Ward from target, and applies a +10% Myth Armor Piercing Charm on self",
         "effects": [
             {"type": "DoT", "school": "myth", "amount": 945, "rounds": 3, "wait": true, "target": "enemy_same"},
-            {"type": "destroy", "aspect": "ward", "target": "enemy_same"},
+            {
+                "type": "repeat", 
+                "up_to": 1,
+                "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"},
+                "effects": [
+                    {"type": "destroy", "aspect": "ward", "target": "enemy_same"}
+                ]
+            },
             {"type": "charm", "aspect": "armor_piercing", "school": "myth", "amount": 10, "target": "self"}
         ],
         "image": "static/w101/spells/myth/(Spell)_King_Artorius_(Myth).png",

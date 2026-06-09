@@ -156,7 +156,10 @@
                 "type": "gambit", 
                 "condition": {"type": "amount", "aspect": "ward", "amount": 4, "target": "self"}, 
                 "true": [
-                    {"type": "repeat", "up_to": 4, "effects": [{"type": "destroy", "aspect": "ward", "target": "self"}]},
+                    {"type": "destroy", "aspect": "ward", "target": "self"},
+                    {"type": "destroy", "aspect": "ward", "target": "self"},
+                    {"type": "destroy", "aspect": "ward", "target": "self"},
+                    {"type": "destroy", "aspect": "ward", "target": "self"},
                     {"type": "damage", "school": "death", "amount": 1640, "target": "enemy"}
                 ], 
                 "false": [
@@ -224,7 +227,10 @@
                 "type": "gambit", 
                 "condition": {"type": "amount", "aspect": "charm", "amount": 4, "target": "self"}, 
                 "true": [
-                    {"type": "repeat", "up_to": 4, "effects": [{"type": "destroy", "aspect": "charm", "target": "self"}]},
+                    {"type": "destroy", "aspect": "charm", "target": "self"},
+                    {"type": "destroy", "aspect": "charm", "target": "self"},
+                    {"type": "destroy", "aspect": "charm", "target": "self"},
+                    {"type": "destroy", "aspect": "charm", "target": "self"},
                     {"type": "damage", "school": "death", "amount": 1320, "target": "enemy"}
                 ], 
                 "false": [
@@ -589,22 +595,6 @@
         "image": "static/w101/spells/death/(Spell)_Infection.png",
         "id": "infection",
         "accuracy": 100
-    },
-    {
-        "name": "Dark Pact",
-        "school": "death",
-        "type": "charm",
-        "pips": 1,
-        "description": "Deals 250 Moon Damage to caster and applies two +25% Damage Blades on target",
-        "effects": [
-            {"type": "damage", "school": "moon", "amount": 250, "target": "self"},
-            {"type": "charm", "aspect": "damage", "amount": 25, "target": "ally_same"},
-            {"type": "charm", "aspect": "damage", "amount": 25, "target": "ally_same"}
-        ],
-        "image": "static/w101/spells/death/(Spell)_Dark_Pact.png",
-        "id": "dark_pact",
-        "accuracy": 100,
-        "pvp_level": 35
     },
     {
         "name": "Monster Mash",

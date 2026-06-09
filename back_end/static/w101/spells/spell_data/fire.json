@@ -447,7 +447,9 @@
         "pips": 8,
         "description": "Applies three Damage over Time effects on target that each deal 435 Damage of caster's School over 6 Rounds",
         "effects": [
-            {"type": "DoT", "school": "player", "amount": 435, "rounds": 6, "times": 3}
+            {"type": "DoT", "school": "player", "amount": 435, "rounds": 6, "target": "enemy_same"},
+            {"type": "DoT", "school": "player", "amount": 435, "rounds": 6, "target": "enemy_same"},
+            {"type": "DoT", "school": "player", "amount": 435, "rounds": 6, "target": "enemy_same"}
         ],
         "image": "static/w101/spells/fire/(Spell)_Fires_of_Mars.png",
         "id": "fires_of_mars",
@@ -641,7 +643,7 @@
         "description": "Destroys 1 Damage over Time effect on target and deals its full remaining Damage",
         "condition": {"type": "amount", "aspect": "DoT", "amount": 1, "target": "enemy"},
         "effects": [
-            {"type": "detonate"}
+            {"type": "detonate", "target": "enemy", "amount": 1.0}
         ],
         "image": "static/w101/spells/fire/(Spell)_Detonate.png",
         "id": "detonate",

@@ -3,11 +3,13 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import uuid
 import json as _json
+import threading
 
 # ===== Game Logic =====
 from Game import Game, createBotPlayer
-from Player import loadPlayer
-from Card import CARD_BY_ID
+from Player import Player, loadPlayer
+from Card import Card, CARD_BY_ID
+from Deck import Deck
 from stats import compute_stats, compute_school_chart
 
 # ===== Auth System =====
@@ -95,24 +97,30 @@ def list_avatars():
         return jsonify({"error": str(e)}), 500
 
 
-'''
-@app.after_request
-def add_cors_headers(response):
-    response.headers["Access-Control-Allow-Origin"] = ORIGIN
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    return response
+@app.route("/api/models", methods=["GET"])
+def list_models():
+    from rl.inference import list_checkpoints
+    try:
+        return jsonify({"models": list_checkpoints()})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    response = jsonify({"error": str(e)})
-    response.status_code = 500
-    response.headers["Access-Control-Allow-Origin"] = ORIGIN
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    return response
 
-'''
+@app.route("/api/demo-deck/<school>", methods=["GET"])
+def get_demo_deck(school):
+    """Return the default deck card IDs from best.pt for the given school."""
+    from rl.inference import get_school_best_deck
+    school = school.capitalize()
+    valid = {"Fire", "Ice", "Storm", "Life", "Death", "Myth", "Balance"}
+    if school not in valid:
+        return jsonify({"error": "Invalid school"}), 400
+    try:
+        card_ids = get_school_best_deck(school)
+        return jsonify({"card_ids": card_ids, "school": school})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 # ========================================================
 # In-Memory Data Models
 # ========================================================
@@ -147,7 +155,7 @@ def _compute_elo_changes(lobby, winner_team):
 
 
 class LobbyPlayer:
-    def __init__(self, user_id, sid, name, image_path, school="Balance", level=1, wins=0, losses=0, elo=100, team="A", isBot=False, school_elos=None):
+    def __init__(self, user_id, sid, name, image_path, school="Balance", level=1, wins=0, losses=0, elo=100, team="A", isBot=False, school_elos=None, deck_data=None, model_path=None, model_config=None):
         self.id = user_id
         self.name = name
         self.team = team
@@ -161,6 +169,9 @@ class LobbyPlayer:
         self.losses = losses
         self.elo = elo              # active school's ELO (used for matchmaking)
         self.school_elos = school_elos or {}
+        self.deck_data = deck_data  # set for duplicate-player bots; None uses DECK_MASTER
+        self.model_path = model_path      # path to checkpoint if this is an AI model bot
+        self.model_config = model_config  # metadata dict from the checkpoint
 
 
 class Lobby:
@@ -172,6 +183,7 @@ class Lobby:
         self.watchers = set()  # socket IDs watching game state
         self.initial_game_state = None   # public state snapshot right after begin()
         self.replay_turns = []           # [{log, finalGameState}] accumulated per turn
+        self._turn_lock = threading.Lock()  # prevents double turn resolution under concurrent actions
 
     def team_counts(self):
         amount = {"A": 0, "B": 0}
@@ -183,8 +195,6 @@ class Lobby:
         team_counts = self.team_counts()
         if team_counts["A"] == 0 or team_counts["B"] == 0:
             return False
-        print("What are we seeing")
-        print(list(filter(lambda p: not p.isBot, self.players.values())))
         return all([player.isReady for player in list(filter(lambda p: not p.isBot, self.players.values()))])
     
     def snapshot(self):
@@ -199,6 +209,7 @@ class Lobby:
                     "school": p.school,
                     "level": p.level,
                     "isBot": p.isBot,
+                    "model_path": getattr(p, "model_path", None),
                 }
                 for p in self.players.values()
             ],
@@ -241,8 +252,6 @@ connected_users = {}  # sid → user_id
 
 @socketio.on("connect")
 def on_connect(auth):
-    print("PLAYER IS CONNECTING")
-
     token = auth.get("token") if auth else None
     if not token:
         raise ConnectionRefusedError("authentication failed")
@@ -257,11 +266,6 @@ def on_connect(auth):
 
     # Bind socket → identity
     connected_users[request.sid] = user_id
-
-    print(
-        f"[connect] socket {request.sid} authenticated "
-        f"as {user_type} {user_id}"
-    )
 
 @socketio.on("disconnect")
 def on_disconnect():
@@ -306,6 +310,10 @@ def get_player_info():
     if not user_id:
         emit("error", {"msg": "Not authenticated"})
         return
+
+    # Demo sessions have no DB record — skip silently
+    if str(user_id).startswith("demo_"):
+        return
     
     # Query DB using user_id...
     db = SessionLocal()
@@ -323,10 +331,8 @@ def get_player_info():
 
 @socketio.on("get_player_stats")
 def get_player_stats():
-    print(f"[get_player_stats] received from sid={request.sid}")
     user_id = get_user_identity(request.sid)
     if not user_id:
-        print("[get_player_stats] not authenticated")
         emit("player_stats", {"error": "Not authenticated"})
         return
 
@@ -334,20 +340,17 @@ def get_player_stats():
     try:
         player = db.query(PlayerState).filter_by(player_id=user_id).first()
         if not player:
-            print(f"[get_player_stats] player not found for user_id={user_id}")
             emit("player_stats", {"error": "Player not found"})
             return
 
         school = (player.school or "Balance").lower()
         level  = player._compute_school_level(school)
-        print(f"[get_player_stats] computing stats for level={level} school={school}")
         stats        = compute_stats(level, school)
         school_chart = compute_school_chart(level, school)
         if stats is None:
             emit("player_stats", {"error": f"Unknown school: {school}"})
             return
 
-        print(f"[get_player_stats] emitting stats: {stats}")
         emit("player_stats", {"ok": True, "stats": stats, "school_chart": school_chart})
     except Exception as e:
         print(f"[get_player_stats] ERROR: {e}")
@@ -436,12 +439,113 @@ def create_bot_game(data):
         bot_id = f"bot_{i}"
         lobby.players[bot_id] = LobbyPlayer(
             bot_id, None, f"Bot {i+1}", getRandomPlayerImage(),
-            school=_random.choice(BOT_SCHOOLS), level=1,
+            school=_random.choice(BOT_SCHOOLS), level=lobby.players[user_id].level,
             team="B", isBot=True,
         )
 
     join_room(gameId)
     return {"gameId": gameId}
+
+
+@socketio.on("create_rl_demo_game")
+def create_rl_demo_game(data):
+    """Create and immediately start a 1v1 demo game vs a trained RL agent.
+
+    Bypasses the database entirely — the human player state comes from the
+    request payload (school, deck card IDs, level=100).
+    """
+    from rl.inference import load_model, pick_demo_ai_deck, get_school_best_deck
+    from stats import compute_stats, compute_school_chart
+
+    user_id = get_user_identity(request.sid)
+    if not user_id:
+        return {"ok": False, "error": "Not authenticated"}
+
+    player_school   = (data.get("player_school") or "Fire").strip().title()
+    player_deck_ids = data.get("player_deck_card_ids") or get_school_best_deck(player_school)
+    ai_school       = (data.get("ai_school") or "Balance").strip().title()
+    player_name     = data.get("player_name", "Demo Player")
+
+    LEVEL = 100
+
+    # ── Build human player ───────────────────────────────────────────────────
+    human_cards = [Card(CARD_BY_ID[cid]) for cid in player_deck_ids if cid in CARD_BY_ID]
+    if not human_cards:
+        return {"ok": False, "error": "No valid cards in deck"}
+    human_deck   = Deck("Demo Deck", human_cards)
+    h_stats      = compute_stats(LEVEL, player_school)
+    h_chart      = compute_school_chart(LEVEL, player_school)
+    human_img    = getRandomPlayerImage()
+    human_player = Player(
+        player_name, user_id, player_school, human_deck,
+        isBot=False, img_path=human_img,
+        base_stats=h_stats, school_chart=h_chart,
+    )
+
+    # ── Build AI bot ─────────────────────────────────────────────────────────
+    ai_deck_ids, _ = pick_demo_ai_deck(ai_school)
+    ai_cards = [Card(CARD_BY_ID[cid]) for cid in ai_deck_ids if cid in CARD_BY_ID]
+    if not ai_cards:
+        # Fallback: use a default deck if the checkpoint deck is broken
+        ai_cards = [Card(CARD_BY_ID[cid]) for cid in get_school_best_deck(ai_school) if cid in CARD_BY_ID]
+    ai_deck   = Deck("AI Deck", ai_cards)
+    bot_id    = f"bot_{uuid.uuid4().hex[:6]}"
+    b_stats   = compute_stats(LEVEL, ai_school)
+    b_chart   = compute_school_chart(LEVEL, ai_school)
+    bot_img   = getRandomPlayerImage()
+    bot_player = Player(
+        f"AI ({ai_school})", bot_id, ai_school, ai_deck,
+        isBot=True, img_path=bot_img,
+        base_stats=b_stats, school_chart=b_chart,
+    )
+
+    # ── Create lobby ─────────────────────────────────────────────────────────
+    gameId = str(uuid.uuid4())[:8]
+    lobby  = Lobby(host_id=user_id)
+    lobby.is_demo = True
+    lobbies[gameId] = lobby
+
+    lobby.players[user_id] = LobbyPlayer(
+        user_id=user_id, sid=request.sid, name=player_name,
+        image_path=human_img, school=player_school,
+        level=LEVEL, team="A",
+    )
+    lobby.players[bot_id] = LobbyPlayer(
+        user_id=bot_id, sid=None, name=f"AI ({ai_school})",
+        image_path=bot_img, school=ai_school,
+        level=LEVEL, team="B", isBot=True,
+    )
+
+    # ── Create game ───────────────────────────────────────────────────────────
+    lobby.game = Game([human_player], [bot_player])
+
+    # Wire up the RL model as a callable (model_agents must store callables)
+    import os as _os
+    ai_model_path = _os.path.join(
+        _os.path.dirname(__file__), "rl", "checkpoints", ai_school, "best.pt"
+    )
+    try:
+        from rl.inference import take_model_action
+        model, _ = load_model(ai_model_path)
+        _game = lobby.game
+        lobby.game.model_agents[bot_id] = (
+            lambda p, _m=model, _g=_game: take_model_action(_m, _g, p, "cpu")
+        )
+    except Exception as e:
+        print(f"[create_rl_demo_game] Could not load model for {ai_school}: {e}")
+
+    lobby.game.begin()
+    lobby.started = True
+    lobby.initial_game_state = _json.loads(_json.dumps(lobby.game.to_json_public()))
+
+    join_room(gameId)
+
+    # Handle unlikely edge case: bot team goes first
+    if lobby.game.isAllBots(lobby.game.playing_team_i):
+        while not lobby.game.winner and attemptTurnResolution(lobby, lobby.game):
+            continue
+
+    return {"ok": True, "gameId": gameId}
 
 
 @socketio.on("join_game")
@@ -532,6 +636,8 @@ def switch_team(data):
     lobby = lobbies.get(gameId)
     if not lobby or user_id not in lobby.players:
         return
+    if new_team not in ("A", "B"):
+        return
 
     lobby.players[user_id].team = new_team
     lobby.players[user_id].isReady = False
@@ -544,23 +650,114 @@ def add_bot(data):
     import random as _random
     gameId = data["gameId"]
     team = data.get("team", "A")
+    caller = get_user_identity(request.sid)
 
     lobby = lobbies.get(gameId)
-    if not lobby:
+    if not lobby or caller != lobby.host:
         return
 
     BOT_SCHOOLS = ["Fire", "Ice", "Storm", "Life", "Death", "Myth", "Balance"]
     bot_num = sum(1 for p in lobby.players.values() if p.isBot) + 1
     bot_id = f"bot_{uuid.uuid4().hex[:6]}"
+
+    #Get average level of players:
+    total = 0
+    n = 0
+    for p in lobby.players.values():
+        if not p.isBot:
+            n += 1
+            total += p.level
+
+    avgLevel = total // n
     lobby.players[bot_id] = LobbyPlayer(
         user_id=bot_id,
         sid=None,
         name=f"Bot {bot_num}",
         image_path=getRandomPlayerImage(),
         school=_random.choice(BOT_SCHOOLS),
-        level=1,
+        level=avgLevel,
         team=team,
         isBot=True,
+    )
+
+    socketio.emit("update_lobby_state", lobby.snapshot(), room=gameId)
+
+
+@socketio.on("add_model_bot")
+def add_model_bot(data):
+    """Add a bot driven by a trained RL model checkpoint."""
+    from rl.inference import list_checkpoints
+    gameId = data["gameId"]
+    team   = data.get("team", "A")
+    path   = data.get("model_path")
+    caller = get_user_identity(request.sid)
+
+    lobby = lobbies.get(gameId)
+    if not lobby or not path or caller != lobby.host:
+        return
+
+    # Find metadata for this checkpoint
+    model_config = None
+    for ckpt in list_checkpoints():
+        if ckpt.get("path") == path or ckpt.get("filename") == path:
+            model_config = ckpt
+            path = ckpt["path"]
+            break
+
+    if model_config is None:
+        return
+
+    school = model_config.get("agent_school", "Balance")
+    level  = model_config.get("agent_level", 1)
+    deck_name = model_config.get("agent_deck_name")
+
+    bot_num = sum(1 for p in lobby.players.values() if p.isBot) + 1
+    bot_id  = f"bot_{uuid.uuid4().hex[:6]}"
+    label   = f"AI ({school} Lv{level}, iter {model_config.get('iteration', '?')})"
+
+    lobby.players[bot_id] = LobbyPlayer(
+        user_id=bot_id,
+        sid=None,
+        name=label,
+        image_path=getRandomPlayerImage(),
+        school=school,
+        level=level,
+        team=team,
+        isBot=True,
+        model_path=path,
+        model_config=model_config,
+    )
+
+    socketio.emit("update_lobby_state", lobby.snapshot(), room=gameId)
+
+
+@socketio.on("add_duplicate_bot")
+def add_duplicate_bot(data):
+    gameId = data["gameId"]
+    team = data.get("team", "A")
+
+    user_id = get_user_identity(request.sid)
+    lobby = lobbies.get(gameId)
+    if not lobby or user_id not in lobby.players:
+        return
+
+    db_player = get_player_from_db(user_id)
+    if not db_player:
+        return
+
+    human = lobby.players[user_id]
+    bot_num = sum(1 for p in lobby.players.values() if p.isBot) + 1
+    bot_id = f"bot_{uuid.uuid4().hex[:6]}"
+    lobby.players[bot_id] = LobbyPlayer(
+        user_id=bot_id,
+        sid=None,
+        name=f"Bot {bot_num}",
+        image_path=human.image_path,
+        school=human.school,
+        level=human.level,
+        team=team,
+        isBot=True,
+        deck_data=db_player.get("deck"),
     )
 
     socketio.emit("update_lobby_state", lobby.snapshot(), room=gameId)
@@ -570,9 +767,10 @@ def add_bot(data):
 def remove_bot(data):
     gameId = data["gameId"]
     bot_id = data["botId"]
+    caller = get_user_identity(request.sid)
 
     lobby = lobbies.get(gameId)
-    if not lobby:
+    if not lobby or caller != lobby.host:
         return
 
     player = lobby.players.get(bot_id)
@@ -588,30 +786,24 @@ def start_game(data):
     if not lobby:
         return {"ok": False, "error": "Lobby missing"}
 
-    '''
-    host_id = lobby.host
     caller = get_user_identity(request.sid)
+    if caller != lobby.host:
+        return {"ok": False, "error": "Only the host can start the game"}
 
-    if caller != host_id:
-        return {"ok": False, "error": "Only host can start"}
-    
-    # Require all real players ready
     for p in lobby.players.values():
-        if not p.id.startswith("bot_") and not p.isReady:
+        if not p.isBot and not p.isReady:
             return {"ok": False, "error": "All players must be ready"}
-    '''
     # Build teams for Game()
     teamA = []
     teamB = []
+    model_agents = {}  # user_id → (model, device)
 
     for p in lobby.players.values():
         # Query DB using user_id...
         player = None
-        if not p.isBot: 
+        if not p.isBot:
             db = SessionLocal()
             try:
-                print(p.id)
-
                 player = db.query(PlayerState).filter_by(player_id=p.id).first()
 
                 if not player:
@@ -619,11 +811,40 @@ def start_game(data):
                     return
             finally:
                 db.close()
-            
-            player = loadPlayer(player.to_dict())
-        
+
+            player_data = player.to_dict()
+            if not player_data.get("deck"):
+                emit("error", {"msg": "No deck selected. Please create a deck in the deck editor first."})
+                return
+            player = loadPlayer(player_data)
+
         else:
-            player = createBotPlayer(p.name, p.id, p.image_path, school=p.school, difficulty="easy", level=p.level)
+            deck = None
+            if p.deck_data:
+                cards = [Card(CARD_BY_ID[cid]) for cid in p.deck_data.get("card_ids", []) if cid in CARD_BY_ID]
+                deck = Deck(p.deck_data["name"], cards)
+            elif p.model_config and p.model_config.get("agent_deck_name"):
+                from Deck import DECK_MASTER
+                deck_name = p.model_config["agent_deck_name"]
+                school = p.school
+                # Try to locate the deck by name in DECK_MASTER across difficulties
+                for diff in ("moderate", "simple", "easy"):
+                    tier = DECK_MASTER.get(diff, {})
+                    if school in tier:
+                        candidate = tier[school]()
+                        if candidate.name == deck_name:
+                            deck = candidate
+                            break
+            player = createBotPlayer(p.name, p.id, p.image_path, school=p.school, deck=deck, difficulty="moderate", level=p.level)
+
+            # Load RL model if this bot has one
+            if p.model_path:
+                try:
+                    from rl.inference import load_model
+                    model, _ = load_model(p.model_path)
+                    model_agents[player.user_id] = (model, "cpu")
+                except Exception as e:
+                    print(f"[start_game] Could not load model for bot {p.id}: {e}")
 
 
         if p.team == "A":
@@ -631,9 +852,10 @@ def start_game(data):
         else:
             teamB.append(player)
 
-        
+
 
     lobby.game = Game(teamA, teamB)
+    lobby.game.model_agents = model_agents
     lobby.game.begin()
     lobby.started = True
     lobby.initial_game_state = _json.loads(_json.dumps(lobby.game.to_json_public()))
@@ -680,17 +902,13 @@ def leave_lobby(data):
 # Game Events
 # ========================================================
 
-'''
-@socketio.on("watch_game")
-def watch_game(data):
-    gameId = data["gameId"]
-    lobby = lobbies.get(gameId)
-    if not lobby or not lobby.started:
-        return
+@socketio.on("unwatch_game")
+def unwatch_game(data):
+    gameId = data.get("gameId")
+    if gameId:
+        leave_room(gameId + ":A")
+        leave_room(gameId + ":B")
 
-    lobby.watchers.add(request.sid)
-    join_room(gameId)
-'''
 
 @socketio.on("watch_team")
 def watch_team(data):
@@ -704,10 +922,8 @@ def watch_team(data):
     if not player:
         return {"error": "Player not in lobby"}
     if player.team == "A":
-        print(f"[join] {user_id} joins room {gameId + ':A'}")
         join_room(gameId + ":A")
     else:
-        print(f"[join] {user_id} joins room {gameId + ':B'}")
         join_room(gameId + ":B")
 
 @socketio.on("get_game_state")
@@ -818,6 +1034,8 @@ def build_match_result(lobby, winner_team, elo_changes):
 
 
 def record_match_results(lobby, winner_team, elo_changes):
+    if getattr(lobby, "is_demo", False):
+        return  # demo games don't persist to the database
     """Update wins/losses, per-school ELO, and per-school records in the DB."""
     db = SessionLocal()
     updated = {}  # player_id → fresh to_dict() to push after commit
@@ -1031,7 +1249,7 @@ def delete_deck(data):
             return {"ok": False, "error": "Invalid deck index"}
         decks.pop(deck_index)
         # Keep selected_deck_index in bounds
-        if ps.selected_deck_index >= len(decks):
+        if (ps.selected_deck_index or 0) >= len(decks):
             ps.selected_deck_index = max(0, len(decks) - 1)
         ps.decks = decks
         db.commit()
@@ -1075,6 +1293,8 @@ def update_player_deck(data):
 
 def save_game_log(game_id, lobby, match_result):
     """Persist the full game replay to the database."""
+    if getattr(lobby, "is_demo", False):
+        return  # demo games are not logged
     if not lobby.initial_game_state or not lobby.replay_turns:
         return
     db = SessionLocal()
@@ -1151,6 +1371,8 @@ def get_replay(game_id):
         log = db.query(GameLog).filter_by(game_id=game_id).first()
         if not log:
             return jsonify({"error": "Replay not found"}), 404
+        if str(user_id) not in (log.player_ids or []):
+            return jsonify({"error": "Not authorized"}), 403
         return jsonify({
             "game_id": log.game_id,
             "winner": log.winner,
@@ -1163,9 +1385,9 @@ def get_replay(game_id):
 
 
 def attemptTurnResolution(lobby, game):
-    print("attempting turn resolution")
-    if game.allActionsReceived():
-        print("At least we are here!!!!")
+    with lobby._turn_lock:
+        if not game.allActionsReceived():
+            return False
         # Resolve actions and collect log
         turn_log = game.resolve_actions()
         opp = game.opposite_team(aliveOnly=True)
@@ -1195,7 +1417,6 @@ def attemptTurnResolution(lobby, game):
                     to=sid
                 )
         return True
-    return False
 
 def prepareLog(log):
     for entry in log:
@@ -1227,9 +1448,6 @@ def set_school_pip(data):
 
 @socketio.on("player_action")
 def player_action(data):
-    print("DATA")
-    print(data)
-
     gameId = data["gameId"]
     action = data["action"]
 
@@ -1285,7 +1503,6 @@ def player_action(data):
         match_result = build_match_result(lobby, game.winner, elo_changes)
         record_match_results(lobby, game.winner, elo_changes)
         save_game_log(gameId, lobby, match_result)
-        game.print_log()
         socketio.emit("match_finished", match_result, room=gameId)
         del lobbies[gameId]
 

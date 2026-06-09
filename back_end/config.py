@@ -9,7 +9,11 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY environment variable is not set")
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///game.db")
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL environment variable is not set")
+
+
 JWT_EXPIRY_SECONDS = 60 * 60 * 2  # 2 hours
 GUEST_SESSION_LIFETIME = 60 * 60  # 1 hour
 
@@ -22,3 +26,5 @@ CHARACTER_IMAGE_PATH = "static/w101/icons/characters/"
 
 
 MAX_PIP_COUNT = 7
+
+HAND_SIZE = 7

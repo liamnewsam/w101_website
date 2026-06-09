@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """
-set_user_level.py — Set a player's display level for a specific school.
+set_user_level.py — Set a player's display level for a specific school (or all schools).
 
 Level is derived from per-school ELO: level = clamp(10, 170, (elo - 100) // 32 + 10)
 This script sets school_elos for the given school to produce the target level.
 
 Usage:
     python set_user_level.py <username> <school> <level>
+    python set_user_level.py <username> all <level>
 
 Examples:
     python set_user_level.py Liam fire 10
     python set_user_level.py Liam balance 40
+    python set_user_level.py Liam all 50
 
-Valid schools: fire, ice, storm, life, death, myth, balance
+Valid schools: fire, ice, storm, life, death, myth, balance, all
 Valid level range: 10–170
 """
 
@@ -29,9 +31,12 @@ def level_to_elo(level: int) -> int:
 
 def set_user_school_level(username: str, school: str, level: int) -> None:
     school = school.lower()
-    if school not in SCHOOLS_LIST:
-        print(f"Error: unknown school '{school}'. Valid: {', '.join(SCHOOLS_LIST)}")
-        sys.exit(1)
+    schools = SCHOOLS_LIST if school == "all" else [school]
+
+    for s in schools:
+        if s not in SCHOOLS_LIST:
+            print(f"Error: unknown school '{s}'. Valid: {', '.join(SCHOOLS_LIST)}, all")
+            sys.exit(1)
 
     if not (_SCHOOL_LEVEL_MIN <= level <= _SCHOOL_LEVEL_MAX):
         print(f"Error: level must be between {_SCHOOL_LEVEL_MIN} and {_SCHOOL_LEVEL_MAX} (got {level})")
@@ -49,18 +54,18 @@ def set_user_school_level(username: str, school: str, level: int) -> None:
             print(f"Error: no player state found for user '{username}' (id={user.id})")
             sys.exit(1)
 
-        old_level = state._compute_school_level(school)
         elo_needed = level_to_elo(level)
-
         school_elos = dict(state.school_elos or {})
-        school_elos[school] = elo_needed
-        state.school_elos = school_elos
-        flag_modified(state, "school_elos")
-        db.commit()
-        db.refresh(state)
 
-        new_level = state._compute_school_level(school)
-        print(f"Updated '{username}' [{school}]: level {old_level} -> {new_level} (elo={elo_needed})")
+        for s in schools:
+            old_level = state._compute_school_level(s)
+            school_elos[s] = elo_needed
+            state.school_elos = school_elos
+            flag_modified(state, "school_elos")
+            db.commit()
+            db.refresh(state)
+            new_level = state._compute_school_level(s)
+            print(f"Updated '{username}' [{s}]: level {old_level} -> {new_level} (elo={elo_needed})")
     finally:
         db.close()
 

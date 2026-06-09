@@ -111,20 +111,6 @@
         "pvp_level": 70
     },
     {
-        "name": "Stun Block",
-        "school": "ice",
-        "type": "ward",
-        "pips": 0,
-        "description": "Applies two Stun Resist Wards on target",
-        "effects": [
-            {"type": "shield", "aspect": "stun", "target": "ally_same"},
-            {"type": "shield", "aspect": "stun", "target": "ally_same"}
-        ],
-        "image": "static/w101/spells/ice/(Spell)_Stun_Block.png",
-        "id": "stun_block",
-        "accuracy": 100
-    },
-    {
         "name": "Icespear",
         "school": "ice",
         "type": "charm",
@@ -186,7 +172,12 @@
         "pips": 4,
         "description": "Steals a helpful Ward from and deals 120-150 Ice Damage to target",
         "effects": [
-            {"type": "take", "aspect": "ward", "target": "enemy_same"},
+            {
+                "type": "gambit",
+                "condition": {"type": "amount", "aspect": "ward", "amount": 1, "target": "enemy"},
+                "true": [{"type": "take", "aspect": "ward", "target": "enemy_same"}],
+                "false": []
+            },
             {"type": "damage", "school": "ice", "min": 120, "max": 150, "target": "enemy"}
         ],
         "image": "static/w101/spells/ice/(Spell)_Thieving_Dragon.png",
@@ -561,7 +552,7 @@
                 "condition": {"type": "amount", "aspect": "curse", "amount": 1, "target": "ally"}, 
                 "effects": [
                     {"type": "destroy", "aspect": "curse", "target": "ally"},
-                    {"type": "shield", "aspect": ["damage", "steal"], "amount": -20, "target": "ally"}
+                    {"type": "shield", "aspect": "damage", "amount": -20, "target": "ally"}
                 ]
             }
         ],

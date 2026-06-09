@@ -106,13 +106,10 @@ class Player:
     
     def receive_pip(self):
         if self.pip_count() >= MAX_PIP_COUNT:
-            print("Hit Pip Limit")
             return {"type": "effect_resolve", "target": self.user_id, "aspect": "pip_choke"}
 
         if random.randint(0, 99) < self.power_pip_chance:
-            print("Receiving powerpip!")
             if random.randint(0, 99) < self.school_pip_chance:
-                print(f"Converting to {self.school_pip_select} pip!")
                 self.pips[self.school_pip_select] += 1
                 return {"type": "effect_resolve", "target": self.user_id, "aspect": "pip_gain", "amount": {self.school_pip_select: 1}}
             else:
@@ -127,6 +124,29 @@ class Player:
         deducted_pips = {"regular": 0, "powerpip": 0, "myth": 0, "life": 0, "fire": 0, "ice": 0, "storm": 0, "death": 0, "balance": 0}
 
         pips = card.card_def.pips
+
+        if pips == "X":
+            # Consume all pips; each power pip and matching school pip counts as 2
+            card_school = card.card_def.school
+            school_aligned = card_school == self.school
+            x_pips = 0
+            for key in list(self.pips.keys()):
+                count = self.pips[key]
+                if count <= 0:
+                    continue
+                if key == "powerpip":
+                    x_pips += count * (2 if school_aligned else 1)
+                elif key == card_school:
+                    x_pips += count * 2
+                else:
+                    x_pips += count
+                deducted_pips[key] = count
+                self.pips[key] = 0
+            deducted_final = {k: v for k, v in deducted_pips.items() if v}
+            deducted_final["converted"] = False
+            deducted_final["x_pips"] = x_pips
+            return deducted_final
+
         if type(pips) == int:
             pips = {"regular": pips}
 
@@ -143,8 +163,14 @@ class Player:
 
         if school_aligned:
             # Primary school spell:
-            # Power pips count as 2 → school pips of matching school count as 2 → regular pips count as 1
-            # Prefer power pips first to maximize efficiency, then school pips, then regular.
+            # Regular pips are spent first (1:1), then power pips (2:1), then school pips (2:1).
+            # Spending regular pips before power pips preserves the more valuable double-pips
+            # for higher-cost spells later in the game.
+
+            while needed > 0 and self.pips["regular"] > 0:
+                needed -= 1
+                self.pips["regular"] -= 1
+                deducted_pips["regular"] += 1
 
             while needed >= 2 and self.pips["powerpip"] > 0:
                 needed -= 2
@@ -156,11 +182,6 @@ class Player:
                 self.pips[card_school] -= 1
                 deducted_pips[card_school] += 1
 
-            while needed > 0 and self.pips["regular"] > 0:
-                needed -= 1
-                self.pips["regular"] -= 1
-                deducted_pips["regular"] += 1
-
             # Odd pip leftover: spend a power pip or school pip (worth 2, only need 1)
             if needed == 1:
                 if self.pips["powerpip"] > 0:
@@ -168,7 +189,6 @@ class Player:
                     self.pips["powerpip"] -= 1
                     deducted_pips["powerpip"] += 1
                     if random.randint(0, 99) < self.pip_conversion[card_school]:
-                        print("Converted pip!")
                         self.pips["regular"] += 1
                         converted = True
                 elif self.pips[card_school] > 0:
@@ -176,7 +196,6 @@ class Player:
                     self.pips[card_school] -= 1
                     deducted_pips[card_school] += 1
                     if random.randint(0, 99) < self.pip_conversion[card_school]:
-                        print("Converted pip!")
                         self.pips["regular"] += 1
                         converted = True
 
@@ -214,7 +233,6 @@ class Player:
                 self.pips[card_school] -= 1
                 deducted_pips[card_school] += 1
                 if random.randint(0, 99) < self.pip_conversion[card_school]:
-                    print("Converted pip!")
                     self.pips["regular"] += 1
                     converted = True
 
@@ -301,7 +319,6 @@ class Player:
                         hangingEffectList.remove(hangingEffect)
                         used.append(hangingEffect)
                         consumed = True
-                        print(f"Adding {hangingEffect.amount}% damage")
                 elif hangingEffect.aspect == "armor_piercing" and damage_schools:
                     if (not hangingEffect.school or hangingEffect.school == "any" or hangingEffect.school in damage_schools) and not isRedundant(used, hangingEffect):
                         if not hangingEffect.school:
@@ -312,13 +329,11 @@ class Player:
                         hangingEffectList.remove(hangingEffect)
                         used.append(hangingEffect)
                         consumed = True
-                        print(f"Adding {hangingEffect.amount}% armor_piercing")
                 elif hangingEffect.aspect == "heal" and has_heal and not isRedundant(used, hangingEffect):
                     accumulation["heal"] += hangingEffect.amount
                     hangingEffectList.remove(hangingEffect)
                     used.append(hangingEffect)
                     consumed = True
-                    print(f"Adding {hangingEffect.amount}% health")
                 if not consumed:
                     i += 1
         return used
@@ -338,12 +353,10 @@ class Player:
                             accumulation["damage"][hangingEffect.school] += hangingEffect.amount
                         hangingEffectList.remove(hangingEffect)
                         used.append(hangingEffect)
-                        print(f"Adding {hangingEffect.amount}% damage")
                     elif hangingEffect.aspect == "armor_piercing" and (not hangingEffect.school or hangingEffect.school in ["any", effect["school"]]) and not isRedundant(used, hangingEffect):
                         accumulation["armor_piercing"][hangingEffect.school] += hangingEffect.amount
                         hangingEffectList.remove(hangingEffect)
                         used.append(hangingEffect)
-                        print(f"Adding {hangingEffect.amount}% armor_piercing")
                     else:
                         i += 1
             elif effect["type"] in ["heal", "HoT"]:
@@ -354,7 +367,6 @@ class Player:
                         accumulation["heal"] += hangingEffect.amount
                         hangingEffectList.remove(hangingEffect)
                         used.append(hangingEffect)
-                        print(f"Adding {hangingEffect.amount}% health")
                     else:
                         i += 1
         return used
@@ -367,7 +379,7 @@ class Player:
                 i = 0
                 while i < len(hangingEffectList):
                     hangingEffect = hangingEffectList[i]
-                    if hangingEffect.aspect == "damage" and (not hangingEffect.school or hangingEffect.school in ["any", target_accumulation["prism_school"] or effect["school"]]) and not isRedundant(used, hangingEffect):
+                    if hangingEffect.aspect == "damage" and (not hangingEffect.school or hangingEffect.school in ["any", target_accumulation["prism_school"] or effect.get("school", "")]) and not isRedundant(used, hangingEffect):
                         if not hangingEffect.school:
                             for school in SCHOOLS:
                                 target_accumulation["damage"][school] += hangingEffect.amount
@@ -375,15 +387,13 @@ class Player:
                             target_accumulation["damage"][hangingEffect.school] += hangingEffect.amount
                         hangingEffectList.remove(hangingEffect)
                         used.append(hangingEffect)
-                        print(f"Adding {hangingEffect.amount}% damage")
-                    elif hangingEffect.aspect == "prism" and hangingEffect.inputSchool == (target_accumulation["prism_school"] or effect["school"]):
+                    elif hangingEffect.aspect == "prism" and hangingEffect.inputSchool == (target_accumulation["prism_school"] or effect.get("school", "")):
                         target_accumulation["damage"][hangingEffect.outputSchool] = target_accumulation["damage"][hangingEffect.inputSchool]
                         target_accumulation["armor_piercing"][hangingEffect.outputSchool] = target_accumulation["armor_piercing"][hangingEffect.inputSchool]
                         target_accumulation["prism_school"] = hangingEffect.outputSchool
 
                         hangingEffectList.remove(hangingEffect)
                         used.append(hangingEffect)
-                        print(f"Adding {hangingEffect.inputSchool} to {hangingEffect.outputSchool} Prism")
                     else:
                         i += 1
         elif effect["type"] in ["heal", "HoT"]:
@@ -395,13 +405,32 @@ class Player:
                         target_accumulation["heal"] += hangingEffect.amount
                         hangingEffectList.remove(hangingEffect)
                         used.append(hangingEffect)
-                        print(f"Adding {hangingEffect.amount}% health")
                     else:
                         i += 1
 
         return used
 
-
+    def absorb_damage(self, dmg):
+        """Apply absorb wards to incoming flat damage. Returns (remaining_dmg, log_events).
+        Shields reduce damage first (already applied via consume_wards_jinxes percentage modifiers),
+        then absorb wards subtract from the post-shield flat amount. If an absorb ward breaks
+        mid-absorption the leftover damage still hits the player."""
+        events = []
+        if dmg <= 0:
+            return dmg, events
+        for ward in self.wards[:]:
+            if ward.aspect != "absorb" or dmg <= 0:
+                continue
+            prev = ward.to_json()
+            absorbed = min(dmg, ward.amount)
+            ward.amount -= absorbed
+            dmg -= absorbed
+            if ward.amount <= 0:
+                self.wards.remove(ward)
+                events.append({"type": "effect_trigger", "player": self.user_id, "aspect": "ward", "value": ward.to_json()})
+            else:
+                events.append({"type": "effect_resolve", "player": self.user_id, "aspect": "update", "aspectType": "ward", "from": prev, "to": ward.to_json()})
+        return dmg, events
 
     def to_json(self):
         return {
@@ -460,7 +489,6 @@ def loadPlayer(data):
     level         = data.get("level", 1)
     img_path      = data["image_path"]
     cards = []
-    print(data["deck"])
     for card_id in data["deck"]["card_ids"]:
         card_def = CARD_BY_ID.get(card_id)
         if card_def is None:
@@ -487,15 +515,20 @@ def isRedundant(effects, effect):
 
 class Effect(ABC):
     """
-    Base effect class. 
+    Base effect class.
     Subclasses implement resolve().
     """
-    def __init__(self, template, owner, target, card):
+    def __init__(self, template, owner, target, card, x_pips=1):
         self.template = template
         self.owner = owner
         self.target = target
         self.card = card
+        self.x_pips = x_pips
         self.school = template.get("school", "any")
+        if isinstance(self.school, list):
+            self.school = random.choice(self.school)
+        if self.school == "player" and owner is not None:
+            self.school = owner.school.lower()
 
     @abstractmethod
     def resolve(self, game):
@@ -517,15 +550,17 @@ class Effect(ABC):
 
     # -------- Utility for subclasses --------
     def get_amount(self):
-        """Handles: amount = X  or min/max random amounts."""
+        """Handles: amount = X  or min/max random amounts. Scales by x_pips for X-pip spells."""
         if "amountType" in self.template:
             if self.template["amountType"] == "player_max":
-                return self.template["amount"] * 1.0 / 100 * self.owner.maxHealth
+                return self.template["amount"] * 1.0 / 100 * self.owner.maxHealth * self.x_pips
         if "amount" in self.template:
-            return self.template["amount"]
+            amt = self.template["amount"]
+            base = random.choice(amt) if isinstance(amt, list) else amt
+            return base * self.x_pips
         if "min" in self.template and "max" in self.template:
-            return random.randint(self.template["min"], self.template["max"])
-        
+            return random.randint(self.template["min"], self.template["max"]) * self.x_pips
+
         return False
     
     def to_json(self):
@@ -555,11 +590,11 @@ class DamageEffect(Effect):
 
         dmg *= critical_multiplier
 
-        dmg -= self.target.flat_resistance[school]
+        dmg -= self.target.flat_resistance[self.school]
 
-        resist = self.target.resistance[school]
-        pierce = self.owner.armor_piercing[school] if self.owner else 0
-        pierce += caster_accumulation["armor_piercing"][school] if caster_accumulation else 0
+        resist = self.target.resistance[self.school]
+        pierce = self.owner.armor_piercing[self.school] if self.owner else 0
+        pierce += caster_accumulation["armor_piercing"][self.school] if caster_accumulation else 0
 
         effective_resist = max(resist - pierce, 0)
         dmg *= (1 - effective_resist / 100.0)
@@ -569,32 +604,30 @@ class DamageEffect(Effect):
 
         return dmg
 
-    def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
+    def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier, skip_absorb=False):
 
         dmg = self.compute_dmg(game, caster_accumulation, target_accumulation, critical_multiplier)
-
-        #absorbed = self.target.absorb_shield(dmg) Should be replaced with looking at wards with absorption aspect
-        #dmg -= absorbed
 
         if dmg < 0:
             dmg = 0
 
+        pre_events = []
+        if not skip_absorb and self.target:
+            dmg, pre_events = self.target.absorb_damage(dmg)
+
         if self.owner:
-            print(f"{self.owner.name} deals {int(dmg)} {self.school} damage to {self.target.name}!")
         else:
-            print(f"{int(dmg)} {self.school} damage to {self.target.name}!")
         dmg_message = {"type": "effect_resolve", "player": self.owner.user_id if self.owner else None, "aspect": "damage", "amount": dmg, "target": self.target.user_id, "school": self.school}
 
         if self.target.health - dmg <= 0:
             self.target.health = 0
-            return [
-                dmg_message, 
-                {"type": "result", "result": "dead", "player": self.target.user_id}
-            ]
-        
+            return pre_events + [dmg_message, {"type": "result", "result": "dead", "player": self.target.user_id}]
+
         self.target.health -= dmg
 
-        return  dmg_message
+        if pre_events:
+            return pre_events + [dmg_message]
+        return dmg_message
 
     
 
@@ -628,23 +661,20 @@ class HealEffect(Effect):
             self.target.health += hp
             
         if self.owner:
-            print(f"{self.owner.name} heals {self.target.name} for {int(hp)} hp!")
         else:
-            print(f"+{int(hp)} health to player {self.target.name}!")
         
 
         return {"type": "effect_resolve", "player": self.owner.user_id if self.owner else None, "aspect": "heal", "amount": hp, "target": self.target.user_id}
     
 class WardEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.aspect = template["aspect"]
         self.amount = self.get_amount()
 
     def resolve(self, game):
         # Add the shield to target's shield list
         self.target.wards.append(self)
-        print(f"{self.target.name} gains a {self.amount} shield!")
         return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "ward", "value": self.to_json()}
 
     def to_json(self):
@@ -664,8 +694,8 @@ class WardEffect(Effect):
         return absorbed'''
     
 class JinxEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         if template["type"] == "trap":
             self.aspect = "damage"
         else:
@@ -675,7 +705,6 @@ class JinxEffect(Effect):
 
     def resolve(self, game):
         self.target.jinxes.append(self)
-        print(f"{self.target.name} is trapped with +{self.amount} incoming damage.")
         return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "jinx", "value": self.to_json()}
 
     '''
@@ -690,16 +719,16 @@ class JinxEffect(Effect):
         return {"type": "jinx", "aspect": self.aspect, "school": self.school, "amount": self.amount}
 
 class DoTEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
-        self.rounds = template["rounds"]
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
+        r = template["rounds"]
+        self.rounds = random.randint(r["min"], r["max"]) if isinstance(r, dict) else r
         self.wait = template.get("wait", False)
     
     def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
         self.target.dots.append(self)
         self.amount = DamageEffect(self.template, self.owner, self.target, self.card).compute_dmg(game, caster_accumulation, target_accumulation, critical_multiplier)
 
-        print(f"{self.target.name} is hit with a {self.rounds}-round DoT for a total of {self.amount}")
         return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "dot", "value": self.to_json()}
 
     def tick(self, target_accumulation):
@@ -738,16 +767,16 @@ class DoTEffect(Effect):
         return log
     
     def to_json(self):
-        return {"type": "dot", "school": self.school, "amount": self.amount, "rounds": self.rounds, "wait": self.wait}
+        return {"type": "dot", "school": self.school, "amount": getattr(self, "amount", None), "rounds": self.rounds, "wait": self.wait}
 
 class HoTEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
-        self.rounds = template["rounds"]
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
+        r = template["rounds"]
+        self.rounds = random.randint(r["min"], r["max"]) if isinstance(r, dict) else r
     def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
         self.target.hots.append(self)
         self.amount = HealEffect(self.template, self.owner, self.target, self.card).compute_heal(caster_accumulation, target_accumulation, critical_multiplier)
-        print(f"{self.target.name} receives a {self.rounds}-round HoT for a total of {self.amount}")
         return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "hot", "value": self.to_json()}
     def tick(self):
         log = []
@@ -774,27 +803,26 @@ class HoTEffect(Effect):
         return {"type": "hot", "amount": self.amount, "rounds": self.rounds}
 
 class AuraEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.amount = self.get_amount()
 
 
 class CharmEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.amount = self.get_amount()
         self.aspect = template["aspect"]
     def resolve(self, game):
         self.target.charms.append(self)
-        print(f"{self.target.name} gains a {self.amount}% {self.aspect} blade!")
         return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "charm", "value": self.to_json()}
     
     def to_json(self):
         return {"type": "charm", "aspect": self.aspect, "school": self.school, "amount": self.amount}
 
 class CurseEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.amount = self.get_amount()
         self.aspect = template["aspect"]
     def resolve(self, game):
@@ -805,32 +833,33 @@ class CurseEffect(Effect):
         return {"type": "curse", "aspect": self.aspect, "school": self.school, "amount": self.amount}
 
 class DestroyEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.aspect = template["aspect"]
     
     def resolve(self, game):
-        if self.aspect == "charm":
-            charm = self.target.charms.pop(random.randint(0, len(self.target.charms)-1))
-            return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "destroy", "aspectType": "charm", "value": charm.to_json()}
-        if self.aspect == "curse":
-            curse = self.target.curses.pop(random.randint(0, len(self.target.curses)-1))
-            return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "destroy", "aspectType": "curse", "value": curse.to_json()}
-        if self.aspect == "ward":
-            ward = self.target.wards.pop(random.randint(0, len(self.target.wards)-1))
-            return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "destroy", "aspectType": "ward", "value": ward.to_json()}
-        if self.aspect == "jinx":
-            jinx = self.target.jinxes.pop(random.randint(0, len(self.target.jinxes)-1))
-            return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "destroy", "aspectType": "jinx", "value": jinx.to_json()}
-        if self.aspect == "DoT":
-            dot = self.target.dots.pop(random.randint(0, len(self.target.dots)-1))
-            return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "destroy", "aspectType": "dot", "value": dot.to_json()}
-        if self.aspect == "HoT":
-            hot = self.target.hots.pop(random.randint(0, len(self.target.hots)-1))
-            return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "destroy", "aspectType": "hot", "value": hot.to_json()}
+        _lists = {
+            "charm": (self.target.charms, "charm"),
+            "curse": (self.target.curses, "curse"),
+            "ward":  (self.target.wards,  "ward"),
+            "jinx":  (self.target.jinxes, "jinx"),
+            "DoT":   (self.target.dots,   "dot"),
+            "HoT":   (self.target.hots,   "hot"),
+        }
+        entry = _lists.get(self.aspect)
+        if entry is None:
+            return []
+        lst, log_key = entry
+        if not lst:
+            # The aspect list was emptied mid-cast (e.g. a damage-modifier curse was
+            # consumed by a paired DoT effect before this destroy could fire).
+            print(f"[DestroyEffect] Warning: {self.target.user_id} has no {self.aspect} to destroy (consumed mid-cast)")
+            return []
+        item = lst.pop(random.randint(0, len(lst) - 1))
+        return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "destroy", "aspectType": log_key, "value": item.to_json()}
 class DetonateEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.amount = self.get_amount()
 
     def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
@@ -854,21 +883,22 @@ class DetonateEffect(Effect):
         if dmg < 0:
             dmg = 0
 
-        print(f"{self.owner.name if self.owner else '?'} detonates a DoT on {self.target.name} for {int(dmg)} {school} damage!")
+        dmg, absorb_events = self.target.absorb_damage(dmg)
+
 
         dot_log = {"type": "effect_resolve", "player": self.owner.user_id if self.owner else None, "aspect": "destroy", "aspectType": "dot", "value": dot.to_json(), "target": self.target.user_id}
         dmg_message = {"type": "effect_resolve", "player": self.owner.user_id if self.owner else None, "aspect": "damage", "amount": dmg, "target": self.target.user_id, "school": school}
 
         if self.target.health - dmg <= 0:
             self.target.health = 0
-            return [dot_log, dmg_message, {"type": "result", "result": "dead", "player": self.target.user_id}]
+            return [dot_log] + absorb_events + [dmg_message, {"type": "result", "result": "dead", "player": self.target.user_id}]
 
         self.target.health -= dmg
-        return [dot_log, dmg_message]
+        return [dot_log] + absorb_events + [dmg_message]
 
 class ExtendEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.amount = self.get_amount()
         self.aspect = template["aspect"]
     
@@ -882,8 +912,8 @@ class ExtendEffect(Effect):
             return {"type": "effect_resolve", "target": self.target.user_id, "aspect": "update", "aspectType": "hot", "from": hot_before, "to": hot.to_json()}
 
 class GlobalEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.amount = self.get_amount()
         self.aspect = template["aspect"]
         
@@ -896,8 +926,8 @@ class GlobalEffect(Effect):
 
 
 class PipEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
 
     def resolve(self, game):
         gained = 1 if self.target.pip_count() < MAX_PIP_COUNT else 0
@@ -912,8 +942,8 @@ class PipEffect(Effect):
         return effect
 
 class PrismEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.inputSchool = template["from"]
         self.outputSchool = template["to"]
         self.aspect = "prism"
@@ -928,8 +958,8 @@ class PrismEffect(Effect):
         return {"type": "jinx", "aspect": "prism", "from": self.inputSchool, "to": self.outputSchool}
 
 class ReshuffleEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
     
     def resolve(self, game):
         self.owner.deck.play_cards.extend(self.owner.deck.play_discard)
@@ -939,14 +969,14 @@ class ReshuffleEffect(Effect):
         return {"type": "effect_resolve", "target": self.owner.user_id, "aspect": "reshuffle"}
 
 class DrainEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.amount = self.get_amount()
 
-        self.damageEffect = DamageEffect(template, owner, target, card)
+        self.damageEffect = DamageEffect(template, owner, target, card, x_pips=x_pips)
 
     def resolve(self, game, caster_accumulation, target_accumulation, critical_multiplier):
-        result = self.damageEffect.resolve(game, caster_accumulation, target_accumulation, critical_multiplier)
+        result = self.damageEffect.resolve(game, caster_accumulation, target_accumulation, critical_multiplier, skip_absorb=True)
         if type(result) is list:
             result[0]["aspect"] = "drain"
             hp = result[0]["amount"] / 2.0
@@ -966,8 +996,8 @@ class DrainEffect(Effect):
 
 
 class TakeEffect(Effect):
-    def __init__(self, template, owner, target, card):
-        super().__init__(template, owner, target, card)
+    def __init__(self, template, owner, target, card, x_pips=1):
+        super().__init__(template, owner, target, card, x_pips=x_pips)
         self.aspect = template["aspect"]
     
     def resolve(self, game):
@@ -976,7 +1006,7 @@ class TakeEffect(Effect):
             self.owner.charms.append(charm)
             return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "take", "aspectType": "charm", "value": charm.to_json()}
         if self.aspect == "ward":
-            ward = self.target.ward.pop(random.randint(0, len(self.target.ward)-1))
+            ward = self.target.wards.pop(random.randint(0, len(self.target.wards)-1))
             self.owner.wards.append(ward)
             return {"type": "effect_resolve", "player": self.owner.user_id, "target": self.target.user_id, "aspect": "take", "aspectType": "ward", "value": ward.to_json()}
         if self.aspect == "pip":
