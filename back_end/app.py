@@ -1521,8 +1521,11 @@ except Exception as e:
 try:
     from sqlalchemy import text as _text
     with engine.connect() as _conn:
-        existing = [row[1] for row in _conn.execute(_text("PRAGMA table_info(player_state)"))]
-        if "school_wins" not in existing:
+        result = _conn.execute(_text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_name='player_state' AND column_name='school_wins'"
+        ))
+        if result.fetchone() is None:
             _conn.execute(_text("ALTER TABLE player_state ADD COLUMN school_wins JSON"))
             _conn.commit()
             print("[startup] Added school_wins column to player_state")
