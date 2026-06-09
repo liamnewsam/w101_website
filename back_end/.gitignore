@@ -8,6 +8,14 @@ rl/checkpoints/Ice/phase1_final.pt
 rl/checkpoints/Life/phase1_final.pt
 rl/checkpoints/Myth/phase1_final.pt
 rl/checkpoints/Storm/phase1_final.pt
+
+rl/checkpoints/Balance/latest.pt
+rl/checkpoints/Death/latest.pt
+rl/checkpoints/Fire/latest.pt
+rl/checkpoints/Ice/latest.pt
+rl/checkpoints/Life/latest.pt
+rl/checkpoints/Myth/latest.pt
+rl/checkpoints/Storm/latest.pt
 rl/crashes
 rl/logs
 rl/eval
