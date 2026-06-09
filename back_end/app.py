@@ -30,7 +30,7 @@ from socketio.exceptions import ConnectionRefusedError
 # Flask + CORS Setup
 # --------------------------------------------------------
 ALLOWED_ORIGINS = [
-    "https://w101-website.vercel.app",
+    "https://w101demo.vercel.app",
     "http://localhost:5173",
 ]
 
