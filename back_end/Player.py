@@ -615,8 +615,6 @@ class DamageEffect(Effect):
         if not skip_absorb and self.target:
             dmg, pre_events = self.target.absorb_damage(dmg)
 
-        if self.owner:
-        else:
         dmg_message = {"type": "effect_resolve", "player": self.owner.user_id if self.owner else None, "aspect": "damage", "amount": dmg, "target": self.target.user_id, "school": self.school}
 
         if self.target.health - dmg <= 0:
@@ -660,10 +658,6 @@ class HealEffect(Effect):
         else:
             self.target.health += hp
             
-        if self.owner:
-        else:
-        
-
         return {"type": "effect_resolve", "player": self.owner.user_id if self.owner else None, "aspect": "heal", "amount": hp, "target": self.target.user_id}
     
 class WardEffect(Effect):
