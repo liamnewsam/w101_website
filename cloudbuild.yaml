@@ -6,6 +6,7 @@ steps:
       - gcr.io/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
       - '--builder=gcr.io/buildpacks/builder:latest'
       - '--path=back_end'
+      - '--clear-cache'
     id: Build
 
   # 2️⃣ Push container to Artifact Registry
