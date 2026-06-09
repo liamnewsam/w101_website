@@ -36,7 +36,6 @@ export async function login(username, password) {
 }
 
 export async function guestLogin() {
-  console.log("guestLogin called")
   const res = await fetch(`${BACKEND_URL}/auth/guest`, {
     method: "POST",
   });
@@ -51,13 +50,11 @@ export async function guestLogin() {
 }
 
 export function logout(disconnectSocket) {
-  console.log("removing token");
   localStorage.removeItem("token");
   if (disconnectSocket) disconnectSocket();
 }
 
 
 export function getToken() {
-  console.log("getting token");
   return localStorage.getItem("token");
 }

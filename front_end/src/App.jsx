@@ -10,17 +10,23 @@ import DeckEditorPage from "./pages/DeckEditorPage";
 import StatsPage from "./pages/StatsPage";
 import MatchHistoryPage from "./pages/MatchHistoryPage";
 import ReplayPage from "./pages/ReplayPage";
-import {useSocket} from "./socket/socketContext"
+import RLDemoLobbyPage from "./pages/RLDemoLobbyPage";
+import RLDemoResultsPage from "./pages/RLDemoResultsPage";
+import Loading from "./components/Loading";
+import { useSocket } from "./socket/socketContext";
 
 function ProtectedRoute({ element }) {
-  const { socket, connected, disconnectSocket } = useSocket();
+  const { socket, connected, authFailed } = useSocket();
+  const hasToken = !!localStorage.getItem("token");
 
-  // No token → send to login page
-  if (!socket || !connected) {
-    console.log("UH OH!!");
-    localStorage.removeItem("token");
-
+  // No token, or token was rejected by the server → send to login
+  if (!hasToken || authFailed) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Token exists but socket not yet connected → wait for connection
+  if (!socket || !connected) {
+    return <Loading />;
   }
 
   return element;
@@ -79,6 +85,17 @@ export default function App() {
       <Route
         path="/replay/:gameId"
         element={<ProtectedRoute element={<ReplayPage />} />}
+      />
+
+      {/* RL Demo — protected (needs socket), but no DB player record */}
+      <Route
+        path="/rl-demo"
+        element={<ProtectedRoute element={<RLDemoLobbyPage />} />}
+      />
+
+      <Route
+        path="/demo-results/:gameId"
+        element={<ProtectedRoute element={<RLDemoResultsPage />} />}
       />
 
       <Route path="*" element={<Navigate to="/menu" replace />} />

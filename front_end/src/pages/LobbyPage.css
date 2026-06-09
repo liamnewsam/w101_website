@@ -68,6 +68,51 @@
   font-weight: 600;
 }
 
+.team-header-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.duplicate-bot-btn {
+  background: #1e2a3a;
+  border: 1px solid #2e4a6a;
+  color: #7eaacc;
+  border-radius: 6px;
+  padding: 5px 11px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.duplicate-bot-btn:hover {
+  background: #243550;
+}
+
+.add-bot-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.bot-selector {
+  flex: 1;
+  background: #1a1a1a;
+  border: 1px solid #2e5a2e;
+  color: #7ec87e;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  appearance: auto;
+  min-width: 0;
+}
+
+.bot-selector:focus {
+  outline: none;
+  border-color: #4a8a4a;
+}
+
 .add-bot-btn {
   background: #1e3a1e;
   border: 1px solid #2e5a2e;
@@ -77,10 +122,26 @@
   font-size: 0.8rem;
   cursor: pointer;
   transition: background 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .add-bot-btn:hover {
   background: #2a4e2a;
+}
+
+.model-badge {
+  display: inline-block;
+  background: #2a1e3a;
+  border: 1px solid #5a3a8a;
+  color: #b07ecc;
+  border-radius: 3px;
+  padding: 0 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  margin-left: 5px;
+  vertical-align: middle;
+  letter-spacing: 0.04em;
 }
 
 /* ── Player tabs ────────────────────────────────────── */

@@ -1,0 +1,176 @@
+.demo-results-page {
+  min-height: 100vh;
+  background: #0a0a14;
+  color: #e8e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.8rem;
+  padding: 2rem 1rem;
+  font-family: inherit;
+}
+
+/* ── Outcome banner ── */
+.dr-outcome {
+  font-size: 3.2rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.dr-victory {
+  color: #ffd700;
+  text-shadow:
+    0 0 30px rgba(255, 215, 0, 0.7),
+    0 0 70px rgba(255, 180, 0, 0.4);
+  animation: dr-pulse 2s ease-in-out infinite;
+}
+
+.dr-defeat {
+  color: #e05c5c;
+  text-shadow: 0 0 30px rgba(224, 92, 92, 0.5);
+}
+
+@keyframes dr-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.82; }
+}
+
+.dr-subtitle {
+  font-size: 0.95rem;
+  color: #666;
+  text-align: center;
+  max-width: 400px;
+}
+
+/* ── Teams layout ── */
+.dr-teams {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 700px;
+}
+
+.dr-team-panel {
+  flex: 1 1 240px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #1e1e2e;
+  border-radius: 14px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.dr-team-panel.dr-team-won {
+  border-color: rgba(255, 215, 0, 0.3);
+  background: rgba(255, 215, 0, 0.04);
+}
+
+.dr-team-heading {
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #aaa;
+}
+
+.dr-team-panel.dr-team-won .dr-team-heading {
+  color: #ffd700;
+}
+
+/* ── Player card ── */
+.dr-player-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #1e1e2e;
+  border-radius: 10px;
+}
+
+.dr-player-card.dr-winner {
+  border-color: rgba(255, 215, 0, 0.2);
+}
+
+.dr-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #2a2a3a;
+  flex-shrink: 0;
+}
+
+.dr-player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.dr-player-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.dr-school-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.dr-school-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dr-bot-tag {
+  font-size: 0.72rem;
+  color: #9b59d0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Divider ── */
+.dr-divider {
+  width: 1px;
+  background: #1e1e2e;
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .dr-divider { display: none; }
+}
+
+/* ── Return button ── */
+.dr-return-btn {
+  padding: 13px 40px;
+  background: linear-gradient(135deg, #6a3de8 0%, #9b59d0 100%);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.18s, box-shadow 0.18s;
+  box-shadow: 0 0 22px rgba(106, 61, 232, 0.45);
+}
+
+.dr-return-btn:hover {
+  opacity: 0.88;
+  box-shadow: 0 0 34px rgba(106, 61, 232, 0.65);
+}

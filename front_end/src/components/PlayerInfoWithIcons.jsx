@@ -80,6 +80,12 @@ function statusToPopup(status) {
         ];
       }
     case "ward":
+      if (status["aspect"] == "absorb") {
+        return [
+          {"type": "text", "value": `${Math.round(status.amount)}`, "color": goodColor},
+          {"type": "image", "src": BACKEND_URL + BATTLE_PATH + `Ward.png`}
+        ];
+      }
       if (status["aspect"] == "damage") {
         return [
           {"type": "text", "value": `${status.amount}%`, "color": goodColor},

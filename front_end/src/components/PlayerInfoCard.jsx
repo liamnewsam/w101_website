@@ -17,7 +17,7 @@ export default function PlayerInfoCard({
       <div style={styles.topRow}>
         <span style={styles.name}>{displayName}</span>
         <span style={styles.healthText}>
-          {currHealth.toFixed(1)} / {maxHealth.toFixed(1)}
+          {Math.ceil(currHealth)} / {Math.ceil(maxHealth)}
         </span>
       </div>
 

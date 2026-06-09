@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSocket } from "../socket/socketContext";
 import CardHand from "../components/CardHand";
 import OrbitalGraphic from "../components/OrbitalGraphic";
@@ -23,6 +23,7 @@ export default function GamePage() {
   const { gameId } = useParams();
   const { socket } = useSocket();
   const navigate = useNavigate();
+  const { state: locationState } = useLocation();
 
   const [visualEffects, setVisualEffects] = useState([]);
   const [activatedPlayerID, setActivatedPlayerID] = useState();
@@ -34,12 +35,16 @@ export default function GamePage() {
     return () => setVisualEffects([]);
   }, []);
 
+  const isDemo = locationState?.isDemo === true;
+  const demoResultPath = isDemo ? `/demo-results/${gameId}` : undefined;
+
   const { visual, replaying, dispatch, playerAngles, authoritative, deadPlayerIds } = useGameReplay({
     socket,
     gameId,
     navigate,
     setVisualEffects,
     setActivatedPlayerID,
+    resultPath: demoResultPath,
   });
 
   // Compute clockwise-only cumulative rotation during render.
@@ -243,6 +248,7 @@ export default function GamePage() {
           cards={visual.player.hand}
           selectedIndex={selectedCardIndex}
           onSelectCard={onCardSelected}
+          onClearSelection={clearSelection}
           onDiscardCard={discardCard}
         />
 

@@ -222,8 +222,9 @@ export default function OrbitalGraphic({
                     className={`
                         player-image
                         ${(player.health == 0 || deadPlayerIds.has(player.user_id)) ? "dead" : userSelectingTarget() ? (targetIsValid(player.user_id) ? "valid-target" : "invalid-target") : ""}
-                        
+
                     `}
+                    onMouseDown={(userSelectingTarget() && targetIsValid(player.user_id)) ? (e) => e.stopPropagation() : undefined}
                     onClick={(userSelectingTarget() && targetIsValid(player.user_id)) ? () => onSelectTarget(player.user_id) : undefined}
                     style={{
                         cursor: (userSelectingTarget() && targetIsValid(player.user_id)) ? "pointer" : "default",
@@ -231,7 +232,7 @@ export default function OrbitalGraphic({
                 />
             </div>
 
-                
+
             <div style={{
                 left: `${orbit_size/2 + targetXRelative}px`,
                 top: `${orbit_size/2 + targetYRelative}px`,
@@ -292,7 +293,7 @@ export default function OrbitalGraphic({
                 onSchoolPipChange={isCurrentPlayer ? onSchoolPipChange : undefined}
             />
 
-            
+
             <div style={{ overflow: "hidden" }}>
                 <img
                     src={BACKEND_URL + "/" + player.img_path}
@@ -301,6 +302,7 @@ export default function OrbitalGraphic({
                         player-image
                         ${(player.health == 0 || deadPlayerIds.has(player.user_id)) ? "dead" : userSelectingTarget() ? (targetIsValid(player.user_id) ? "valid-target" : "invalid-target") : ""}
                     `}
+                    onMouseDown={(userSelectingTarget() && targetIsValid(player.user_id)) ? (e) => e.stopPropagation() : undefined}
                     onClick={(userSelectingTarget() && targetIsValid(player.user_id)) ? () => onSelectTarget(player.user_id) : undefined}
                     style={{
                         cursor: (userSelectingTarget() && targetIsValid(player.user_id)) ? "pointer" : "default",

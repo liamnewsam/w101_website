@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
  * - startX, startY: initial position (px)
  * - onComplete?: callback when animation ends
  */
+const CARD_W = 200;
+const CARD_H = 280;
+
 export default function CardReveal({
   imgSrc,
   startPos,
@@ -15,15 +18,15 @@ export default function CardReveal({
   const controls = useAnimation();
   const [visible, setVisible] = useState(true);
 
-  let startX = startPos.x;
-  let startY = startPos.y;
+  const startX = startPos.x;
+  const startY = startPos.y;
 
   useEffect(() => {
     async function runAnimation() {
       // 1. Spawn → move to center + grow
       await controls.start({
-        x: "-50%",
-        y: "-50%",
+        x: -CARD_W / 2,
+        y: -CARD_H / 2,
         scale: 1,
         opacity: 1,
         transition: {
@@ -62,8 +65,8 @@ export default function CardReveal({
           src={imgSrc}
           alt="Card"
           initial={{
-            x: `calc(-50% + ${startX}px)`,
-            y: `calc(-50% + ${startY}px)`,
+            x: startX - CARD_W / 2,
+            y: startY - CARD_H / 2,
             scale: 0.1,
             opacity: 0.5,
           }}
@@ -73,8 +76,9 @@ export default function CardReveal({
             position: "absolute",
             left: "50%",
             top: "50%",
-            
-            width: 200,
+            width: CARD_W,
+            height: CARD_H,
+            objectFit: "contain",
             pointerEvents: "none",
             zIndex: 1000,
           }}

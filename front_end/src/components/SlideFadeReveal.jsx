@@ -62,7 +62,8 @@ export default function SlideFadeReveal({
             pointerEvents: "none",
             zIndex: 1000,
             backgroundImage: `url(${srcImg})`,
-            backgroundSize: "cover",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
           }}
         />

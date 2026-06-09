@@ -24,21 +24,33 @@ export default function DeckEditorPage() {
   const { socket } = useSocket();
   const { player } = usePlayer();
 
+  // localMode: no DB save — return deck to returnTo route
+  const localMode  = location.state?.localMode === true;
+  const returnTo   = location.state?.returnTo ?? "/profile";
+  const playerSchool = location.state?.playerSchool ?? null;
+
   // deckIndex === null means "new deck"
   const deckIndex = location.state?.deckIndex ?? null;
   const isNew = deckIndex === null;
 
-  const initialDeck = isNew ? null : player?.decks?.[deckIndex];
+  const initialCardIds = localMode
+    ? (location.state?.cardIds ?? [])
+    : (isNew ? null : player?.decks?.[deckIndex])?.card_ids ?? [];
 
-  const [deckName, setDeckName] = useState(initialDeck?.name ?? "New Deck");
-  const [cardIds, setCardIds] = useState(initialDeck?.card_ids ?? []);
+  const [deckName, setDeckName] = useState("Demo Deck");
+  const [cardIds, setCardIds] = useState(initialCardIds);
   const [allCards, setAllCards] = useState(null); // { school: [{id,name,pips,pvp_level,img_path}] }
-  const [activeSchool, setActiveSchool] = useState(SCHOOLS[0]);
+  const [activeSchool, setActiveSchool] = useState(
+    playerSchool?.toLowerCase() ?? SCHOOLS[0]
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const nameRef = useRef(null);
 
-  const activeSchoolLevel = player?.level ?? 0;
+  // In local mode override level to 100 so all cards are accessible
+  const activeSchoolLevel = localMode
+    ? (location.state?.overrideLevel ?? 100)
+    : (player?.level ?? 0);
 
   // Fetch card catalogue once
   useEffect(() => {
@@ -82,6 +94,15 @@ export default function DeckEditorPage() {
   }
 
   function save() {
+    if (localMode) {
+      navigate(returnTo, {
+        state: {
+          customDeck: { name: deckName.trim() || "Demo Deck", card_ids: cardIds },
+          playerSchool: playerSchool ?? activeSchool,
+        },
+      });
+      return;
+    }
     setSaving(true);
     setError("");
     socket.emit(
@@ -101,7 +122,7 @@ export default function DeckEditorPage() {
     <div className="deck-editor-page">
       {/* ── Header ── */}
       <div className="de-header">
-        <button className="de-back-btn" onClick={() => navigate("/profile")}>← Back</button>
+        <button className="de-back-btn" onClick={() => navigate(localMode ? returnTo : "/profile")}>← Back</button>
         <input
           ref={nameRef}
           className="de-name-input"
@@ -111,7 +132,7 @@ export default function DeckEditorPage() {
           placeholder="Deck name"
         />
         <button className="de-save-btn" onClick={save} disabled={saving}>
-          {saving ? "Saving…" : "Save"}
+          {localMode ? "Use This Deck" : (saving ? "Saving…" : "Save")}
         </button>
       </div>
       {error && <p className="de-error">{error}</p>}

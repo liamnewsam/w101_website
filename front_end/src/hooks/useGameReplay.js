@@ -197,7 +197,6 @@ export async function processEvent(
           // falls through — activate also shows the cast animation
           break;
         case "attempt_cast":
-          console.log(event)
           setVisualEffects(effects => [...effects, {
             type: "IMAGE",
             srcImg: BACKEND_URL + BATTLE_PATH + "cast_symbols/" + event.school + ".png",
@@ -249,6 +248,18 @@ export async function processEvent(
       }
 
       switch (event.aspect) {
+        case "critical": {
+          setVisualEffects(effects => [...effects, {
+            type: "FLOATING_PRESENT",
+            items: [{ type: "text", value: "Critical!!", color: goodColor}],
+            id: crypto.randomUUID(),
+            pos: {
+                x: playerPositions[event.player].x + FLOATING_PRESENT_OFFSET_X,
+                y: playerPositions[event.player].y + FLOATING_PRESENT_OFFSET_Y
+            }
+          }]);
+          break;
+        }
         case "reshuffle": {
           setVisualEffects(effects => [...effects, {
             type: "FLOATING_PRESENT",
@@ -648,7 +659,7 @@ export async function processEvent(
   return { gs, ps };
 }
 
-export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setActivatedPlayerID }) {
+export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setActivatedPlayerID, resultPath }) {
   const [replayState, dispatch] = useReducer(replayReducer, initialReplayState);
   const { visual, replaying, eventQueue, turnQueue } = replayState;
   const [deadPlayerIds, setDeadPlayerIds] = useState(new Set());
@@ -755,7 +766,7 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
   // Navigate immediately when result arrives and no animation is in progress
   useEffect(() => {
     if (hasPendingResult && !replaying && turnQueue.length === 0) {
-      navigate(`/results/${gameId}`, { state: { result: pendingResultRef.current } });
+      navigate(resultPath ?? `/results/${gameId}`, { state: { result: pendingResultRef.current } });
     }
   }, [hasPendingResult, replaying, turnQueue.length]);
 

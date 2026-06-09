@@ -85,11 +85,9 @@ export default function StatsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    console.log("[StatsPage] socket:", socket, "connected:", socket?.connected);
     if (!socket) return;
 
     const onStats = (data) => {
-      console.log("[StatsPage] received player_stats:", data);
       if (data?.error) {
         setError(data.error);
       } else {
@@ -99,7 +97,6 @@ export default function StatsPage() {
     };
 
     socket.on("player_stats", onStats);
-    console.log("[StatsPage] emitting get_player_stats");
     socket.emit("get_player_stats");
 
     return () => socket.off("player_stats", onStats);

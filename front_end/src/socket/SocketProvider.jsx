@@ -6,10 +6,17 @@ import { SocketContext } from "./socketContext";
 export function SocketProvider({ children }) {
   const socketRef = useRef(null);
   const [connected, setConnected] = useState(false);
+  const [authFailed, setAuthFailed] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("token"));
 
   const updateToken = (t) => {
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+      setConnected(false);
+    }
     localStorage.setItem("token", t);
+    setAuthFailed(false);
     setToken(t);
   };
 
@@ -23,8 +30,16 @@ export function SocketProvider({ children }) {
       auth: { token },
     });
 
-    s.on("connect", () => setConnected(true));
+    s.on("connect", () => { setConnected(true); setAuthFailed(false); });
     s.on("disconnect", () => setConnected(false));
+    s.on("connect_error", (err) => {
+      if (err.message === "authentication failed") {
+        setAuthFailed(true);
+        localStorage.removeItem("token");
+        s.disconnect();
+        socketRef.current = null;
+      }
+    });
 
     socketRef.current = s;
 
@@ -45,6 +60,7 @@ export function SocketProvider({ children }) {
       value={{
         socket: socketRef.current,
         connected,
+        authFailed,
         disconnectSocket,
         updateToken,
       }}

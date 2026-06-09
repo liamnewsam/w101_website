@@ -7,13 +7,11 @@ export default function CardHand({
   cards,
   selectedIndex,
   onSelectCard,
-  //onClearSelection,
+  onClearSelection,
   onDiscardCard
 }) {
   const handRef = useRef(null);
 
-  /*
-  // Click outside → clear selection
   useEffect(() => {
     function handleClickOutside(e) {
       if (handRef.current && !handRef.current.contains(e.target)) {
@@ -25,7 +23,7 @@ export default function CardHand({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [onClearSelection]);*/
+  }, [onClearSelection]);
 
   function handleCardMouseDown(e, instanceId) {
     // Middle click → discard

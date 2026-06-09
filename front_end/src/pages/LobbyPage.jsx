@@ -30,6 +30,8 @@ function PlayerTab({ p, isMe, onReady, onRemoveBot }) {
   if (hovered && isMe) hintLabel = p.isReady ? "Unready" : "Ready up";
   if (hovered && p.isBot) hintLabel = "Remove";
 
+  const isModelBot = p.isBot && p.model_path;
+
   return (
     <div
       className={`player-tab${p.isReady ? " ready" : ""}${hovered && isClickable ? " tab-hovered" : ""}`}
@@ -51,6 +53,7 @@ function PlayerTab({ p, isMe, onReady, onRemoveBot }) {
         <div className="tab-name">{p.name}{isMe ? " (You)" : ""}</div>
         <div className="tab-school" style={{ color: schoolColor }}>
           {p.school ? p.school.charAt(0).toUpperCase() + p.school.slice(1).toLowerCase() : ""}
+          {isModelBot && <span className="model-badge">AI</span>}
         </div>
         <div className="tab-deck">Lv. {p.level ?? 1}</div>
       </div>
@@ -63,10 +66,19 @@ function PlayerTab({ p, isMe, onReady, onRemoveBot }) {
   );
 }
 
-function TeamBox({ team, label, players, myId, myTeam, onJoin, onAddBot, onReady, onRemoveBot }) {
+function TeamBox({
+  team, label, players, myId, myTeam,
+  onJoin, onAddBot, onAddDuplicateBot, onReady, onRemoveBot,
+  availableModels, selectedBotType, onBotTypeChange,
+}) {
   const [hovered, setHovered] = useState(false);
   const isMyTeam = myTeam === team;
   const showJoinHint = hovered && !isMyTeam && myTeam !== undefined;
+
+  function handleAddClick(e) {
+    e.stopPropagation();
+    onAddBot(selectedBotType);
+  }
 
   return (
     <div
@@ -77,12 +89,14 @@ function TeamBox({ team, label, players, myId, myTeam, onJoin, onAddBot, onReady
     >
       <div className="team-header">
         <h3 className="team-label">{label}</h3>
-        <button
-          className="add-bot-btn"
-          onClick={(e) => { e.stopPropagation(); onAddBot(); }}
-        >
-          + Add Bot
-        </button>
+        <div className="team-header-buttons">
+          <button
+            className="duplicate-bot-btn"
+            onClick={(e) => { e.stopPropagation(); onAddDuplicateBot(); }}
+          >
+            ⊕ Duplicate Me
+          </button>
+        </div>
       </div>
 
       <div className="team-players">
@@ -100,6 +114,24 @@ function TeamBox({ team, label, players, myId, myTeam, onJoin, onAddBot, onReady
         )}
       </div>
 
+      <div className="add-bot-row" onClick={(e) => e.stopPropagation()}>
+        <select
+          className="bot-selector"
+          value={selectedBotType}
+          onChange={(e) => onBotTypeChange(e.target.value)}
+        >
+          <option value="random">Random Bot</option>
+          {availableModels.map((m) => (
+            <option key={m.path} value={m.path}>
+              AI: {m.agent_school} Lv{m.agent_level} (iter {m.iteration})
+            </option>
+          ))}
+        </select>
+        <button className="add-bot-btn" onClick={handleAddClick}>
+          + Add
+        </button>
+      </div>
+
       {showJoinHint && (
         <div className="join-hint">Click to join {label}</div>
       )}
@@ -114,6 +146,9 @@ export default function LobbyPage() {
   const navigate = useNavigate();
 
   const [lobbyState, setLobbyState] = useState({ players: [], host: null });
+  const [availableModels, setAvailableModels] = useState([]);
+  const [selectedBotTypeA, setSelectedBotTypeA] = useState("random");
+  const [selectedBotTypeB, setSelectedBotTypeB] = useState("random");
 
   const myId = player?.user_id;
   const myPlayer = lobbyState.players.find((p) => p.id === myId);
@@ -127,6 +162,15 @@ export default function LobbyPage() {
     teamA.length > 0 &&
     teamB.length > 0 &&
     lobbyState.players.every((p) => p.isReady);
+
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/api/models`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.models) setAvailableModels(data.models.filter((m) => !m.error));
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!socket || !gameId) return;
@@ -157,8 +201,16 @@ export default function LobbyPage() {
     socket.emit("switch_team", { gameId, team });
   }
 
-  function addBot(team) {
-    socket.emit("add_bot", { gameId, team });
+  function addBot(team, botType) {
+    if (botType === "random") {
+      socket.emit("add_bot", { gameId, team });
+    } else {
+      socket.emit("add_model_bot", { gameId, team, model_path: botType });
+    }
+  }
+
+  function addDuplicateBot(team) {
+    socket.emit("add_duplicate_bot", { gameId, team });
   }
 
   function removeBot(botId) {
@@ -188,9 +240,13 @@ export default function LobbyPage() {
           myId={myId}
           myTeam={myTeam}
           onJoin={() => switchTeam("A")}
-          onAddBot={() => addBot("A")}
+          onAddBot={(botType) => addBot("A", botType)}
+          onAddDuplicateBot={() => addDuplicateBot("A")}
           onReady={toggleReady}
           onRemoveBot={removeBot}
+          availableModels={availableModels}
+          selectedBotType={selectedBotTypeA}
+          onBotTypeChange={setSelectedBotTypeA}
         />
         <TeamBox
           team="B"
@@ -199,9 +255,13 @@ export default function LobbyPage() {
           myId={myId}
           myTeam={myTeam}
           onJoin={() => switchTeam("B")}
-          onAddBot={() => addBot("B")}
+          onAddBot={(botType) => addBot("B", botType)}
+          onAddDuplicateBot={() => addDuplicateBot("B")}
           onReady={toggleReady}
           onRemoveBot={removeBot}
+          availableModels={availableModels}
+          selectedBotType={selectedBotTypeB}
+          onBotTypeChange={setSelectedBotTypeB}
         />
       </div>
 
