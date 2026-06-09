@@ -260,7 +260,7 @@ export default function GamePage() {
           )}
           <button className="game-btn secondary" onClick={() => {
               sendAction({ type: "leave" });
-              navigate("/menu");
+              navigate(isDemo ? "/" : "/menu");
             }}>Leave Game</button>
         </div>
       </div>
