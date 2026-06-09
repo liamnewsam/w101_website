@@ -670,7 +670,7 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
     setDeadPlayerIds(ids => { const s = new Set(ids); s.add(userId); return s; });
 
   const allUserIds = useMemo(() => {
-    if (!visual.game) return [];
+    if (!visual.game?.teams) return [];
     return visual.game.teams.flatMap(team => team.map(p => p.user_id));
   }, [visual.game]);
 
@@ -709,7 +709,9 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
     socket.emit("get_game_state", { gameId }, gs => {
       if (gs) {
         dispatch({ type: ACTIONS.SNAPSHOT, payload: { game: gs, player: null } });
-        setActivatedPlayerID(gs.teams[gs.playing_team][0].user_id);
+        setActivatedPlayerID(gs.teams?.[gs.playing_team]?.[0]?.user_id);
+      } else {
+        navigate("/menu");
       }
     });
 
