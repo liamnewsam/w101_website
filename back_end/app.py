@@ -247,7 +247,8 @@ def get_player_from_db(user_id):
 # Socket Auth
 # ========================================================
 
-connected_users = {}  # sid → user_id
+connected_users = {}       # sid → user_id
+_pending_disconnects = {}  # user_id → {"timer": threading.Timer, "gameID": str}
 
 
 @socketio.on("connect")
@@ -267,6 +268,19 @@ def on_connect(auth):
     # Bind socket → identity
     connected_users[request.sid] = user_id
 
+    # Cancel any pending disconnect timer (player reconnected in time)
+    if user_id in _pending_disconnects:
+        info = _pending_disconnects.pop(user_id)
+        info["timer"].cancel()
+        gameID = info["gameID"]
+        lobby = lobbies.get(gameID)
+        if lobby and user_id in lobby.players:
+            lp = lobby.players[user_id]
+            lp.sid = request.sid
+            join_room(gameID)
+            join_room(gameID + ":" + lp.team)
+            socketio.emit("player_reconnected", {"userId": user_id}, room=gameID)
+
 @socketio.on("disconnect")
 def on_disconnect():
     sid = request.sid
@@ -281,16 +295,25 @@ def on_disconnect():
         print(f"[disconnect] removed player {user_id} from lobby {gameID}")
 
         if lobby.started:
-            _handle_in_game_leave(gameID, lobby, user_id)
+            # Grace period: 30 seconds to reconnect before being kicked
+            def _kick(uid=user_id, gid=gameID):
+                _pending_disconnects.pop(uid, None)
+                lob = lobbies.get(gid)
+                if lob and uid in lob.players:
+                    _handle_in_game_leave(gid, lob, uid)
+                    lob.players.pop(uid, None)
+
+            timer = threading.Timer(30.0, _kick)
+            _pending_disconnects[user_id] = {"timer": timer, "gameID": gameID}
+            timer.start()
+            socketio.emit("player_disconnected", {"userId": user_id, "timeout": 30}, room=gameID)
         else:
             del lobby.players[user_id]
             if not any(not p.isBot for p in lobby.players.values()):
                 del lobbies[gameID]
-                print(f"[disconnect] removed empty lobby {gameID}")
             else:
                 socketio.emit("update_lobby_state", lobby.snapshot(), room=gameID)
-
-        lobby.players.pop(user_id, None)
+            lobby.players.pop(user_id, None)
         break  # socket belongs to only one lobby
 
 
@@ -1465,7 +1488,11 @@ def player_action(data):
 
     
     if action["type"] == "leave":
-        # Leave the socket rooms first so the leaver doesn't receive further game events
+        # Cancel any pending reconnect timer for this player
+        info = _pending_disconnects.pop(user_id, None)
+        if info:
+            info["timer"].cancel()
+
         leave_room(gameId)
         leave_room(gameId + ":A")
         leave_room(gameId + ":B")
