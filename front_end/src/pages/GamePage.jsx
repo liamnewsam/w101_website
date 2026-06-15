@@ -49,7 +49,7 @@ export default function GamePage() {
   })();
   const missingGamePath = (isDemo || tokenType === "demo") ? "/" : "/menu";
 
-  const { visual, replaying, dispatch, playerAngles, authoritative, deadPlayerIds } = useGameReplay({
+  const { visual, replaying, dispatch, playerAngles, authoritative, deadPlayerIds, disconnectedPlayers } = useGameReplay({
     socket,
     gameId,
     navigate,
@@ -281,6 +281,25 @@ export default function GamePage() {
             }}>Leave Game</button>
         </div>
       </div>
+
+      {disconnectedPlayers.size > 0 && (() => {
+        const names = [...disconnectedPlayers].map(uid => {
+          for (const team of (visual.game?.teams ?? [])) {
+            const p = team.find(p => p.user_id === uid);
+            if (p) return p.name;
+          }
+          return "A player";
+        });
+        return (
+          <div className="game-reconnect-overlay">
+            <div className="game-reconnect-box">
+              <div className="game-reconnect-spinner" />
+              <p>{names.join(", ")} {names.length === 1 ? "has" : "have"} disconnected.</p>
+              <p>Waiting for reconnect… (30s)</p>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

@@ -663,6 +663,7 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
   const [replayState, dispatch] = useReducer(replayReducer, initialReplayState);
   const { visual, replaying, eventQueue, turnQueue } = replayState;
   const [deadPlayerIds, setDeadPlayerIds] = useState(new Set());
+  const [disconnectedPlayers, setDisconnectedPlayers] = useState(new Set());
   const pendingResultRef = useRef(null);
   const [hasPendingResult, setHasPendingResult] = useState(false);
 
@@ -706,6 +707,14 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
       addDeadPlayer(userId);
     });
 
+    socket.on("player_disconnected", ({ userId }) => {
+      setDisconnectedPlayers(s => { const n = new Set(s); n.add(userId); return n; });
+    });
+
+    socket.on("player_reconnected", ({ userId }) => {
+      setDisconnectedPlayers(s => { const n = new Set(s); n.delete(userId); return n; });
+    });
+
     socket.emit("get_game_state", { gameId }, gs => {
       if (gs?.teams) {
         dispatch({ type: ACTIONS.SNAPSHOT, payload: { game: gs, player: null } });
@@ -728,6 +737,8 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
       socket.off("turn_resolved");
       socket.off("match_finished");
       socket.off("player_left");
+      socket.off("player_disconnected");
+      socket.off("player_reconnected");
       socket.emit("unwatch_game", { gameId });
     };
   }, [socket, gameId, navigate]);
@@ -782,5 +793,6 @@ export function useGameReplay({ socket, gameId, navigate, setVisualEffects, setA
     playerAngles,
     authoritative: replayState.authoritative,
     deadPlayerIds,
+    disconnectedPlayers,
   };
 }

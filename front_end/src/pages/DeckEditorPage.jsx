@@ -33,12 +33,30 @@ export default function DeckEditorPage() {
   const deckIndex = location.state?.deckIndex ?? null;
   const isNew = deckIndex === null;
 
-  const initialCardIds = localMode
-    ? (location.state?.cardIds ?? [])
-    : (isNew ? null : player?.decks?.[deckIndex])?.card_ids ?? [];
+  // Draft key for localStorage auto-save (null in localMode — no persistence needed)
+  const draftKey = localMode ? null : `w101_deck_draft_${isNew ? "new" : deckIndex}`;
 
-  const [deckName, setDeckName] = useState("Demo Deck");
-  const [cardIds, setCardIds] = useState(initialCardIds);
+  const [deckName, setDeckName] = useState(() => {
+    if (draftKey) {
+      try {
+        const draft = JSON.parse(localStorage.getItem(draftKey));
+        if (draft?.name) return draft.name;
+      } catch {}
+    }
+    if (!isNew) return player?.decks?.[deckIndex]?.name ?? "New Deck";
+    return "New Deck";
+  });
+
+  const [cardIds, setCardIds] = useState(() => {
+    if (localMode) return location.state?.cardIds ?? [];
+    if (draftKey) {
+      try {
+        const draft = JSON.parse(localStorage.getItem(draftKey));
+        if (draft?.cardIds) return draft.cardIds;
+      } catch {}
+    }
+    return (isNew ? null : player?.decks?.[deckIndex])?.card_ids ?? [];
+  });
   const [allCards, setAllCards] = useState(null); // { school: [{id,name,pips,pvp_level,img_path}] }
   const [activeSchool, setActiveSchool] = useState(
     playerSchool?.toLowerCase() ?? SCHOOLS[0]
@@ -59,6 +77,12 @@ export default function DeckEditorPage() {
       .then(setAllCards)
       .catch(() => setError("Failed to load cards."));
   }, []);
+
+  // Auto-save draft to localStorage on every change
+  useEffect(() => {
+    if (!draftKey) return;
+    localStorage.setItem(draftKey, JSON.stringify({ name: deckName, cardIds }));
+  }, [deckName, cardIds, draftKey]);
 
   // Count how many of each card id are in the deck
   const counts = useMemo(() => {
@@ -110,8 +134,12 @@ export default function DeckEditorPage() {
       { deckIndex: isNew ? null : deckIndex, name: deckName.trim() || "New Deck", card_ids: cardIds },
       (resp) => {
         setSaving(false);
-        if (resp?.ok) navigate("/profile");
-        else setError(resp?.error ?? "Failed to save deck.");
+        if (resp?.ok) {
+          if (draftKey) localStorage.removeItem(draftKey);
+          navigate("/profile");
+        } else {
+          setError(resp?.error ?? "Failed to save deck.");
+        }
       }
     );
   }
